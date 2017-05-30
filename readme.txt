@@ -16,8 +16,3 @@
 # 
 #     You should have received a copy of the GNU General Public License
 #     along with Eirene.  If not, see <http://www.gnu.org/licenses/>.
-
-
-Thank you for trying Eirene!  Please check back with us in the coming weeks for extended
-documentation, example files, and updates.  If or any reason you need to contact the
-author, his contact information can be found at www.gregoryhenselman.org.
