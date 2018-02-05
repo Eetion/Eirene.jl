@@ -4795,7 +4795,7 @@ end
 ##########################################################################################
 
 ####	BARCODE PLOTTING
-####	Contributed by Paul Breiding, 25 January 2018
+####	Contributed by Paul Breiding and Sara Kališnik Verovšek, 25 January 2018
 
 ##########################################################################################
 
