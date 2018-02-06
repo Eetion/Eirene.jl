@@ -13,11 +13,7 @@ git:
 
 ## uncomment the following lines to allow failures on nightly julia
 ## (tests will run but not make your overall status red)
-<<<<<<< HEAD
 matrix:
-=======
-# matrix:
->>>>>>> 587baac04bd9cae2d5bceb2518150e50f33bebc5
  allow_failures:
  - julia: nightly
 
