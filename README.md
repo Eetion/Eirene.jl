@@ -39,7 +39,7 @@ then you will want to append `Eirene.` to the beginning of each function in the 
 julia> C = Eirene.eirene(x, model = "pc")
 ```
 
-**Note 2**  For a richer example using real-world demography data, visit [gregoryhenselman.org](gregoryhenselman.org/eirene).  The documentation on this page is written for an older version of Eirene, so the commands may need to be modified according to the guidelines below.
+**Note 2**  For a richer example using real-world demography data, visit gregoryhenselman.org/eirene.  The documentation on this page is written for an older version of Eirene, so the commands may need to be modified according to the guidelines below.
 
 ### Keywords
 <br>
