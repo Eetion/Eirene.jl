@@ -128,7 +128,7 @@ end
 
 ##########################################################################################
 
-# NOTA BENE: eirene permutes vertex labels prior to calculation;
+# NB: eirene permutes vertex labels prior to calculation;
 # all versions of <vertexrealization> must be interpreted with
 # respect to the PERMUTED labeling scheme
 function vertexrealization(farfaces,firstv,facecardinality,facenames)
@@ -163,14 +163,14 @@ function vertexrealization(farfaces,firstv,facecardinality,facenames)
 	return vrealization
 end
 
-# NOTA BENE: eirene permutes vertex labels prior to calculation;
+# NB: eirene permutes vertex labels prior to calculation;
 # all versions of <vertexrealization> must be interpreted with
 # respect to the PERMUTED labeling scheme
 function vertexrealization(D::Dict,facecardinality,facenames)
 	return vertexrealization(D["farfaces"],D["firstv"],facecardinality,facenames)
 end
 
-# NOTA BENE: eirene permutes vertex labels prior to calculation;
+# NB: eirene permutes vertex labels prior to calculation;
 # all versions of <vertexrealization> must be interpreted with
 # respect to the PERMUTED labeling scheme
 function vertexrealization(D::Dict;dim = 1, class = 1)
@@ -187,7 +187,7 @@ function vertexrealization(D::Dict;dim = 1, class = 1)
 	vrealization = vertexrealization(D::Dict,facecard,rep)
 end
 
-# NOTA BENE: eirene permutes vertex labels prior to calculation;
+# NB: eirene permutes vertex labels prior to calculation;
 # the output of <incidentverts> must be interpreted with respect
 # to the PERMUTED labeling scheme
 function incidentverts(farfaces,firstv,facecardinality,facenames)
@@ -221,14 +221,14 @@ function incidentverts(farfaces,firstv,facecardinality,facenames)
 	return find(vsupp)
 end
 
-# NOTA BENE: eirene permutes vertex labels prior to calculation;
+# NB: eirene permutes vertex labels prior to calculation;
 # the output of <incidentverts> must be interpreted with respect
 # to the PERMUTED labeling scheme
 function incidentverts(D::Dict,facecardinality,facenames)
 	return incidentverts(D["farfaces"],D["firstv"],facecardinality,facenames)
 end
 
-# NOTA BENE: eirene permutes vertex labels prior to calculation;
+# NB: eirene permutes vertex labels prior to calculation;
 # the output of <incidentverts> must be interpreted with respect
 # to the PERMUTED labeling scheme
 function incidentverts(D::Dict;dim=1,class=1)
@@ -435,6 +435,12 @@ function ff2complex(farfaces,firstv;maxcard = length(farfaces))
 	return Nrv,Ncp
 end
 
+function eirened2complex(C)
+	rv,cp 	= 	boundarymatrices(C)
+	f 		= 	ocff2of(C["grain"],C["ocg2rad"])
+	return 		rv,cp,f
+end
+
 function ocff2of(grain::Array{Int64},ocg2rad::Array{Int64})
 	m = length(grain)
 	filt = Array{Int64}(m)
@@ -600,7 +606,7 @@ end
 
 #=
 
-NOTA BENE
+NB
 - Input argument <grain> must be arranged least to greatest
 
 OUTPUTS
@@ -644,12 +650,21 @@ function filteredmatrixfromfarfaces{Tv}(
 	lowtranslator = zeros(Tv,numlows)
 	lowtranslator[pplows] = 1:numppair
 
-	if !isempty(nplows) && sd > 2
-		npfilt = grain[sd-1][nplows]
-		nporder = integersinsameorder(npfilt)
+	# if !isempty(nplows) && sd > 2
+	# 	npfilt = grain[sd-1][nplows]
+	# 	nporder = integersinsameorder(npfilt)
+	# 	addinteger!(nporder,numppair)
+	# else
+	# 	nporder = (numppair+1):(numppair+length(nplows))
+	# end
+
+	if sd > 1
+		npfilt 	= 	grain[sd-1][nplows]
+		nporder = 	integersinsameorder(npfilt)
 		addinteger!(nporder,numppair)
 	else
-		nporder = (numppair+1):(numppair+length(nplows))
+		npfilt 	= 	zeros(Int64,0)
+		nporder =	zeros(Int64,0)
 	end
 
 	lowtranslator[nplows] = nporder
@@ -878,7 +893,7 @@ end
 notes on morselu!
 - 	the output array tid has size equal to the number of columns of the
 	input array, NOT the column-rank of the input array
--	the columns of M must be ordered by grain
+-	the columns of M must be ordered by grain (ascending)
 -	the first (rank of M) elements of tlab index the complete set
 	of nonzero columns in the reduced matrix
 =#
@@ -983,7 +998,7 @@ function morselu!{Tv<:Integer}(
 	return Srv,Scp,Sprows,Spcols,tlab,maxnz
 end
 
-function persistF2_core_cell(
+function persistf2_core_cell(
 	Nrv,
 	Ncp,
 	grain;
@@ -1058,6 +1073,9 @@ function persistF2_core_cell(
 		if verbose
 			println("Constructed Morse boundary operator, columns indexed by cells of dimension $(sd-1)")
 		end
+		# NB: It is critical that the columns of the input array should
+		# be ordered according to filtration; in particular, the entries of
+		# lowfiltemp should increase monotonically
 		Srv,Scp,Sphigs,Splows,tlab,maxnz =
 		morselu!(
 			Mrv,
@@ -1081,7 +1099,7 @@ function persistF2_core_cell(
 	return trv,tcp,plo,phi,tid,maxnzs
 end
 
-function persistF2_core_vr(
+function persistf2_core_vr(
 	farfaces::Array{Array{Int64,1},1},
 	firstv::Array{Array{Int64,1},1},
 	prepairs::Array{Array{Int64,1},1},
@@ -1141,6 +1159,33 @@ function persistF2_core_vr(
 		end
 		pplow = convert(Array,length(prepairs[sd]):-1:1)
 		pphig = convert(Array,length(prepairs[sd]):-1:1)
+		####################################################################################
+		# if sd == 2
+		# 	mrv, mcp 	= 	transposeLighter(Mrv,Mcp,Mm[1])
+		# 	println()
+		# 	mfull 		= 	ss2full(mrv,mcp,length(Mcp)-1)
+		# 	mfull 		=   [higfilttemp[:]';mfull]
+		# 	mfull 		= 	[[0;lowfilttemp[:]] mfull]
+		# 	println("M transpose (decorated):")
+		# 	display(mfull)
+		# 	println()
+		# 	println("prepairs")
+		# 	display(prepairs)
+		# 	println("lowlab")
+		# 	display(lowlab)
+		# 	println("higlab")
+		# 	display(higlab)
+		# 	println("pplow, pphig")
+		# 	display(pplow)
+		# 	display(pphig)
+		# 	println("Mm")
+		# 	display(Mm)
+		# end
+		##############################################################################
+
+		# NB: It is critical that the columns of the input array should
+		# be ordered according to filtration; in particular, the entries of
+		# lowfiltemp should increase monotonically
 		Srv,Scp,Sphigs,Splows,tlab,maxnz =
 		morselu!(
 			Mrv,
@@ -1164,7 +1209,7 @@ function persistF2_core_vr(
 	return trv,tcp,plo,phi,tid,maxnzs
 end
 
-function persistF2!(
+function persistf2!(
 	D::Dict;maxcard=0,
 	dictionaryoutput::Bool = true,
 	verbose::Bool = false,
@@ -1179,7 +1224,7 @@ function persistF2!(
 	end
 
 	trv,tcp,plo,phi,tid,maxnzs =
-	persistF2_core_vr(farfaces,firstv,prepairs,grain,maxcard::Integer;record=record,verbose = verbose)
+	persistf2_core_vr(farfaces,firstv,prepairs,grain,maxcard::Integer;record=record,verbose = verbose)
 	if dictionaryoutput == true
 		D["trv"] = trv
 		D["tcp"] = tcp
@@ -1187,13 +1232,22 @@ function persistF2!(
 		D["plo"] = plo
 		D["phi"] = phi
 		D["maxnz"] = maxnzs
+		###########################################################################################
+		# Dtrv 		= trv[2]
+		# Dtcp 		= tcp[2]
+		# Drv,Dcp 	= transposeLighter(Dtrv,Dtcp,length(Dtcp)-1)
+		# Dfull 		= ss2full(Drv,Dcp,length(Dcp)-1)
+		# Dfull 		= [[0;tid[2][:]] [tid[2]';Dfull]]
+		# println("Dfull (decorated):")
+		# display(Dfull)
+		#############################################################################
 		return D
 	else
 		return trv,tcp,plo,phi,tid
 	end
 end
 
-function persistF2_vr(
+function persistf2vr(
 	s,
 	maxcard;
 	model 			= "vr",
@@ -1201,8 +1255,9 @@ function persistF2_vr(
 	minrad			= -Inf,
 	maxrad			= Inf,
 	numrad			= Inf,
+	nodrad  		= [],
 	fastop			= true,
-	vscale			= "default",
+	vscale			= "diagonal",
 	pointlabels 	= [],
 	verbose 		= false,
 	record 			= "cyclerep")
@@ -1253,6 +1308,7 @@ function persistF2_vr(
 		"maxrad"		=> maxrad,
 		"minrad"		=> minrad,
 		"numrad"		=> numrad,
+		"nodrad"		=> nodrad,
 		"fastop"		=> fastop,
 		"record"	 	=> record,
 		"version" 		=> Pkg.installed("Eirene"),
@@ -1295,28 +1351,62 @@ function persistF2_vr(
 	s = convert(Array{Float64,2},s)
 	if model == "pc"
 		d = Distances.pairwise(Euclidean(),s)
+		if !isempty(nodrad)
+			for 	i 	= 	1:numpoints
+				d[i,i] 	= 	nodrad[i]
+			end
+		end
 	elseif model == "vr"
 		d = convert(Array{Float64,2},s)
 	end
 
-	(t,ocg2rad) = ordercanonicalform_3(
-		d;
-		minrad=minrad,
-		maxrad=maxrad,
-		numrad=numrad,
-		fastop=fastop,
-		vscale=vscale,
-		verbose = verbose)
+	################################################################################
+	d 			= 	minmaxceil(		d,
+									minrad 	= 	minrad,
+									maxrad 	= 	maxrad,
+									numrad 	= 	numrad)
+
+	# vfilt 		= 	diag(t)
+	# recall that t will have the same order (NOT inverted) as d
+	# <trueordercanonicalform> is a bit like <integersinsameorder>, just valid for floating point inputs, and with a bit more data in the output
+	t,ocg2rad 	= 	trueordercanonicalform(d)
+	t 			= 	1+maximum(t)-t
+	ocg2rad 	= 	flipdim(ocg2rad,1)
+
+	if 	any(d.>maxrad)
+		t 		= 	t-1
+		deleteat!(ocg2rad,1)
+	end
+
+	vertices2keep 	= 	find(diag(t).!=0)  # this step is necessary in order to cover the case where some vertices never enter the filtration
+	t 				= 	t[vertices2keep,vertices2keep]
+
+	# if 	ocg2rad[end] 	== 	Inf
+	# (t,ocg2rad)
+	################################################################################
+
+	# (t,ocg2rad) = ordercanonicalform_4(
+	# 	d;
+	# 	minrad=minrad,
+	# 	maxrad=maxrad,
+	# 	numrad=numrad, # note we have already performed the necessary rounding by this point
+	# 	fastop=fastop,
+	# 	vscale=vscale,
+	# 	verbose = verbose)
 
 	#### Build the complex
 	D = buildcomplex3(t,maxcard;verbose = verbose)
 	D["ocg2rad"]=ocg2rad
+	################################################################################
+
+	################################################################################
 
 	#### Compute persistence
-	persistF2!(D;verbose = verbose,record = record)
+	persistf2!(D;verbose = verbose,record = record)
 
 	#### Store input data
-	D["input"] = input
+	D["input"] 		= 	input
+	D["nvl2ovl"]	= 	vertices2keep[D["nvl2ovl"]]  # this covers the case where some vertices never enter the filtration
 
 	#### Store generators
 	#gc()
@@ -1350,15 +1440,28 @@ end
 	- line 1: cell dimensions
 	- line 2: cell filtrations
 	- line 3: boundary matrix row values
-	- line 4: coundary matric column pattern
+	- line 4: boundary matrix column pattern
+
+NB: the default value for maxdim has not been tested, and may cause errors;
+the -3 accounts for (1) julia uses 1-indexed arrays, (2) to calculate
+homology in dimension p, one must inspect the (p+1)-dimensional boundary
+operator, (3) this operator should be givent the same treatment as those
+that precede it ... generally this assumes that the next one up is at least
+defined, even if it is trivial.
 =#
-function persistF2_cell(filepath::String;
+function persistf2complex(filepath::String;
 						maxdim=Inf,
 						record = "cyclerep",
 						verbose=false)
 	rv,cp,fv,dp 	= 	filepath2unsegmentedfilteredcomplex(filepath)
-	C  				= 	persistF2_cell(
-						rv,cp,fv,dp,
+	if 	maxdim 		== 	Inf
+		maxdim 		= 	length(dp)-3
+	end
+	C  				= 	persistf2complex(
+						rv = rv,
+						cp = cp,
+						fv = fv,
+						dp = dp,
 						maxdim=maxdim,
 						record=record,
 						verbose=verbose)
@@ -1433,21 +1536,31 @@ function unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ndim=In
 	return rvc,cpc,fvc
 end
 
-# version with 4 (integer array) non-keyword arguments
-# rv:row values, cp: column pattern, fv: filtration values, dp: dimension pattern
-function persistF2_cell(rv::Array{Int64,1},
-						cp::Array{Int64,1},
-						fv::Array{Float64,1},
-						dp::Array{Int64,1};
-						maxdim=length(dp),
-						record = "cyclerep",
-						verbose=false)
-	rvc,cpc,fvc = unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ndim=maxdim+2)
-	return persistF2_cell(rvc,cpc,fvc;maxdim=maxdim,record = record,verbose=false)
-end
+#=
+version with 4 (integer array) non-keyword arguments
+- 	rv:	row values
+- 	cp: column pattern
+- 	fv: filtration values
+- 	dp: dimension pattern (satisfies cran(dp,j) = {cells of dimension j-1})
 
-# version with 3 (array of arrays) non-keyword arguments
-function persistF2_cell(rv,cp,filt;maxdim=length(rv),record = "cyclerep",verbose=false)
+NB: the default value for maxdim has not been tested, and may cause errors;
+the -3 accounts for (1) julia uses 1-indexed arrays, (2) to calculate
+homology in dimension p, one must inspect the (p+1)-dimensional boundary
+operator, (3) this operator should be givent the same treatment as those
+that precede it ... generally this assumes that the next one up is at least
+defined, even if it is trivial.
+=#
+function persistf2complex(	;
+							rv 			= zeros(Int64,0),
+							cp 			= zeros(Int64,0),
+							fv 			= zeros(Int64,0),
+							dp 			= zeros(Int64,0),
+							maxdim		= length(dp)-3,
+							record 		= "cyclerep",
+							verbose		= false)
+	if !isempty(dp)
+		rv,cp,fv = unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ndim=maxdim+2)
+	end
 
 	### Record the input parameters
 	input = Dict(
@@ -1459,28 +1572,29 @@ function persistF2_cell(rv,cp,filt;maxdim=length(rv),record = "cyclerep",verbose
 		"record" 		=> record
 		)
 
-	n = length(rv)
+    complexdim 		= 	p -> length(fv[p])
+	maxcard 		= 	maxdim+2
 
 	### Format the grain data
 	# Concatenate the grain vectors
-	numcells = 0
-	for i = 1:n
-		numcells+=length(filt[i])
+	numcells 		= 	0
+	for p 			= 	1:maxcard
+		numcells   += 	complexdim(p)
 	end
 	filt1 = Array{Float64}(numcells)
 	numcells = 0
-	for i = 1:n
-		l = length(filt[i])
-		filt1[numcells+1:numcells+l] = filt[i]
-		numcells += l
+	for p 								= 	1:maxcard
+		l 								= 	complexdim(p)
+		filt1[numcells+1:numcells+l] 	= 	fv[p]
+		numcells   					   += 	l
 	end
 
 	# Convert to order canonical form
 	filt2 = integersinoppositeorder_nonunique(filt1)
-	ocff = fill(Array{Int64}(0),n+3)
+	ocff = fill(Array{Int64}(0),maxcard+3)
 	numcells = 0
-	for i = 1:n
-		l = length(filt[i])
+	for i = 1:maxcard
+		l = length(fv[i])
 		ocff[i] = filt2[numcells+1:numcells+l]
 		numcells += l
 	end
@@ -1491,7 +1605,7 @@ function persistF2_cell(rv,cp,filt;maxdim=length(rv),record = "cyclerep",verbose
 
 	### Perform the persistence computation
 	trv,tcp,plo,phi,tid =
-	persistF2_core_cell(
+	persistf2_core_cell(
 		rv,
 		cp,
 		ocff;
@@ -1628,6 +1742,11 @@ function maxnonsingblock_simplex(farfaces,firstv,plo,phi,tid,sd;verbose=false)
 	numnlpl = numl-length(plo[sd-1])
 
 	lowtranslator = zeros(Int64,numl)
+	############################################################################################################
+	# println()
+	# println("noneror message sd = $(sd)")
+	#################################################################################
+
 	lowtranslator[tid[sd]] = 1:numnlpl
 	brv = ff2aflight(farfaces,firstv,sd,phi[sd])
 	brv = reshape(brv,length(brv))
@@ -1644,6 +1763,10 @@ function maxnonsingblock_cell(rv,cp,plo,phi,tid,sd;verbose=false)
 	numnlpl = numl-length(plo[sd-1])
 
 	lowtranslator = zeros(Int64,numl)
+	############################################################################################################
+	# println()
+	# println("noneror message sd = $(sd)")
+	#################################################################################
 	lowtranslator[tid[sd]] = 1:numnlpl
 	dummy0 = zeros(Int64,0)
 
@@ -1676,6 +1799,16 @@ function unpack!(D::Dict)
 		Rrv[maxcard]=Array{Int64,1}(0)
 		Rcp[maxcard]=Array{Int64,1}(0)
 	end
+	#################################################################################################
+	# println()
+	# println("nonerror message: N = $(N)")
+	# if haskey(D,"rv")
+	# 	l 	= length(D["rv"])
+	# 	println("length(D[\"rv\"]) = $(l)")
+	# 	l 	= 	D["input"]["maxdim"]
+	# 	println("D[\"input\"][\"maxdim\"] = $(l)")
+	# end
+	####################################################################################
 	for i = 2:N
 		Lrv[i],Lcp[i],Lirv[i],Licp[i],Rrv[i],Rcp[i] = boundarylimit(D,i)
 		if isempty(Lcp[i])
@@ -2751,24 +2884,165 @@ end
 
 ##########################################################################################
 
-function customceil(N,a,b,numrad)
-	S = copy(N)
-	ran = linspace(a,b,numrad)
-	ran = convert(Array{Float64},ran)
-	ran[1] 		= a
-	ran[end] 	= b
-	append!(ran,[Inf])
-	for j = 1:(m-1)
-		for i = (j+1):m
-			post = 1
-			while ran[post] < N[i,j]
-				post+=1
-			end
-			S[i,j] = ran[post]
-			S[j,i] = ran[post]
+#=
+The output of this function is obtatined by *first* rounding all values below
+minrad up to minrad, *then* rounding all values above maxrad up to Inf, *then*
+rounding the entries valued in [minrad,maxrad] to the nearest greater element of
+[minrad:numrad:maxrad], where by definition [minrad:Inf:maxrad] is the closed
+inteveral containing all reals between minrad and maxrad.
+If minrad == -Inf, then we set it to minimum(N) before performing any operations.
+If maxrad == Inf, then we set it to maximum(N) before performing any operations.
+=#
+function minmaxceil(N;minrad=minimum(N),maxrad=maximum(N),numrad=Inf)
+	# if !issymmetric(N)
+	# 	println()
+	# 	println("error: input N must be symmetric")
+	# 	return
+	# end
+
+	S 	= 	Array{Float64}(copy(N)) #NB it has been verified experimentally that it is VERY important to use the copy function here
+
+	if 	(minrad == Inf) || (maxrad == -Inf)
+		return fill(Inf,size(S)...)
+	end
+
+	if minrad == "minedge"
+		minrad = minimum(offdiagmin(S))
+	end
+
+	S[S.<minrad] 	= 	minrad
+	S[S.>maxrad] 	= 	Inf
+
+	fi 	= 	find(isfinite,S) # stands for finite indices
+	fv 	= 	S[fi]
+
+	if isempty(fv)
+		return S
+	end
+
+	if minrad 	== 	-Inf
+		minrad 	=  	minimum(fv)
+	end
+	if maxrad 	== 	Inf
+		maxrad 	= 	maximum(fv)
+	end
+	if numrad 	== 	1
+		S[fi]	= 	maxrad
+		return 	S
+	end
+	if numrad 	== 	Inf
+		return S
+	end
+
+	ran 		= 	linspace(minrad,maxrad,numrad)
+	ran 		= 	Array{Float64}(ran)
+	ran[end] 	= 	maxrad
+
+	fvr 		= 	ceil2grid(fv,ran)
+
+	S[fi]		= 	fvr
+
+	return 		S
+    #
+	# if 	(minimum(N) == -Inf) || (maximum(N) == Inf) || (minrad == Inf) || (maxrad == -Inf)
+	# 	println()
+	# 	println("error: N must have finite entries, minrad must not be Inf, and maxrad must not be -Inf")
+	# 	return
+	# end
+	# if 	numrad < 1
+	# 	println()
+	# 	println("error: numrad must be positive")
+	# 	return
+	# end
+    #
+	# minrad 		= 	Float64(minrad) # this conversion is necessary to ensure that <linspace> functions properly
+	# maxrad 		= 	Float64(maxrad)
+    #
+	# if 	minrad 	== 	-Inf
+	# 	minrad 	= 	minimum(N)
+	# end
+	# if maxrad 	== 	Inf
+	# 	maxrad 	= 	maximum(N)
+	# end
+	# m 	= 	size(N,1)
+	# S 	= copy(N)
+    #
+	# if 	numrad 	== 	Inf
+	# 	S[S.<minrad] = minrad
+	# 	S[S.>maxrad] = Inf
+	# 	return S
+	# end
+	# if 	numrad 	== 	1
+	# 	S[S.<maxrad] 	= 	maxrad
+	# 	S[S.>maxrad] 	= 	Inf
+	# 	return S
+	# end
+    #
+	# ###################################################################################################
+	# if max(maxrad,numrad) == Inf
+	# 	println()
+	# 	println("maxrad = $(maxrad), numrad = $(numrad), maximum(N) = $(maximum(N))")
+	# end
+	# ##########################################################################################
+	# ran = linspace(minrad,maxrad,numrad)
+	# ran = convert(Array{Float64},ran)
+	# ran[1] 		= minrad
+	# ran[end] 	= maxrad # note that ran[end] would not always equal maxrad if we did not to this; it's an artifact of numerical precision in julia
+	# append!(ran,[Inf])
+	# for j = 1:m
+	# 	for i = j:m
+	# 		post = 1
+	# 		while ran[post] < N[i,j]
+	# 			post+=1
+	# 		end
+	# 		S[i,j] = ran[post]
+	# 		S[j,i] = ran[post]
+	# 	end
+	# end
+	# return S
+end
+
+# ran should be an array in sorted order, with ran[end] >= maximum(A)
+function ceil2grid(A,ran)
+	if 	ran 			== 		"all"
+		return A
+	end
+	B 					= 		copy(A)
+	for j 				= 		1:length(A)
+		post 			= 		1
+		while ran[post] < A[j]
+			post+=1
+		end
+		B[j] 			= 		ran[post]
+	end
+	return B
+end
+
+function batchcheckceil2grid(numits)
+	for 	p 	=	1:numits
+		A 		= 	rand(70)
+		ran 	= 	sort(rand(20))
+		ran 	= 	ran*(1/maximum(ran)) # this guarantees that maximum(ran) > maximum(A)
+		crct 	= 	crosscheckceil2grid(A,ran)
+		if !crct
+			println()
+			println("error: please check batchcheckceil2grid")
 		end
 	end
-	return S
+end
+
+function crosscheckceil2grid(A,ran)
+	B 		= 	ceil2grid(A,ran)
+	for j 	= 	1:length(A)
+		q 	= 	findfirst(ran.>A[j])
+		val = 	ran[q]
+		if B[j] 	!= 	val
+			println()
+			println("error: please check <checkceil2grid>")
+			return false
+		end
+	end
+	return true
 end
 
 function ocfcheckfun3()
@@ -2825,8 +3099,8 @@ function ocfcheckfun3()
 			end
 			maxentry = maximum(N)
 
-			Q = customceil(copy(M),minentry,upperlim,numrad)
-			N = customceil(copy(M),minentry,maxentry,numrad)
+			Q = minmaxceil(copy(M),minentry,upperlim,numrad)
+			N = minmaxceil(copy(M),minentry,maxentry,numrad)
 			for i = 1:m
 				N[i,i] = Inf
 				Q[i,i] = Inf
@@ -2922,6 +3196,7 @@ function ocfcheckfun3()
 			end
 		end
 	end
+	return "passedtest"
 end
 
 function offdiagmin(S,i)
@@ -2932,6 +3207,51 @@ function offdiagmin(S,i)
 	else
 		return min(minimum(S[1:i-1,i]),minimum(S[i+1:end,i]))
 	end
+end
+
+function offdiagmean(S;defaultvalue=[])
+	m,n 	= 	size(S)
+	if m 	!= 	n
+		println()
+		println("error in <offdiagmean>: input matrix should be square")
+	end
+	if isempty(defaultvalue)
+		println()
+		println("warning: no defaulvalue was set for <offdiagmin>; this parameter has been set to 0")
+		defaultvalue 	= 	0
+	end
+	if m 		== 	1
+		return 	defaultvalue
+	end
+	mu 			= 	zeros(m)
+	for j 		= 	1:m
+		v 		= 	S[1:(j-1),j]
+		u 		= 	S[(j+1):m,j]
+		################################################################################
+		# if vcat(v[:],u[:]) != S[setdiff(1:m,j),j]
+		# 	println()
+		# 	println(m)
+		# 	print("hmmmmmmmmm")
+		# 	return
+		# end
+        #
+		# if mean(vcat(v[:],u[:])) !=  mean(S[setdiff(1:m,j),j])
+		# 	println()
+		# 	print("huuuummmmmmmmm")
+		# 	println(m)
+		# 	print("haaaammmmmmmmm")
+		# 	return
+		# end
+
+		################################################################################
+		mu[j]  	= 	mean(vcat(v[:],u[:]))
+	end
+################################################################################
+	# if any(mu.==0)
+	# 	println("error: a portion of my is zero")
+	# end
+################################################################################
+	return 		mu
 end
 
 function ordercanonicalform_3{Tv}(
@@ -2979,6 +3299,7 @@ function ordercanonicalform_3{Tv}(
 		for i=1:m
 			vscale[i]	=	symmat[i,i]
 		end
+		# the following is in prnciple unnecessary, but it simplifies rounding
 		for i=1:m
 			if offdiagmin(symmat,i) < vscale[i]
 				print("Error: the \"birth time\" assigned a vertex by keyword argument <vscale> may be no greater than that of any incident edge.  The value assigned to vertex $(i) by <vscale> is $(vscale[i]), and i is incident to an edge with birth time $(offdiagmin(symmat,i)).")
@@ -2986,7 +3307,6 @@ function ordercanonicalform_3{Tv}(
 			end
 		end
 	end
-
 
 	# Deterime the public maxrad
 	if maxrad == Inf
@@ -3099,6 +3419,33 @@ function ordercanonicalform_3{Tv}(
 	ocg2rad = flipdim(ocg2rad,1)
 	ocf = cutoff - ocf
 	return ocf,ocg2rad # additional outputs for diagnostic purposes -> #,privatemax,S,maxrad,publicmax,publicmin,maxrad
+end
+
+function ordercanonicalform_4(
+	d;
+	minrad=-Inf,
+	maxrad=Inf,
+	numrad=Inf, # note we have already performed the necessary rounding by this point
+	fastop=true,
+	vscale="diagonal",
+	verbose = verbose)
+
+	# round as necessary
+	if 	minrad 		== 	"minedge"
+		minrad 		= 	minimum(offdiagmin(d))
+	end
+	d 				= 	minmaxceil(d,minrad=minrad,maxrad=maxrad,numrad=numrad)
+	d[d.>maxrad] 	= 	maxrad+1; # we make this reassignment b/c ordercanonicalform_3 takes only arguments with finite entries
+
+	(t,ocg2rad) = ordercanonicalform_3(
+		d;
+		minrad=minrad,
+		maxrad=maxrad,
+		numrad=Inf, # note we have already performed the necessary rounding by this point
+		fastop=fastop,
+		vscale=vscale,
+		verbose = verbose)
+	return t, ocg2rad
 end
 
 # Under development as of 12/30/2017
@@ -3271,6 +3618,65 @@ function ordercanonicalform{Tv}(
 	end
 	deleteat!(ocg2rad,(ordervalue+1):binom(m,2))
 	return round.(Int64,symmat),ocg2rad
+end
+
+function trueordercanonicalform(M)
+	m 					= 	length(M)
+	n 					= 	length(unique(M))
+	ocf 				= 	zeros(Int64,size(M)...)
+	val 				= 	zeros(Float64,n)
+	p 					= 	sortperm(M[:])
+	k 					= 	1
+	val[k] 				= 	M[p[1]]
+	ocf[p[1]] 			= 	k
+	for i 				= 	2:m
+		if 	M[p[i]]		> 	M[p[i-1]]
+			k 				+=1
+			val[k] 		= 	M[p[i]]
+		end
+		ocf[p[i]] 	= 	k
+	end
+	return ocf,val
+end
+
+function checktrueordercanonicalform(numits)
+	for p 	= 	1:numits
+		m 	= 	rand(50:300,1)
+		m 	= 	m[1]
+		x 	= 	rand(m,m)
+		if 		isodd(p)
+			x 	= 	x+x';
+		end
+		ocf,val 	= 	trueordercanonicalform(x)
+		check1 		= 	x == val[ocf]
+		check2 		= 	val == sort(unique(x))
+		if !(check1 & check2)
+			println("error: please check trueordercanonicalform")
+			return x
+		end
+	end
+	return []
+end
+
+function checkoffdiagmean(numits)
+	for p = 1:numits
+		numpts 	= 	rand(50:100,1)
+		numpts 	= 	numpts[1]
+		S 		= 	rand(numpts,numpts)
+		T 		= 	copy(S)
+		mu 		= 	offdiagmean(T,defaultvalue = 0)
+		u 		= 	zeros(numpts)
+		for i 	= 	1:numpts
+			ran =   setdiff(1:numpts,i)
+			u[i]= 	mean(S[ran,i])
+		end
+		if 			u[:] != mu[:]
+			println()
+			println("error: please check <offdiagmean>")
+			return S,T,mu,u
+		end
+	end
+	return []
 end
 
 function getstarweights(symmat)
@@ -3941,8 +4347,8 @@ end
 function getcycle_cell(rv,cp,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cyclenumber::Array{Int64,1})
 	numclasses 	= length(cyclenumber)
 	rep 	 	= Array{Array{Int64,1},1}(numclasses)
-	for p in cyclenumber
-		rep[p] 	= getcycle_cell(rv,cp,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,p)
+	for p 		= 1:numclasses
+		rep[p] 	= getcycle_cell(rv,cp,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cyclenumber[p])
 	end
 	return rep
 end
@@ -4269,6 +4675,7 @@ function boundarymatrices(C)
 		rv = C["rv"]
 		cp = C["cp"]
 	end
+	return rv,cp
 end
 
 function classrep(
@@ -4353,6 +4760,18 @@ function cyclevertices(
 end
 
 function barcode(D::Dict;dim = 1,ocf = false,verbose = false, givenztidindices = false)
+	if 	haskey(D,:perseusjlversion)
+		return	barcode_perseus(D,dim=dim)
+	elseif haskey(D,:barcodes)
+		return  D[:barcodes][dim+1]
+	elseif !haskey(D,"cp") & !haskey(D,"farfaces")
+		print("unrecognized object:")
+		display(D)
+	elseif dim > D["input"]["maxdim"]
+		maxdim 	= 	D["input"]["maxdim"]
+		println("error: barcodes were not computed in dimensions greater than $(maxdim).")
+		return
+	end
 	sd = dim+2
 	plo = D["plo"][sd]
 	phi = D["phi"][sd]
@@ -4397,6 +4816,14 @@ function barcode(D::Dict;dim = 1,ocf = false,verbose = false, givenztidindices =
 		end
 	end
 	if ocf == false
+		################################################################################################
+		if any(summary[:,1].==0)
+			println("some elements of <summary> are zero")
+			display(D)
+			display(D["input"])
+			println("requested barcode dim = $(dim)")
+		end
+		################################################################################################
 		summary[:,1]=D["ocg2rad"][convert(Array{Int64},summary[:,1])]
 		summary[1:numnzmortalbars,2] = D["ocg2rad"][convert(Array{Int64},summary[1:numnzmortalbars,2])]
 	else
@@ -5561,12 +5988,6 @@ end
 
 function buildcomplex3{Tv}(symmat::Array{Tv},maxcard; dictionaryoutput = true, verbose = false)
 
-	m = size(symmat,1)
-	w = vec(mean(symmat,1))
-
-	vperm = sortperm(-w)
-	symmat = symmat[vperm,vperm]
-
 	grain = Array{Array{Int64,1}}(maxcard+1)
 	farfaces = Array{Array{Int64,1}}(maxcard+1)
 	prepairs = Array{Array{Int64,1}}(maxcard+1)
@@ -5576,6 +5997,12 @@ function buildcomplex3{Tv}(symmat::Array{Tv},maxcard; dictionaryoutput = true, v
 	firstv[maxcard+1] = ones(Int64,1)
 	grain[maxcard+1] = Array{Int64}(0)
 	prepairs[maxcard+1] = Array{Int64}(0)
+
+	m = size(symmat,1)
+	w = vec(offdiagmean(symmat,defaultvalue=0)) 	# modified 02/12/2018
+
+	vperm = sortperm(-w)
+	symmat = symmat[vperm,vperm]
 
 	farfaces[1] = convert(Array,1:m)
 	firstv[1] = convert(Array,1:(m+1))
@@ -6385,6 +6812,7 @@ function eirene(
 	minrad		= -Inf,
 	maxrad		= Inf,
 	numrad		= Inf,
+	nodrad 		= [],
 	fastop		= true,
 	vscale		= "default",
 	record		= "cyclerep",
@@ -6393,13 +6821,14 @@ function eirene(
 
 	if in(model,["vr","pc"])
 		maxcard = 		maxdim+2
-		D = persistF2_vr(
+		D = persistf2vr(
 			s,
 			maxcard;
 			model 		= model,
 			minrad 		= minrad,
 			maxrad 		= maxrad,
 			numrad 		= numrad,
+			nodrad 		= nodrad,
 			fastop 		= fastop,
 			record 		= record,
 			filetype 	= filetype,
@@ -6408,7 +6837,7 @@ function eirene(
 
 		return 	D
 	elseif model == "complex"
-		D   = 	persistF2_cell(
+		D   = 	persistf2complex(
 				s;
 				maxdim=maxdim,
 				record = record,
@@ -6422,47 +6851,58 @@ function eirene(
 	end
 end
 
-function eirene(
-	rv,
-	cp,
-	filt;
-	maxdim = length(rowvalues),
-	record="cyclerep",
-	pointlabels=[],
-	verbose=false)
+#=
+NB: the default value for maxdim has not been tested, and may cause errors;
+the -3 accounts for (1) julia uses 1-indexed arrays, (2) to calculate
+homology in dimension p, one must inspect the (p+1)-dimensional boundary
+operator, (3) this operator should be givent the same treatment as those
+that precede it ... generally this assumes that the next one up is at least
+defined, even if it is trivial.
+=#
+function eirene(   	;
+	rv				= 	zeros(Int64,0),
+	cp 				= 	zeros(Int64,0),
+	fv				= 	zeros(Int64,0),
+	dp 				= 	zeros(Int64,0),
+	model 			= 	"complex",
+	maxdim 			= 	length(rv)-3,
+	record			=	"cyclerep",
+	pointlabels		=	[],
+	verbose			=	false)
 
-	D = persistF2_cell(
-		rv,
-		cp,
-		filt;
-		maxdim = maxdim,
-		record = record,
-		verbose = verbose)
-
-	return D
-end
-
-function eirene(
-	rv,
-	cp,
-	filt,
-	dim;
-	maxdim = length(rowvalues),
-	record="cyclerep",
-	pointlabels=[],
-	verbose=false)
-
-	D = persistF2_cell(
-		rv,
-		cp,
-		filt,
-		dim,
-		maxdim = maxdim,
-		record = record,
-		verbose = verbose)
+	D = persistf2complex(
+		rv			= 	rv,
+		cp			= 	cp,
+		fv 			= 	fv,
+		dp 			= 	dp,
+		maxdim 		= 	maxdim,
+		record 		= 	record,
+		verbose 	= 	verbose)
 
 	return D
 end
+
+# function eirene(
+# 	rv,
+# 	cp,
+# 	filt,
+# 	dim;
+# 	maxdim = length(rowvalues)-2,
+# 	record="cyclerep",
+# 	pointlabels=[],
+# 	verbose=false)
+#
+# 	D = persistf2complex(
+# 		rv,
+# 		cp,
+# 		filt,
+# 		dim,
+# 		maxdim = maxdim,
+# 		record = record,
+# 		verbose = verbose)
+#
+# 	return D
+# end
 
 ##########################################################################################
 
@@ -6479,7 +6919,7 @@ function persistencestats(x)
 		println(i)
 		pcloud = rand(20,i)
 		tic()
-		D = persistF2_vr(pcloud,5,model = "pc",fastop=false)
+		D = persistf2vr(pcloud,5,model = "pc",fastop=false)
  		t = toc()
 		A[1,ip] = length(D["prepairs"][5])
 		A[2,ip] = length(D["farfaces"][5])
@@ -6545,15 +6985,17 @@ end
 
 function cellcheck()
 	c = 0
+	maxdim 	= 	3
 	for i = 1:20
-		print([i])
-		D 	= eirene(rand(20,50),model="pc",maxdim=4)
+		D 	= eirene(rand(20,50),model="pc",maxdim=maxdim)
 		N 	= ff2complex(D["farfaces"],D["firstv"])
 		Nf 	= ocff2of(D["grain"],D["ocg2rad"])
 		N1 = copy(N[1]);
 		N2 = copy(N[2]);
 		Nf_copy = copy(Nf)
-		F = persistF2_cell(N[1],N[2],Nf)
+		####################################################################################
+		# F = persistf2complex(N[1],N[2],Nf,maxdim=maxdim) ##########################
+		F = persistf2complex(N[1],N[2],Nf,maxdim=maxdim,record="all")
 		if N1 != N[1] || N2 != N[2]
 			print("changed N")
 			break
@@ -6576,32 +7018,902 @@ end
 
 ##########################################################################################
 
+#=
+
+test functions:
+
+eirenevrVperseusvr
+>> filepath
+>> filepath
+>> filepath
+eirenevrVeirenepc
+eirenevrVeirenecomplex
+eirenecomplexVhandcalc
+>> filepath
+>> filepath
+>> filepath
+eirene_checkparameters
+eirenecomplex_checksuspension
+
+batchcheckceil2grid
+checkminmaxceil
+checkoffdiagmin
+checkoffdiagmean
+checkloadfile
+checktruecanonicalform
+>> filepath
+>> filepath
+>> filepath
+>> filepath
+>> filepath
+generatorbdc
+firstbcdiff
+
+generateperesusbripsdata
+saveperseustestdata
+
+generatehandcalcdata
+savehandcalcdata
+
+generateloadfiledata
+saveloadfiledata
+
+
+=#
+
+function testfp(s)
+	D 	= 	Dict(
+			"prsip" => joinpath(@__DIR__,"perseus/reservoir/input.txt"),
+			"prsop" => joinpath(@__DIR__,"perseus/reservoir/output"),
+			"prsjd" => joinpath(@__DIR__,"test/perseus/testdata.jld"), # peresus julian data
+			"hantx" => joinpath(@__DIR__,"test/handcalc/testdata.txt"),
+			"hanjd" => joinpath(@__DIR__,"test/handcalc/testdata.jld"),
+			"hsphr" => joinpath(@__DIR__,"test/handcalc/sphere.csv"),
+			"hempt" => joinpath(@__DIR__,"test/handcalc/empty.csv"),
+			"pcrap" => joinpath(@__DIR__,"test/fileload/pcrap.txt"), # point cloud / rows are points
+			"pcrad" => joinpath(@__DIR__,"test/fileload/pcrad.txt"), # point cloud / rows are dimensions
+			"vrmat" => joinpath(@__DIR__,"test/fileload/vrmat.txt"), # vietoris rips
+			"cpxvn" => joinpath(@__DIR__,"test/fileload/cpxvn.txt"), # vanilla complex
+			"cpxez" => joinpath(@__DIR__,"test/fileload/cpxez.txt") # easy complex
+			)
+	return  D[s]
+end
+
+function saveperseustestdata()
+	E 					= 	generateperseusvrdata()
+	filepath			= 	testfp("prsjd")
+	JLD.save(filepath,"E",E)
+end
+
+# function savehandcalcdata()
+# 	E 					= 	generatehandcalcdata()
+# 	filepath			= 	testfp("hanjd")
+# 	JLD.save(filepath,"E",E)
+# end
+
+function eirenevrVperseusvr()
+	passtest 			= 	true
+
+	datapath 			=   testfp("prsjd")
+	E 					= 	JLD.load(datapath)
+	E 					= 	E["E"]
+
+	for p 				= 	1:length(E)
+		vrmatr 			= 	E[p]["vrmat"]
+		maxdim 			= 	E[p]["maxdim"]-1	# for perseus, maxdim refers to simplices, not homlogy
+		prdict 			= 	E[p]["perseusdict"] 						# persesus dictionary
+		endict 			= 	eirene(vrmatr,model="vr",maxdim=maxdim)		# eirene dictionary
+
+		i,j 			= 	firstbcdiff([endict prdict],maxdim=maxdim)
+		if 	i 			!= 	0
+			return 		endict, prdict, j
+		end
+	end
+	return 				[]
+end
+
+function generateperseusvrdata()
+	numits 				= 	1
+	ambdim 				= 	40
+	maxdim 				= 	2
+	numsteps 			= 	10000
+	minrad 				= 	0
+	stepsize 			= 	1
+	calibrationdata 	= 	Array{Any}(numits)
+
+	for p 	= 	1:numits
+		numpts 			= 	rand(50:70,1)
+		numpts 			= 	numpts[1]
+		vrmat 			= 	vertexlifemat(	numpts,
+											model 		= 	"rand",
+											scale 		= 	0) # we want zeros on the diagonal
+		# pcloud 			= 	rand(ambdim,numpts)
+		# vrmat 			= 	©(	pcloud,
+		# 									model="pc",
+		# 									scale=1/2)
+		# birthtimesraw 	= 	diagonalentries(vrmat)
+		vrmat 			= 	ceil2grid(		vrmat*numsteps;
+											origin=minrad,
+											stepsize=stepsize,
+											numsteps=numsteps)
+
+		# birthtimes 		= 	birthtimesraw./2
+
+		D 				=
+		perseusjl(
+		vrmat;			# 	filepaths should end with .txt
+		model			= 	"vr",
+		# rowsare 		= 	"dimensions",
+		datapath		= 	testfp("prsip"),
+		outpath			= 	testfp("prsop"),
+		maxdim 			= 	maxdim,
+		minrad			= 	minrad,
+		stepsz			= 	stepsize,
+		nsteps			= 	numsteps,
+		# pointbirths		= 	birthtimes,
+		perseusfilepath = 	"/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdc_agora/gdc_a_peresuswrappers/perseusMac"
+		)
+
+
+		E 				= 	Dict(
+							"perseusdict" 	=>	D,
+							# "pcloud" 		=>	pcloud,
+							"minrad"		=> 	minrad,
+							"stepsize"		=> 	stepsize,
+							"maxdim" 		=>  maxdim,
+							"vrmat"			=>  vrmat)
+
+		calibrationdata[p] 					= 	E
+	end
+	return calibrationdata
+end
+
+function eirenevrVeirenepc(numits,maxdim)
+	for p 			= 	1:numits
+		numpts 		= 	rand(50:100,1)
+		numpts 		= 	numpts[1]
+		ambdim 		= 	rand(1:100,1)
+		ambdim 		= 	ambdim[1]
+		pc 			= 	rand(ambdim,numpts)
+		d 			= 	colwised(pc)
+		nodrad		= 	offdiagmin(d)./2
+
+		Cvr 		= 	eirene( d,model="vr",maxdim=maxdim)
+		Cpc 		= 	eirene(pc,model="pc",maxdim=maxdim,nodrad=nodrad)
+
+		i,j 		= 	firstbcdiff([Cpc Cvr],maxdim=maxdim)
+		if 	i 		!= 	0
+			return  Cpc, Cvr, j
+			break
+		end
+	end
+	return 				[]
+end
+
+function 	eirenevrVeirenecomplex(numits,maxdim)
+	passtest 		= 	true
+	for p 	= 	1:numits
+		numpts 		= 	rand(50:60,1)
+		numpts 		= 	numpts[1]
+		d 			= 	vertexlifemat(numpts,model="rand")
+		Cvr 		= 	eirene(d,maxdim=maxdim,model="vr")
+
+		rv,cp 		= 	boundarymatrices(Cvr)
+		fv 			= 	ocff2of(Cvr["grain"],Cvr["ocg2rad"])
+		Ccx		 	= 	eirene(rv=rv,cp=cp,fv=fv,model = "complex",maxdim=maxdim)
+
+		i,j 		= 	firstbcdiff([Cvr Ccx],maxdim=maxdim)
+		if 	i 			!= 	0
+			return 	 	Cvr, Ccx, i
+		end
+	end
+	return 				[]
+end
+
+function 	eirenecomplexVhandcalc()
+	passtest 				= 	true
+	numits 					= 	2
+	maxdim 					= 	2
+	maxrad 					= 	100
+	numradset 				= 	Array{Any}(2)  # must take extra care to ensure that
+	numradset[1]			= 	10
+	numradset[2]			= 	Inf
+	for space 				= 	["sphere", "empty"]
+		for numrad 			= 	numradset
+			if 		space 	== 	"sphere"
+				pathkey 	= 	"hsphr"
+			elseif 	space 	== 	"empty"
+				pathkey 	= 	"hempt"
+			end
+
+			datapath 		= 	testfp(pathkey)
+
+			C 				= 	eirene(	datapath,
+										model 		= 	"complex",
+										maxdim 		= 	maxdim)
+
+			D				= 	handcalcsolution() #  load(solnpath)
+			solkey	 		= 	solutionkey(
+								model 		= 	"complex",
+								maxrad 		= 	maxrad,
+								numrad		= 	numrad,
+								space		= 	space,
+								problemset 	= 	"hand")
+			####################################################################################################
+			if !haskey(D,solkey)
+				display(D)
+			end
+			####################################################################################################
+			D				= 	D[solkey]
+
+			i,j 			= 	firstbcdiff([C D],maxdim=maxdim)
+			if 	i 		   != 	0
+				return 			C, D, j
+			end
+		end
+	end
+	return					[]
+end
+
+#=
+This function was used to check that
+(1) in dimensions higher than 0,
+the farfaces, firstv, filtration, prepairs (plus the vertex permutation)
+generated by buildcomplex3 are invariant under changes to the diagonal.
+(2) the filtration in dimension 0 is an approrpriately permuted copy of the
+diagonal of the input matrix
+(3) the value assigned to key "symmat" is an approrpriately permuted copy of
+the input matrix itself
+=#
+function checkbuildcomplex3_diagentries(numits)
+	for p 				= 	1:numits
+		for maxcard 	= 	1:4
+			numpts 			= 	rand(10:50,1)
+			numpts 			= 	numpts[1]
+			d 				= 	rand(1:10^6,numpts,numpts)
+			d 				= 	d+d'
+			randv 			= 	rand(1:numpts,1)
+			randv 			= 	randv[1]
+			d[randv,randv] 	= 	maximum(d)+1
+			t 				= 	copy(d)
+			for 	q 		= 	1:numpts
+				t[q,q] 		= 	0
+			end
+
+			diagd 			= 	diag(d)
+			diagt 			= 	diag(t)
+
+			if any(diag(t).!=0)
+				println("please check that the diagonal entries of s are zeros")
+			end
+			if countnz(t)!= numpts^2-numpts
+				println("please check that the off-diagonal entries of s are nonzero")
+			end
+
+			Dd 				= 	buildcomplex3(d,maxcard)
+			Dt 				= 	buildcomplex3(t,maxcard)
+
+			Ddc 			= 	copy(Dd)
+			Dtc 			= 	copy(Dt)
+			Ddc["grain"] 	= 	Ddc["grain"][2:end]
+			Dtc["grain"] 	= 	Dtc["grain"][2:end]
+			Ddc["symmat"] 	= 	[]
+			Dtc["symmat"]	= 	[]
+
+			check1 			= 	Ddc == Dtc
+			check2 			= 	Dd["grain"][1] 	== 	diagd[Dd["nvl2ovl"]]
+			check3 			= 	Dt["grain"][1]	== 	diagt[Dt["nvl2ovl"]]
+			check4 			= 	Dd["symmat"] 	== 	d[Dd["nvl2ovl"],Dd["nvl2ovl"]]
+			check5 			= 	Dt["symmat"] 	== 	t[Dt["nvl2ovl"],Dt["nvl2ovl"]]
+
+			if !(check1 && check2 && check3 && check4 && check5)
+				return Dd,Dt
+			end
+		end
+	end
+	return []
+end
+
+function checkminmaxceil(numits)
+	for p 			= 	1:numits
+		numpts 		= 	rand(50:100,1)
+		numpts 		= 	numpts[1]
+		x 			= 	rand(numpts,numpts)
+		x 			= 	x+x';
+		numradA		= 	Array{Any}(rand(10:50,2))
+		maxradA		= 	Array{Any}(rand(2))
+		minradA		= 	Array{Any}(rand(2))
+		append!(maxradA,[Inf])
+		append!(minradA,[-Inf])
+		append!(minradA,["minedge"])
+		append!(numradA,[1,Inf])
+		for	maxrad in maxradA
+			for minrad in minradA
+				for numrad in numradA
+					A 	= 	minmaxceil(x,minrad=minrad,maxrad=maxrad,numrad=numrad)
+					B   = 	ceilvr(x,minrad=minrad,maxrad=maxrad,numrad=numrad)
+					if  	A != 	B
+						println()
+						println("error: please check minmaxceil and ceilvr")
+						return x,minrad,maxrad,numrad
+					end
+					# if minrad <= maxrad
+					# 	check 	= 	minmaxceilroundsright(
+					# 									x,
+					# 									minrad = minrad,
+					# 									maxrad = maxrad,
+					# 									numrad = numrad)
+					# 	if !check
+					# 		println()
+					# 		println("error: please check minmaxceil")
+					# 		return x,minrad,maxrad,numrad
+					# 	end
+					# end
+				end
+			end
+		end
+	end
+	return []
+end
+
+#=
+- returns finite values for mingrid and maxgrid
+- it will always be true that mingrid <= maxgrid
+=#
+function ceil2grid_overflowparameters(	N;
+										minrad 	=	-Inf,
+										maxrad	=	Inf
+										)
+	if (minrad == Inf) || (maxrad == -Inf)
+		mingrid 	= 	0
+		maxgrid 	= 	0
+		return 			minrad,maxrad,mingrid,maxgrid
+	end
+
+	S 								= 	Array{Float64}(copy(N)) #NB it has been verified experimentally that it is VERY important to use the copy function here
+
+	if 	minrad 						== 	"minedge"
+		minrad 						= 	minimum(offdiagmin(S))
+	end
+
+	S[S.<minrad] 					= 	minrad
+	S[S.>maxrad] 					= 	maxrad
+
+	fi 								= 	find(isfinite,S)
+	if 									isempty(fi)
+		mingrid 					= 	0
+		maxgrid 					= 	0
+	else
+		# note the case minrad == Inf has already been covered,
+		# as has the case where minimum(S[fi]) might be infinite
+		if minrad 					==	-Inf
+			mingrid 				= 	minimum(S[fi])
+		else
+			mingrid 				= 	minrad
+		end
+		# note the case maxrad == -Inf has already been covered
+		# as has the case where maximum(S[fi]) might not be infinite
+		if maxrad 					== 	Inf
+			maxgrid					= 	maximum(S[fi])
+		else
+			maxgrid					= 	maxrad
+		end
+	end
+
+	return	minrad, maxrad, mingrid, maxgrid
+end
+
+function truncatearray(N,minrad,maxrad)
+	S 					= 	copy(N) #NB it has been verified experimentally that it is VERY important to use the copy function here
+	S[S.<minrad] 		= 	minrad
+	S[S.>maxrad] 		= 	Inf
+	return 					S
+end
+
+function makegrid(mingrid,maxgrid,numrad)
+	if numrad < 1
+		println("error in <makegrid>: argument numrad must be a positive integer")
+		return
+	end
+	mingrid 		= 	Float64(mingrid)
+	maxgrid 		= 	Float64(maxgrid)
+
+	if numrad 		== 	1
+		grid 		= 	[maxgrid]
+	elseif numrad 	== 	Inf
+		grid 		= 	"all"
+	else
+		grid 		= 	linspace(mingrid,maxgrid,numrad)
+		grid 		= 	Array{Float64}(grid)
+		grid[end] 	= 	maxgrid # this identity might not hold if we did not enforce it, due to numerical imprecision
+	end
+	return grid
+end
+
+function ceil2grid_overflow( 	N;
+								minrad 		=	-Inf,
+								maxrad		=	Inf,
+								mingrid 	= 	Inf,
+								maxgrid 	= 	Inf,
+								numgrid 	= 	Inf
+								)
+	S 							= 	truncatearray(N,minrad,maxrad)
+	fi 							= 	find(isfinite,S) # stands for finite indices
+	fv 							= 	S[fi]
+	ran 						= 	makegrid(mingrid,maxgrid,numgrid)
+	S[fi] 						= 	ceil2grid(fv,ran)
+	return S
+end
+
+function ceilvr(	N;
+					minrad 			= 	-Inf,
+					maxrad 			= 	Inf,
+					numrad 			= 	Inf)
+	minrad,maxrad,mingrid,maxgrid 	= 	ceil2grid_overflowparameters(
+										N,
+										minrad 	= 	minrad,
+										maxrad 	= 	maxrad)
+					S 				= 	ceil2grid_overflow(
+										N,
+										minrad 	= 	minrad,
+										maxrad 	= 	maxrad,
+										mingrid = 	mingrid,
+										maxgrid = 	maxgrid,
+										numgrid = 	numrad)
+	return S
+end
+
+function minmaxceilroundsright(	N;
+								minrad=minimum(N),
+								maxrad=maximum(N),
+								numrad=Inf)
+	#=
+	check 	ceil2grid
+	check 	checkoffdiagmin
+	check 	all inf when minrad = Inf, maxrad = -Inf, or minrad > maxrad
+	check 	minrad = 	offdiagmin when minrad == "minedge"
+	check 	minrad = 	mininum(N) when minrad == -Inf
+
+	check 	definition of maxrad/minrad
+	 	 	-
+	=#
+	minrad 				= 	Float64(minrad)
+	maxrad 				= 	Float64(maxrad)
+
+	d 					= 	minmaxceil(
+							N;
+							minrad=minrad,
+							maxrad=maxrad,
+							numrad=numrad)
+
+	S 					=
+
+#################################################################################
+
+	if 		minrad 		== 	-Inf
+		minrad0 		= 	Float64(minimum(N))
+	elseif 	minrad 		== 	"minedge"
+		minrad0 		= 	Float64(minimum(offdiagmin(N)))
+	else
+		minrad0 		= 	Float64(minrad)
+	end
+	if 		maxrad 		== 	Inf
+		maxrad0 		= 	Float64(maximum(N))
+	else
+		maxrad0 		= maxrad
+	end
+
+	if 			maxrad0 == 	minrad0
+		checkall 		= 	all(d.==maxrad0)
+	elseif 		maxrad0 < 	minrad0
+		checkall 		= 	all(d.==Inf)
+	elseif 		numrad 	== 	1
+		M 				= 	copy(N)
+		M[M.<maxrad0] 	= 	maxrad0
+		M[M.>maxrad0] 	= 	Inf
+		checkall 		= 	d==M
+	elseif 		numrad 	== 	Inf
+		M 				= 	copy(N)
+		M[M.<minrad0] 	= 	minrad0
+		M[M.>maxrad0] 	= 	Inf
+		checkall 		= 	d==M
+	else
+		println([])
+		print(typeof(minrad0))
+		print(typeof(maxrad0))
+		print(typeof(numrad))
+		ran0 				= 	linspace(minrad0,maxrad0,numrad)
+		ran0 				= 	Array{Float64}(ran0)
+		ran0[1]				= 	minrad0
+		ran0[end]			= 	maxrad0
+		append!(ran0,Inf)
+
+		p0 				= 	0
+		check3 			= 	false # pre-assigning so this remains defined outside the for-loop
+		check4 			= 	false # pre-assigning so this remains defined outside the for-loop
+		check8 			= 	false # pre-assigning so this remains defined outside the for-loop
+		for p 			= 1:length(N)
+			check1 		= 	N[p] 	> 	maxrad0
+			check2 		= 	d[p] 	==  Inf
+			check3 		= 	check1 	== 	check2
+			check4 		= 	in(d[p],ran0)
+			check5 		= 	d[p]==Inf
+			check6 		= 	0 <= d[p]-N[p]< (maxrad0-minrad0)/(numrad-1)
+			check7 		= 	(N[p]<=minrad0) & (d[p]==minrad0)
+			check8 		= 	check5 || check6 || check7
+			checkall	= 	all([check3 check4 check8])
+			if !checkall
+				if !check4
+					p0 	= 	p
+				end
+				break
+			end
+		end
+		if !checkall
+			println("error loci:")
+			println(find(.![check3 check4 check8]))
+			if !check4
+				println("p = $(p0)")
+			end
+		end
+	end
+	return checkall
+end
+
+
+function 	checkrounding(numits,maxdim)
+	for p 	= 	1:numits
+
+		# CHECK MINOFFDIAG
+		# This is important as it is used to determine the value of <minrad> in
+		# calls to <persistf2vr> where keyword argument <minrad> is assigned a
+		# value of "minedge"
+		n 				= 	100
+		x 				= 	rand(n,n)
+		x 				= 	x+x';
+		y 				= 	copy(x)
+		for p 			= 	1:n
+			y[p,p] 		= 	Inf
+		end
+		if 	minimum(y,2) != offdiagmin(x)
+			println("error: please check <offdiagmin>")
+			return
+		end
+
+
+		numpts 		= 	rand(50:60,1)
+		numpts 		= 	numpts[1]
+		numrad 		= 	rand(10:50)
+		numrad 		= 	numrad[1]
+
+		d 			= 	vertexlifemat(numpts,model="rand")
+
+		cutoffs 	= 	(maximum(d)-minimum(d)).*rand(3)+minimum(d)
+		append!(cutoffs,[-Inf, Inf])
+		for 	maxrad 	in 	cutoffs
+			for minrad 	in 	cutoffs
+				Cvr 		= 	eirene(d,maxdim=maxdim,model="vr")
+
+				s 			= 	Cvr["ocg2rad"][C["symmat"]]
+			end
+		end
+	end
+	return ocfcheckfun3() == "passedtest"
+end
+
+function 	generatorbdc(C;dim=0)
+	# bdc stands for birth, death, cycle status
+	passedtest 		= 	true
+	maxdim 			= 	C["input"]["maxdim"]
+	B 				= 	barcode(C,dim=dim)
+	if C["input"]["record"] == 	"all"
+		for p 		= 	1:size(B,1)
+			rep 	= 	classrep(C,dim=dim,class=p,format="index")
+			case1 	= 	birthtime(C,dim=dim,chain=rep) == B[p,1]
+			case2 	= 	deathtime(C,dim=dim,chain=rep) == B[p,2]
+			case3 	= 	isempty(chainboundary(C,dim=dim,chain=rep))
+			if 		! 	(case1 & case2 & case1)
+				passedtest 	= 	false
+				break
+			end
+		end
+	else
+		println()
+		println("error in function <generatorbdc>: deathtimes can only be checked when C[\"input\"][\"record\"] = \"all\".")
+		return
+	end
+	return passedtest
+end
+
+function 	eirene_checkparameters()
+	passedtest 	= 	true
+	numpts 		= 	rand(50:100,1)
+	numpts 		= 	numpts[1]
+	ambdim 		= 	rand(1:100,1)
+	ambdim 		= 	ambdim[1]
+	pc 			= 	rand(ambdim,numpts)
+	d 			= 	colwised(pc)
+	nodrad		= 	offdiagmin(d)./2
+
+	C0 			= 	eirene(d,model="vr",maxdim=2)
+
+	for maxdim 		= [0 1 2]
+		for minrad 		= [-Inf 0 1 Inf]
+			for maxrad 		= [-Inf 0 1 Inf]
+				for fastop 		= [true,false]
+					for vscale 		= [[]]
+						for record 		=  ["all" "cyclerep" "none"]
+							for pointlabels	= [[]]
+								#######  add numrad iterable here ######
+								# for numrad =
+
+								Cvr  	= 	eirene(
+											d;
+											model		= "vr",
+											maxdim 		= maxdim,
+											minrad		= minrad,
+											maxrad		= maxrad,
+											fastop		= fastop,
+											vscale		= vscale,
+											record		= record,
+											pointlabels	= pointlabels)
+
+								Cpc  	= 	eirene(
+											pc;
+											model		= "pc",
+											maxdim 		= maxdim,
+											minrad		= minrad,
+											maxrad		= maxrad,
+											fastop		= fastop,
+											vscale		= vscale,
+											record		= record,
+											pointlabels	= pointlabels)
+
+								rv,cp 	= 	boundarymatrices(C0)
+								fv 		= 	ocff2of(
+											C0["grain"],
+											C0["ocg2rad"])
+
+								Ccx 	= 	eirene(
+											rv 			= 	rv,
+											cp			= 	cp,
+											fv			= 	fv,
+											model 		= 	"complex",
+											record 		= 	record)
+
+								if 	minrad 			   == 	-Inf && maxrad 	==	Inf
+									X 					= 	[C0 Cvr Cpc Ccx]
+								else
+									X 					= 	[Cvr Cpc Ccx]
+								end
+								i,j 					= 	firstbcdiff(X,maxdim=maxdim)
+								if i 				   !=	0
+									return 					X[1], X[i], j
+								end
+
+								if record 				== 	"all"
+									for 	dim 		= 	0:maxdim
+										if 	!generatorbdc(Cpc,dim=dim)
+											passedtest 	= 	false
+											break
+										end
+										if 	!generatorbdc(Cvr,dim=dim)
+											passedtest 	= 	false
+											break
+										end
+										if 	!generatorbdc(Ccx,dim=dim)
+											passedtest 	= 	false
+											break
+										end
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	return	passedtest
+end
+
+function 	loadsfilecorrectly()
+	filepath_pcrad 		=
+	filepath_pcrap		=
+	filepath_vr			=
+	filepath_cx			= 	#FILEPATH TO HAND CALCULATION
+
+	Cpcrad	= 	eirene(filepath_pcrad,model="pc",rowsare="dimensions")
+	Cpcrap	= 	eirene(filepath_pcrap,model="pc",rowsare="points")
+	Cvr		= 	eirene(filepath_vr,model="vr")
+	Ccx 	= 	eirene(filepath_cx,model="complex")
+
+	pcrad_true 	=	load()
+	pcrap_true 	=	load()
+	vr_true	 	=	load()
+	cx_true 	=	load()
+
+	case1 	= 	Cpcrad["input"]["genera"] 							== pcrad_true
+	case2 	= 	Cpcrap["input"]["genera"] 							== pcrad_true
+	case3 	= 	Cvr["input"]["genera"] 								== vr_true
+	case4 	= 	[Ccx["rv"] Ccx["cp"] Ccx["grain"] Ccx["ocg2rad"]]	== cx_true
+
+	passedtest 	= 	(case1 & case2 & case3 & case4)
+	return 			passedtest
+end
+
+function 	firstbcdiff(arrayofdicts;maxdim=1,offset=0) # stands for first barcode difference
+	A 					= 	arrayofdicts
+	for p 				= 	2:length(A)
+		q 				= 	firstbcdiff(A[1],A[p],maxdim=maxdim,offset=offset)
+		if 	q 			> 	0
+			return p,q
+		end
+	end
+	return 0,0
+end
+
+function 	firstbcdiff(A,B;maxdim=1,offset=0) # stands for first barcode difference
+	for	r 			= 		0:maxdim
+		Ba 			= 		sortrows(barcode(A,dim=r))
+		Bb 			= 		sortrows(barcode(B,dim=r))
+		if 	Ba 		!= 		Bb
+			return 	r
+		end
+	end
+	return 0
+end
+
+function 	colwised(x)
+	return	Distances.pairwise(Euclidean(),x)
+end
+
+function 	diagonalentries(x)
+	if 	size(x,1) != size(x,2)
+		println()
+		println("error: d should be square")
+		return
+	end
+	m 			= 	size(x,2)
+	v 			= 	zeros(m)
+	for 	p 	= 	1:m
+		v[p]	= 	x[p,p]
+	end
+	return 		v
+end
+
+function 	offdiagmin{Tv}(d::Array{Tv})
+	if 	size(d,1) != size(d,2)
+		println()
+		println("error: d should be square")
+		return
+	end
+	v 		= 	zeros(Tv,size(d,2))
+	for 	p 	= 	1:size(d,2)
+		val1 	= 	empteval(minimum,d[1:p-1,p],Inf)
+		val2 	= 	empteval(minimum,d[p+1:end,p],Inf)
+		v[p] 	= 	min(val1,val2)
+	end
+	return 	v
+end
+
+function 	iudsymmat(m)
+	x	= 	rand(m,m)
+	for p 	= 	1:m
+		for 	q 	= 	1:p-1
+			x[q,p] 	= 	x[p,q]
+		end
+	end
+	return x
+end
+
+function vrmat(C::Dict)
+	if C["input"]["model"] != "vr"
+		println()
+		println("error: <vrmat> only applies to vietoris-rips complexes")
+	end
+	nvl2ovl 			= 	C["nvl2ovl"]
+	numpts 				= 	length(nvl2ovl)
+	ovl2nvl 			= 	Array{Int64}(numpts)
+	ovl2nvl[nvl2ovl] 	=   1:numpts
+	symmat 				= 	copy(C["symmat"])
+	symmat 				= 	symmat[ovl2nvl,ovl2nvl]
+	s 					= 	Array{Float64}(symmat)
+	for p 				= 	1:length(s)
+		if symmat[p]	==   0
+			s[p] 		= 	Inf
+		else
+			s[p] 		= 	C["ocg2rad"][symmat[p]]
+		end
+	end
+	return 				s
+end
+
+function 	vertexlifemat(d;model="rand",scale=1/2)
+	if 		model 	== 	"pc"
+		s 	= 	colwised(d)
+	elseif model 	== 	"vr"
+		s 	= 	copy(d)
+	elseif model 	== 	"rand"
+		s 	= 	iudsymmat(d)
+	end
+	v 		= 	offdiagmin(s)
+	if typeof(scale) <: Number
+		for	p 	= 	1:size(s,2)
+			s[p,p]	= 	v[p]*scale
+		end
+	elseif 	scale == "rand"
+		for p 	= 	1:size(s,2)
+			r 		= 	rand(1)
+			s[p,p] 	=   r[1]*v[p]
+		end
+	else
+		println()
+		println("error: scale must be either a scalar or the string \"rand\"")
+		return
+ 	end
+	return 	s
+end
+
+function 	ceil2grid(M;origin=0,stepsize=1,numsteps=Inf)
+	if 	stepsize 	<  	0
+		println()
+		println("error in function <roundentries>: stepsize must be positive")
+		return
+	end
+	if 	numsteps 	<  	1
+		println()
+		println("error in function <roundentries>: numsteps must be positive")
+		return
+	end
+
+	N 				= 	copy(M)
+	N 				= 	Array{Float64}(N)
+	N  				= 	(N - origin)./stepsize
+	N 				= 	ceil.(N)
+	N 				= 	N*stepsize+origin
+
+	N[N.<origin]		= 	-Inf
+	if 	numsteps 	< 	Inf
+		maxval 		= 	origin+numsteps*stepsize
+		N[N.>maxval] 	= 	Inf
+	end
+	return 			N
+end
+
+
+
 # 12/30/2017
 # File nameing systems.
-function 	inputsuffix(model,iteration)
-	if model == "complex"
-		pref = "gdb_da_a_a_cell"
-	elseif model == "vr"
-		pref = "gdb_da_a_b_vr"
-	elseif model == "pc"
-		pref = "gdb_da_a_c_pc"
-	end
-	return pref
-end
+# function 	inputsuffix(model,iteration)
+# 	if model == "complex"
+# 		pref = "gdb_da_a_a_cell"
+# 	elseif model == "vr"
+# 		pref = "gdb_da_a_b_vr"
+# 	elseif model == "pc"
+# 		pref = "gdb_da_a_c_pc"
+# 	end
+# 	return pref
+# end
 
-function 	pathsuffix(model,iteration)
-	pref	= 	inputsuffix(model,iteration)
-	w		= 	string(	pref,"/",
-						pref,"$(iteration)","/",
-						pref,"$(iteration)","_input.csv"
-						)
-	return w
-end
+# function 	pathsuffix(model,iteration)
+# 	pref	= 	inputsuffix(model,iteration)
+# 	w		= 	string(	pref,"/",
+# 						pref,"$(iteration)","/",
+# 						pref,"$(iteration)","_input.csv"
+# 						)
+# 	return w
+# end
+#
+# function 	modit2filepath(model,iteration)
+# 	# fileroot = 	"/Users/greghenselman/Google Drive/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/"
+# 	fileroot = 	"/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/"
+# 	return(string(fileroot,pathsuffix(model,iteration)))
+# end
 
-function 	modit2filepath(model,iteration)
-	# fileroot = 	"/Users/greghenselman/Google Drive/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/"
-	fileroot = 	"/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/"
-	return(string(fileroot,pathsuffix(model,iteration)))
+function modit2filepath(model,iteration)
+	suffix 	= 	string("testdata/",model,"/",model,"$(iteration)_input.csv")
+	joinpath(@__DIR__,suffix)
 end
 
 # 12/30/2017
@@ -6611,17 +7923,17 @@ end
 # reps.
 function unittest()
 
-	filepath 							= 	joinpath(@__DIR__,"solutions/testsolutions.jld")
+	filepath 							= 	joinpath(@__DIR__,"testsolutions/testsolutions.jld")
 	K 									= 	JLD.load(filepath)			# K for "calibrate" (letter C was taken)
 	K									=  	K["K"]
 	errorindices						= 	Array{Any,1}(0)
 
 	for filetype 	= ["textfile"]
-		for model 		= ["complex"]#["vr" "pc" "complex"]
+		for model 		= ["vr" "pc" "complex"]
 			for maxdim 		= [0 1 2]
 				for minrad 		= [-Inf 0]
 					for maxrad 		= [Inf, 100]
-						for numrad 		= [1 10 Inf]
+						for NUMRAD 		= [1 10 0]
 							for fastop 		= [true,false]
 								for vscale 		= [[]]
 									for record 		=  ["all" "cyclerep" "none"]
@@ -6629,6 +7941,15 @@ function unittest()
 											for iteration	= [1 2]
 
 												filepath 	= 	modit2filepath(model,iteration-1)
+												numrad 		= 	NUMRAD2numrad(NUMRAD)
+												solkey 		= 	solutionkey(
+																model 		= 	"model",
+																maxrad 		= 	maxrad,
+																numrad		= 	numrad,
+																space		= 	iteration,
+																problemset 	= 	"checkparameters")
+
+												#solutionkey(model,maxrad,numrad,iteration)
 
 												C = eirene(
 													filepath;
@@ -6637,7 +7958,7 @@ function unittest()
 													maxdim 		= maxdim,
 													minrad		= minrad,
 													maxrad		= maxrad,
-													numrad		= numrad,
+													numrad		= numrad+Int(numrad==1),
 													fastop		= fastop,
 													vscale		= vscale,
 													record		= record,
@@ -6657,64 +7978,54 @@ function unittest()
 													:pointlabels	=> pointlabels
 													)
 
-												# nli stands for number-level-index
-												if [minrad maxrad numrad] == [-Inf Inf Inf]
-													nli	=	1;
-												elseif [minrad maxrad numrad] == [0 100 10]
-													nli	=	2;
-												else
-													nli = 	0
-												end
 
-												xbc = 	(nli > 0) && in(model,["vr" "complex"]) && in(record,["cyclereps","all"]) # stands for cross-check barcode
-												xcr = 	xbc && model == "complex" # stands for cross-check cycle rep
-
-												if xbc
-													xkey = undercat([model,"$(nli)","$(iteration)"])
-													for r 	= 	0:maxdim
-														if r+1 > length(K[xkey][:barcodes])
+												for r 	= 	0:maxdim
+													if r+1 > length(K[solkey][:barcodes])
+														println("")
+														println("error 2")
+														println(solkey)
+														println(K[solkey][:barcodes])
+														println(r)
+														return C,D
+													end
+													Ba	= 	K[solkey][:barcodes][r+1]
+													Bw  = 	barcode(C,dim=r)
+													if record == "all"
+														for p 	= 	1:size(Bw,1)
+															rep 	= 	classrep(C,dim=r,class=p,format="index")
+															case1 	= 	birthtime(C,dim=r,chain=rep) == Bw[p,1]
+															case2 	= 	deathtime(C,dim=r,chain=rep) == Bw[p,2]
+															case3 	= 	isempty(chainboundary(C,dim=r,chain=rep))
+															if !(case1 & case2 & case3)
+																println()
+																println("error: please check birth and death times")
+															end
+														end
+													end
+													if sortrows(Ba) != sortrows(Bw)
+														println("") ##############
+														println("error 1")
+														println(Ba)##############
+														println(Bw)##############
+														append!(errorindices,[solkey])
+														return C,D,K,solkey
+													end
+													checkcells 	= 	model == "complex" 	&&
+																	maxrad == Inf 		&&
+																	in(numrad,[Inf,10]) &&
+																	size(Ba,1)	== 1
+													if checkcells
+														Ra 	= 	K[solkey][:cyclerep][r+1]
+														Rb	= 	classrep(C,dim=r,class=1)
+														if 	sort(Ra) 	   != 	sort(Rb)
 															println("")
-															println("error 2")
-															println(xkey)
-															println(K[xkey][:barcodes])
-															println(r)
-															return C,D
-														end
-														Ba	= 	K[xkey][:barcodes][r+1]
-														Bw  = 	barcode(C,dim=r)
-														if record == "all"
-															for p 	= 	1:size(Bw,1)
-																rep 	= 	classrep(C,dim=r,class=p,format="index")
-																case1 	= 	birthtime(C,dim=r,chain=rep) == Bw[p,1]
-																case2 	= 	deathtime(C,dim=r,chain=rep) == Bw[p,2]
-																case3 	= 	isempty(chainboundary(C,dim=r,chain=rep))
-																if !(case1 & case2 & case3)
-																	println()
-																	println("error: please check birth and death times")
-																end
-															end
-														end
-														if sortrows(Ba) != sortrows(Bw)
-															println("[]") ##############
-															println("error 1")
-															println(Ba)##############
-															println(Bw)##############
-															append!(errorindices,[xkey])
-															return C,D,K,xkey
-														end
-														if xcr 	& 	size(Ba,1) 	==	1
-															Ra 	= 	K[xkey][:cyclerep][r+1]
-															Rb	= 	classrep(C,dim=r,class=1)
-															if 	sort(Ra) 	   != 	sort(Rb)
-																println("")
-																println("error 3")
-																println(sort(Ra))
-																println(sort(Rb))
-																println(K[xkey]) ##############
-																println([r])
-																append!(errorindices,[xkey])
-																return C,r,xkey,D
-															end
+															println("error 3")
+															println(sort(Ra))
+															println(sort(Rb))
+															println(K[solkey]) ##############
+															println([r])
+															append!(errorindices,[solkey])
+															return C,r,solkey,D
 														end
 													end
 												end
@@ -6757,71 +8068,101 @@ function undercat(X)
 	end
 end
 
+function 	solutionkey(	;
+				model 		= 	"complex",
+				maxrad 		= 	Inf,
+				numrad		= 	Inf,
+				space		= 	"sphere",
+				problemset 	= 	"hand")
+	if 	problemset 			== 	"hand"
+		solkey 		= 	string(
+						"mod",model,
+						"mar",string(maxrad),
+						"nr",string(numrad),
+						"it",string(space))
+	end
+	return solkey
+end
+
+function 	suspend(rv,cp,f,degree)
+
+end
+
+function 	nr2ss(numrad)
+	if 		numrad 	== 	1
+		ss	= 	100
+	elseif numrad 	== 	10
+		ss 	= 	10
+	elseif 	numrad 	== 	Inf
+		ss 	= 	1
+	else
+		println()
+		println("error: <nr2ss> only takes arguments 1, 10, and 0")
+		println("argument passed was: $(numrad)")
+	end
+	return ss
+end
+
+function NUMRAD2numrad(NUMRAD)
+	if NUMRAD == 0
+		numrad 	= 	Inf
+	else
+		numrad 	= 	NUMRAD
+	end
+	return numrad
+end
+
 # 12/28/2017
 # This function is meant to generate crosscheck data for the version of <unittest>
 # defined 12/30/2017.
 function generatecrosscheckdata_perseus()
 
-	K 	= 	Dict()			# K for "calibrate" (letter C was taken)
+	K 			= 	Dict()			# K for "calibrate" (letter C was taken)
 
 	for filetype 	= ["textfile"]
 		for model 		= ["vr" "pc"] # cellular examples must be handled separately
 			for maxdim 		= [0 1 2]
 				for minrad 		= [-Inf 0]
 					for maxrad 		= [Inf, 100]
-						for numrad 		= [1 10 Inf]
+						for NUMRAD 		= [1 10 0]
 							for fastop 		= [true,false]
 								for vscale 		= [[]]
 									for record 		= ["all" "cyclerep" "none"]
 										for pointlabels	= [[]]
 											for iteration	= [1 2]
 
-												filepath 	= 	modit2filepath(model,iteration-1)
+												# the last three of these are arbitrary choices
+												proceed 		= 	maxdim 	== 	2 			&&
+																	model 	== 	"vr"		&&
+																	record 	== 	"all"		&&
+																	minrad 	== 	0			&&
+																	fastop
+												if proceed
 
-												# 	nli stands for number-level-index
-												if [minrad maxrad numrad] == [-Inf Inf Inf]
-													nli	=	1;
-												elseif [minrad maxrad numrad] == [0 100 10]
-													nli	=	2;
-												else
-													nli = 	0
-												end
+													filepath 	= 	modit2filepath(model,iteration-1)
+													numrad 		= 	NUMRAD2numrad(NUMRAD)
+													solutionkey(	model 		= 	"complex",
+																	maxrad 		= 	Inf,
+																	numrad		= 	Inf,
+																	space		= 	0,
+																	problemset 	= 	"checkparameters")
+													stepsz 		= 	nr2ss(numrad)
 
-												#		xbc stands for cross-check barcode
-												#		xcr	stands for cross-check cycle rep
-												xbc = 	(nli > 0) &&
-														in(model,["vr" "complex"]) &&
-														in(record,["cyclereps","all"]) &&
-														(maxdim == 2)
-												xcr = 	xbc && model == "complex"
-
-												if xbc
-													if 		numrad 	==	10
-														stepsz 	= 	10
-													elseif 	numrad 	== 	Inf
-														stepsz	= 	1
-													end
-
-													E	= 	perseusvrjl(
+													E	= 	perseusjl(
 															filepath;				# 	filepaths should end with .txt
-															model					= 	"vr",
+															model					= 	model,
 															rowsare 				= 	"distances",
-															# datapath				= 	"/Users/greghenselman/Julia/testtext5.txt",
-															datapath 				= 	"/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdc_agora/gdc_a_peresuswrappers/perseustemporaydatasilo.txt.rtf",
-															outpath					= 	"perseusoutput_caliber",
 															maxdim 					= 	maxdim,
 															minrad					= 	0,
 															stepsz					= 	stepsz,
 															nsteps					= 	Inf,
-															# perseusfilepath 		= 	"/Users/greghenselman/Downloads/perseusMac")
-															perseusfilepath 		= 	"/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdc_agora/gdc_a_peresuswrappers/perseusMac")
+															fr 						= 	numrad == Inf)
 
-													xkey 					= 	undercat([model,"$(nli)","$(iteration)"])
-													K[xkey]					=	Dict()
-													K[xkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
-													K[xkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
+													K[solkey]						=	Dict()
+													K[solkey][:barcodes]			= 	Array{Any,1}(maxdim+1)
+													K[solkey][:cyclerep]			= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
 													for r 	= 	1:(maxdim+1)
-														K[xkey][:barcodes][r] 		= perseus_barcode(E,dim=r-1)
+														K[solkey][:barcodes][r] = barcode_perseus(E,dim=r-1)
 													end
 												end
 											end
@@ -6838,80 +8179,105 @@ function generatecrosscheckdata_perseus()
 	return K
 end
 
-function manualcycleadditions(K)
+function handcalcsolution()
+
+	K 			= 	Dict()
 
     # SPHERE / MACHINE PRECISION
 
-	maxdim		= 	2
+	maxdim 		= 	2
 	model 		= 	"complex"
-	nli			=	1
-	iteration	=   2
-	xkey 		= 	undercat([model,"$(nli)","$(iteration)"])
+	maxrad 		= 	100
+	numrad 		= 	Inf
+	space		=   "sphere"
+	solkey 		= 	solutionkey(
+					model 		= 	"complex",
+					maxrad 		= 	maxrad,
+					numrad		= 	numrad,
+					space		= 	space,
+					problemset 	= 	"hand")
 
-	K[xkey]					=	Dict()
-	K[xkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
-	K[xkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
+	K[solkey]					=	Dict()
+	K[solkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
+	K[solkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
 
-	K[xkey][:barcodes][1] 	=	[20.0 30.0;10.0 Inf]
-	K[xkey][:barcodes][2] 	=	[40.0 50.0]
-	K[xkey][:barcodes][3] 	=	[60.0 70.0]
+	K[solkey][:barcodes][1] 	=	[20.0 30.0;10.0 Inf]
+	K[solkey][:barcodes][2] 	=	[40.0 50.0]
+	K[solkey][:barcodes][3] 	=	[60.0 70.0]
 
-	K[xkey][:cyclerep][1]	= 	[1; 2]
-	K[xkey][:cyclerep][2]	= 	[1; 2]
-	K[xkey][:cyclerep][3]	= 	[1; 2]
+	K[solkey][:cyclerep][1]	= 	[1; 2]
+	K[solkey][:cyclerep][2]	= 	[1; 2]
+	K[solkey][:cyclerep][3]	= 	[1; 2]
 
     # SPHERE / 10:100 PRECISION
     # (identical to sphere with machine precision, just a different nli & key value)
 
-	maxdim		= 	2
 	model 		= 	"complex"
-	nli			=	2
-	iteration	=   2
-	xkey 		= 	undercat([model,"$(nli)","$(iteration)"])
+	maxrad 		= 	100
+	numrad 		= 	10
+	space		=   "sphere"
+	solkey 		= 	solutionkey(
+					model 		= 	"complex",
+					maxrad 		= 	maxrad,
+					numrad		= 	numrad,
+					space		= 	space,
+					problemset 	= 	"hand")
 
-	K[xkey]					=	Dict()
-	K[xkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
-	K[xkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
+	K[solkey]					=	Dict()
+	K[solkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
+	K[solkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
 
-	K[xkey][:barcodes][1] 	=	[20.0 30.0;10.0 Inf]
-	K[xkey][:barcodes][2] 	=	[40.0 50.0]
-	K[xkey][:barcodes][3] 	=	[60.0 70.0]
+	K[solkey][:barcodes][1] 	=	[20.0 30.0;10.0 Inf]
+	K[solkey][:barcodes][2] 	=	[40.0 50.0]
+	K[solkey][:barcodes][3] 	=	[60.0 70.0]
 
-	K[xkey][:cyclerep][1]	= 	[1; 2]
-	K[xkey][:cyclerep][2]	= 	[1; 2]
-	K[xkey][:cyclerep][3]	= 	[1; 2]
+	K[solkey][:cyclerep][1]	= 	[1; 2]
+	K[solkey][:cyclerep][2]	= 	[1; 2]
+	K[solkey][:cyclerep][3]	= 	[1; 2]
 
     # EMPTY SPACE / MACHINE PRECISION
-	maxdim		= 	2
 
 	model 		= 	"complex"
-	nli			=	1
-	iteration	=   1
-	xkey 		= 	undercat([model,"$(nli)","$(iteration)"])
+	maxrad 		= 	100
+	numrad 		= 	Inf
+	space		=   "empty"
+	solkey 		= 	solutionkey(
+					model 		= 	"complex",
+					maxrad 		= 	maxrad,
+					numrad		= 	numrad,
+					space		= 	space,
+					problemset 	= 	"hand")
 
-	K[xkey]					=	Dict()
-	K[xkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
-	K[xkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
+	K[solkey]					=	Dict()
+	K[solkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
+	K[solkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
 
 	for p = 1:maxdim+1
-		K[xkey][:barcodes][p] 	=	Array{Int64,2}(0,2)
+		K[solkey][:barcodes][p] 	=	Array{Int64,2}(0,2)
 	end
 
     # EMPTY SPACE / 10:100 PRECISION
-	maxdim		= 	2
 
 	model 		= 	"complex"
-	nli			=	2
-	iteration	=   1
-	xkey 		= 	undercat([model,"$(nli)","$(iteration)"])
+	maxrad 		= 	100
+	numrad 		= 	10
+	space		=   "empty"
+	solkey 		= 	solutionkey(
+					model 		= 	"complex",
+					maxrad 		= 	maxrad,
+					numrad		= 	numrad,
+					space		= 	space,
+					problemset 	= 	"hand")
 
-	K[xkey]					=	Dict()
-	K[xkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
-	K[xkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
+	K[solkey]					=	Dict()
+	K[solkey][:barcodes]		= 	Array{Any,1}(maxdim+1)
+	K[solkey][:cyclerep]		= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
 
 	for p = 1:maxdim+1
-		K[xkey][:barcodes][p] 	=	Array{Int64,2}(0,2)
+		K[solkey][:barcodes][p] 	=	Array{Int64,2}(0,2)
 	end
+
+	return K
 end
 
 function savesolutions()
@@ -6930,7 +8296,7 @@ function savesolutions()
 	""")
 	K 	= 	generatecrosscheckdata_perseus()
 	manualcycleadditions(K)
-	filepath = joinpath(@__DIR__,"solutions/testsolutions.jld")
+	filepath = joinpath(@__DIR__,"testsolutions/testsolutions.jld")
 	JLD.save(filepath,"K",K)
 	# JLD.save("/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/gdb_da_a_d_solns/gdb_da_a_dsoln_a.jld","K",K)
 	# JLD.save("/Users/greghenselman/Google Drive/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/gdb_da_a_d_solns/gdb_da_a_dsoln_a.jld","K",K)
@@ -6951,92 +8317,66 @@ homology, which is produced and maintained by Vidit Nanda:
 
 Note that keyword argument <filepath> should be a filepath to an executable
 form of Perseus.
+
+Important keyword argument/values are
+
+model
+- 	"vr" (input is a distance matrix)
+- 	"pc2vr" (input is a point cloud; Eirene will compute and pass a distance matrix to perseus)
+- 	"pc" (eirene will pass a pointcloud, calling the brips option)
+
 =#
 
-function perseusvrjl(
+function perseusjl(
 					datum;					# 	filepaths should end with .txt
 					model					= 	"vr",
-					rowsare 				= 	"distances",
-					datapath				= 	"/Users/greghenselman/Julia/testtext4.txt",
-					outpath					= 	"perseusoutput_caliber",
+					rowsare 				= 	"dimensions",
+					datapath				= 	testfp("prsip"),
+					outpath					= 	testfp("prsop"),
 					maxdim 					= 	1,
 					minrad					= 	0,
 					stepsz					= 	0.1,
 					nsteps					= 	10,
-					fr						= 	false, # stands for full resolution
+					fr						= 	false, # stands for full resolution; used only for "vr" model
+					scalefactor				= 	1,
+					pointbirths				= 	[],
 					perseusfilepath 		= 	"/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdc_agora/gdc_a_peresuswrappers/perseusMac"
 					)
 
-	if model == "vr"
-		if typeof(datum)==String
-			filename = datum
-			if typeof(readdlm(filename,','))<:Array{Float64}
-				s = readdlm(filename,',')
-			elseif typeof(readdlm(filename,' '))<:Array{Float64}
-				s = readdlm(filename,' ')
-			else
-				print("Error reading text file.  datum files of this format must be either comma or space delimited.")
-				return
-			end
-		elseif typeof(datum)<:Array{Int64} || typeof(datum)<:Array{Float64}
-			s = datum
-		else
-			print("Error: datum must be a string or an array of type Array{Float64} or Array{Int64}")
-		end
-
-		if rowsare == "dimensions"
-			d = Distances.pairwise(Euclidean(),s)
-		elseif rowsare == "points"
-			d = Distances.pairwise(Euclidean(),s')
-		elseif rowsare == "distances"
-			d = convert(Array{Float64},s)
-		end
-
-		if fr
-			d,ocg2rad 	= 	ordercanonicalform_3{Tv}(
-							d;
-							maxrad=Inf,
-							minrad=-Inf,
-							numrad=Inf,
-							vscale="default",
-							)
-			d 			= 	maximum(d)-d
-			nsteps		= 	Inf
-			stepsz		= 	1
-			minrad		= 	0
-			maxrad		= 	Inf
-		end
-
-		if nsteps == Inf
-			nsteps = 1 + ceil(Int64,maximum(d)/stepsz)
-		end
-
-		samplesize = size(d,1)
-
-		datastream = open(datapath,"w+")
-		close(datastream)  				# this clears the current data file
-		datastream = open(datapath,"a+")
-		str = "$(samplesize)\n$(minrad) $(stepsz) $(nsteps) $(maxdim+1)"
-		write(datastream,str)
-		for p = 1:samplesize
-			str = string(d[p,:])
-			str = replace(str,"[","")
-			str = replace(str,"]","")
-			str = replace(str,",","")
-			str = "\n"*str
-			write(datastream,str)
-		end
-		close(datastream)
-	elseif model == "perseusdistmat"
+	if in(model, ["perseusdistmat","perseusbrips"])
 		datapath = datum
+	else
+		writelog 			=
+		writeperseusfile(	datum;					# 	filepaths should end with .txt
+							model					= 	model,
+							rowsare 				= 	rowsare,
+							datapath				= 	datapath,
+							outpath					= 	outpath,
+							maxdim 					= 	maxdim,
+							minrad					= 	minrad,
+							stepsz					= 	stepsz,
+							nsteps					= 	nsteps,
+							fr						= 	fr, # stands for full resolution
+							scalefactor				= 	scalefactor,
+							pointbirths				= 	pointbirths)
 	end
 
-	command  = `$perseusfilepath distmat $datapath $outpath`
+	nsteps 	= 	writelog["nsteps"]
+	ocg2rad =	writelog["ocg2rad"] # this will only matter when fr == true
+
+	if 		in(model,["vr","perseusdistmat"])
+		command  	= `$perseusfilepath distmat $datapath $outpath`
+	elseif 	model 	== 	"pc"
+		command  	= `$perseusfilepath rips $datapath $outpath`
+	end
 	run(`$(command)`)
 
 	D = Dict(
-			:barcodes => 	Array{Array{Float64,2},1}(maxdim+1),
-			:betti   => 	Array{Int64}(0,maxdim+1)
+			:barcodes 			=> 	Array{Array{Float64,2},1}(maxdim+1),
+			:betti   			=> 	Array{Int64}(0,maxdim+1),
+			:model 				=>	model,
+			:maxdim 			=> 	maxdim,
+			:perseusjlversion 	=>  "0.0.0"
 			)
 
 	# si stands for shifted index; since peresus ouptput starts indexing at 0 and arrays are 1-indexed, the true barcode of dimension r is D[:filtvalssi][D[:barcodes][r]+1]
@@ -7067,13 +8407,139 @@ function perseusvrjl(
 	return D
 end
 
-function perseus_barcode(D;dim=1)
+function writeperseusfile(
+					datum;					# 	filepaths should end with .txt
+					model					= 	"vr",
+					rowsare 				= 	"dimensions",
+					datapath				= 	joinpath(@__DIR__,"perseusreservoir/perseusreservoir_input.txt"),
+					outpath					= 	joinpath(@__DIR__,"perseusreservoir/perseusreservoir_output"),
+					maxdim 					= 	1,
+					minrad					= 	0,
+					stepsz					= 	0.1,
+					nsteps					= 	10,
+					fr						= 	false, # stands for full resolution
+					scalefactor				= 	1,
+					pointbirths				= 	[],
+					)
+
+	if typeof(datum)==String
+		filename = datum
+		if typeof(readdlm(filename,','))<:Array{Float64}
+			s = readdlm(filename,',')
+		elseif typeof(readdlm(filename,' '))<:Array{Float64}
+			s = readdlm(filename,' ')
+		else
+			print("Error reading text file.  datum files of this format must be either comma or space delimited.")
+			return
+		end
+	elseif typeof(datum)<:Array{Int64} || typeof(datum)<:Array{Float64}
+		s = datum
+	else
+		print("Error: datum must be a string or an array of type Array{Float64} or Array{Int64}")
+	end
+
+	# the value assigned to ocg2rad only matters in specific cases; here
+	# we assign it an arbitrary default value
+	ocg2rad 	= 	[]
+
+	if in(model,["vr","pc2vr"])
+
+		if 	model 	== 	"pc2vr"
+			if rowsare == "dimensions"
+				d = Distances.pairwise(Euclidean(),s)
+			elseif rowsare == "points"
+				d = Distances.pairwise(Euclidean(),s')
+			end
+		end
+
+		if model == "vr"
+			d = convert(Array{Float64},s)
+			if !issymmetric(d)
+				println()
+				println("Error: when the \"vr\" keyword value is passed the input array should be symmetric.")
+				return
+			end
+		end
+
+		if fr
+			d,ocg2rad 	= 	ordercanonicalform_4(
+							d;
+							maxrad=Inf,
+							minrad=-Inf,
+							numrad=Inf,
+							vscale="diagonal",
+							)
+			d 			= 	maximum(d)-d
+			nsteps		= 	Inf
+			stepsz		= 	1
+			minrad		= 	0
+			maxrad		= 	Inf
+		end
+
+		if nsteps == Inf
+			nsteps = 1 + ceil(Int64,maximum(d)/stepsz)
+		end
+
+		samplesize = size(d,1)
+
+		datastream = open(datapath,"w+")
+		close(datastream)  				# this clears the current data file
+		datastream = open(datapath,"a+")
+		str = "$(samplesize)\n$(minrad) $(stepsz) $(nsteps) $(maxdim)"
+		write(datastream,str)
+		for p = 1:samplesize
+			str = string(d[p,:])
+			str = replace(str,"[","")
+			str = replace(str,"]","")
+			str = replace(str,",","")
+			str = "\n"*str
+			write(datastream,str)
+		end
+		close(datastream)
+	elseif model 	== 	"brips"
+		println()
+		println("NB: functionality for the \"brips\" keyword value is currently in beta.")
+		if rowsare == "dimensions"
+			s 	= 	s';
+		end
+		ambdim,numpts 		= 	size(s)
+		if nsteps == Inf
+			nsteps = 1 + ceil(Int64,maximum(Distances.pairwise(Euclidean(),s'))/stepsz)
+		end
+		if 	isempty(pointbirths)
+			pointbirths 	= 	zeros(numpts)
+		else
+			pointbirths 	= 	pointbirths(:)
+		end
+		d 					= 	[s pointbirths]
+
+		datastream = open(datapath,"w+")
+		close(datastream)  				# this clears the current data file
+		datastream = open(datapath,"a+")
+		str = "$(ambdim)\n$(scalefactor) $(stepsz) $(nsteps)"
+		write(datastream,str)
+		for p = 1:samplesize
+			str = string(d[p,:])
+			str = replace(str,"[","")
+			str = replace(str,"]","")
+			str = replace(str,",","")
+			str = "\n"*str
+			write(datastream,str)
+		end
+		close(datastream)
+	end
+	writelog 	= 	Dict("nsteps" => nsteps, "ocg2rad" => ocg2rad)
+	return writelog
+end
+
+function barcode_perseus(D;dim=1)
 	p = dim+1
 	if !haskey(D,:barcodes)
 		print("Error: input dictionary does not appear to contain barcode data.")
 		return
-	elseif p > length(D[:barcodes])
-		return zeros(Int64,0,2)
+	elseif p > D[:maxdim]
+		print("Error: input dictionary does not appear to contain barcode data in dimensions greater than $(D[:maxdim]).  The user requested barcodes in dimensions up through $(p).")
+		return
 	else
 		B 					=	D[:barcodes][p]
 		B					=	2+round.(Int64,B)

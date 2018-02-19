@@ -1,6 +1,9 @@
 using Eirene
 using Base.Test
 
-# write your own tests here
 # @test 1 == 2 #(example syntax)
-@test isempty(Eirene.unittest())
+@test isempty(eirenevrVperseusvr())
+@test isempty(eirenevrVeirenepc(10,2))
+@test isempty(eirenevrVeirenecomplex(10,2))
+@test isempty(eirenecomplexVhandcalc())
+@test eirene_checkparameters()
