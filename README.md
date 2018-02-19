@@ -11,16 +11,38 @@ julia> Pkg.clone("https://github.com/Eetion/Eirene.jl.git")
 julia> using Eirene
 ```
 
-Let's plot the 1d persistence diagram for 50 points sampled from the uniform distribution on R<sup>20</sup>.  The first line below generates 20x50 iid matrix and stores it in a variable `x`.  The second asks Eirene to analyze `x` and store the results in a variable `C`.  The third plots the diagram.  Most of what you can do with Eirene is done with minor modifications to these commands.
+It's fairly common to get error messages when you do this.  Generally they will want you to install additional (supporting) packages.  Read these messages, and follow the instructions.  When in doubt, always double check that you are running the latest version of Eirene, and use
+
+```
+julia> Pkg.update()
+```
+
+to ensure that you are using the latest versions of the supporting packages.
+
+Now let's plot the 1d persistence diagram for 50 points sampled from the uniform distribution on R<sup>20</sup>.  The first line below generates 20x50 iid matrix and stores it in a variable `x`.  The second asks Eirene to analyze `x` and store the results in a variable `C`.  The third plots the diagram.  Most of what you can do with Eirene is done with minor modifications to these commands.
 
 ```
 julia> x = rand(20,50)
 julia> C = eirene(x, model = "pc")
 julia> plotpersistencediagram_pjs(C,dim=1)
 ```
+**Note 1**  If you encounter error messages like the following
+
+```
+ERROR: UndefVarError: eirene not defined
+ERROR: UndefVarError: plotpersistencediagram_pjs not defined
+```
+
+then you will want to append `Eirene.` to the beginning of each function in the Eirene package.  For example, in pace of line 2, you would enter
+
+```
+julia> C = Eirene.eirene(x, model = "pc")
+```
+
+**Note 2**  For a richer example using real-world demography data, visit [gregoryhenselman.org](gregoryhenselman.org/eirene).  The documentation on this page is written for an older version of Eirene, so the commands may need to be modified according to the guidelines below.
 
 ### Keywords
-
+<br>
   In the example above, the expression `model = "pc"` that sits inside `C = eirene(x, model = "pc")` declares that the columns of `x` should be treated as points in a Euclidean point cloud. We call `model` a *keyword argument*, and `"pc"` its *value*.  Every keyword comes with a default value; you only have to declare a value if you want something other than a default.
 
 `model = "pc", "vr", "complex"`   
@@ -47,6 +69,7 @@ julia> plotpersistencediagram_pjs(C,dim=1)
 `record = "cyclerep", "none"`
 * Determines wether or not to compute generators.  
 * Possible values: `"cyclerep"`, `"none"`.  Default value: `"cyclerep"`.
+
 
 ### Inputs
 
@@ -97,8 +120,10 @@ julia> C = eirene(dp=dp, fv=fv, rv=rv, cp=cp, <keyword arguments>)
 ```
 The keyword values for `dp`, `fv`, `rv`, `cp` should be vectors complying with the three criteria set out in the *Complexes (file format)* section above.
 
-### Barcodes, Betti Curves, and Persistence Diagrams
 
+
+### Barcodes, Betti Curves, and Persistence Diagrams
+<br>
 Eirene stores a list of every persistent homology class (that is, every bar) in the output variable `C`.  To find the birth and death times of each class, run
 
 ```
@@ -160,6 +185,13 @@ which the user may specify with `embeddingobj = "hop"`. This option often create
 
 #### Point clouds and Vietoris Rips complexes
 
+
+
+
+
+
+
+
 PlotlyJS plots may be exported to the Plotly web API for sharing, storage, and advanced editing. Every function that generates
 a PlotlyJS visual in the Eirene library returns a PlotlyJS object which may be uploaded via the Plotly. post function. See the
 documentation for Plotly.jl to learn more.
@@ -180,7 +212,6 @@ homological barcodes alone (usually around 10%, for Euclidean point cloud data).
 may yield significant savings for other spaces, however.
 
 ### Comments
-
 It is common among persistence solvers to round the entries of a user-provided distance matrix to a fixed number of distinct
 values or significant digits. This is not the default behavior with Eirene, so care must be taken when comparing outputs.
 
@@ -218,6 +249,8 @@ When Eirene processes these data, they are broken down by dimension.  Eirene cre
 ```
 C = eirene(rv=RV, cp=CP, fv=FV, dp=[], <keyword arguments>)
 ```
+
+
 
 ### Common Issues
 
