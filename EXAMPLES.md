@@ -92,18 +92,87 @@ julia> plotclassrep_pjs(C,class=50,dim=1,showlabels=false,showcloud = false)
 # 2: Noisy Torus
 
 Let's try a larger point cloud.  Run
+
 ```
 julia> filepath = eirenefilepath("noisytorus")
+
+julia> pointcloud = readcsv(filepath)
+
+julia> ezplot_pjs(pointcloud)
+
 ```
 
+and checkout the new point cloud (it's a noisy torus).  Note that
 
-# 3: Around the World
+```
+julia> size(pointcloud)
+(3, 1800)
+```
+
+so there are 1800 points in this cloud.  That's large for an H2 compuation, so
+let's use a cutoff radius:
+
+```
+julia> C = eirene(pointcloud,maxdim=2,maxrad=0.3,model="pc")
+```
+
+To find and plot the two primary H1 generators for this cloud:
+
+```
+julia> plotbarcode_pjs(C,dim=0:1)
+
+julia> plotpersistencediagram_pjs(C,dim=1)
+
+julia> plotclassrep_pjs(C,class=768,dim=1)
+
+julia> plotclassrep_pjs(C,class=769,dim=1)
+```
+
+For H2, use the following. Make sure to set showlabels=false, otherwise the
+graphics will be expensive to render!
+
+```
+julia> plotbarcode_pjs(C,dim=2)
+
+julia> plotpersistencediagram_pjs(C,dim=2)
+
+julia> plotclassrep_pjs(C,class=12,dim=2,showlabels=false)
+```
+
+# 3: Clouds
+
+You can generate several other point clouds and distance matrices via built-in
+functions with Eirene.  Check out
+
+```
+julia> noisycircle()
+
+julia> noisycircle3()
+
+julia> torus(m = 100,n = 50,mrad=1,nrad = 0.2)
+
+julia> noisytorus(m = 100,n=50,mrad=1,nrad = 0.2,noiserad= 0.5*nrad)
+
+julia> sphere()
+
+julia> matchingcomplex_symmat(2,3)
+
+julia> chessboardcomplex_symmat(numrows=3,numcols=5)
+
+julia> plane2torus(rand(1000,2)*pi/2)
+
+julia> zerodrandmat(10)
+```
+
+# 4: Around the World
 
 Suppose you want to explore world geography vis-a-vis networks of neighboring cities.  A wealth of data is available online, and for this exercise we will use a catalog of 7322 cities from simplemaps.com.  This data comes preloaded in the form of a .csv file with the Eirene library, and can be accessed via
 
 ```
 julia> filepath = eirenefilepath("simplecity")
+```
 
+```
 julia> a = ezread(filepath)
 7323x9 Array{Any,2}:
  "city"           "city_ascii"       "lat"    "lng"  …  "country"      "iso2"  "iso3"  "province"
@@ -133,7 +202,9 @@ julia> b = a[2:end,3:4]
    ⋮
  -17.8178  31.0447
  -20.17    28.58
+```
 
+```
 julia> b = convert(Array{Float64,2},b)
 7322x2 Array{Float64,2}:
   34.983   63.1333

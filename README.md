@@ -1,6 +1,6 @@
 # Documentation
 
-## An example says it all (almost)
+## One example says it all (almost)
 
 Installing Julia is easy.  Download the latest version of the
 [Julia Language](https://julialang.org/downloads/), open a
@@ -26,7 +26,9 @@ julia> x = rand(20,50)
 julia> C = eirene(x, model = "pc")
 julia> plotpersistencediagram_pjs(C,dim=1)
 ```
-**Note 1**  If you encounter error messages like the following
+**Note 1**  Check out `EXAMPLES.md` for more examples!
+
+**Note 2**  If you encounter error messages like the following
 
 ```
 ERROR: UndefVarError: eirene not defined
@@ -38,8 +40,6 @@ then you will want to append `Eirene.` to the beginning of each function in the 
 ```
 julia> C = Eirene.eirene(x, model = "pc")
 ```
-
-**Note 2**  For a richer example using real-world demography data, visit gregoryhenselman.org/eirene.  The documentation on this page is written for an older version of Eirene, so the commands may need to be modified according to the guidelines below.
 
 ### Keywords
 <br>
@@ -75,7 +75,7 @@ julia> C = Eirene.eirene(x, model = "pc")
 
 Eirene computes persistent homology for three types of inputs: distance matrices, point clouds, and complexes.  Here are some formats these can come in, and how to analyze them.
 
-##### Distance matrices
+##### Distance matrices (matrices and file paths)
 
 ```
 julia> C = eirene(x, <keyword arguments>)
@@ -84,7 +84,7 @@ Formats for `x`
 * a symmetric matrix in Julia
 * a file path to a symmetric matrix, recorded in a comma or space-delimited text file (.csv or .txt)
 
-##### Point clouds
+##### Point clouds (matrices and file paths)
 
 ```
 julia> C = eirene(x, model = "pc", <keyword arguments>)
