@@ -11,13 +11,13 @@ julia> Pkg.clone("https://github.com/Eetion/Eirene.jl.git")
 julia> using Eirene
 ```
 
-It's fairly common to get error messages when you do this.  Generally they will want you to install additional (supporting) packages.  Read these messages, and follow the instructions.  When in doubt, always double check that you are running the latest version of Eirene, and use
+It's fairly common to get error messages when you do this.  Generally they will want you to install additional (supporting) packages.  Read these messages, and follow the instructions.  When in doubt, *FIRST* check that you are running the latest version of Eirene, and use
 
 ```
 julia> Pkg.update()
 ```
 
-to ensure that you are using the latest versions of the supporting packages.
+to ensure that you are using the latest versions of the supporting packages.  *SECOND*, close the Julia shell.  Some updates only take effect in new windows.
 
 Now let's plot the 1d persistence diagram for 50 points sampled from the uniform distribution on R<sup>20</sup>.  The first line below generates 20x50 iid matrix and stores it in a variable `x`.  The second asks Eirene to analyze `x` and store the results in a variable `C`.  The third plots the diagram.  Most of what you can do with Eirene is done with minor modifications to these commands.
 
