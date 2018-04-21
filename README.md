@@ -17,7 +17,7 @@ It's fairly common to get error messages when you do this.  Generally they will 
 julia> Pkg.update()
 ```
 
-to ensure that you are using the latest versions of the supporting packages.  *SECOND*, close the Julia shell.  Some updates only take effect in new windows.
+to ensure that you are using the latest versions of the supporting packages.  *SECOND*, close the Julia shell.  Some updates will only take effect in new windows.
 
 Now let's plot the 1d persistence diagram for 50 points sampled from the uniform distribution on R<sup>20</sup>.  The first line below generates 20x50 iid matrix and stores it in a variable `x`.  The second asks Eirene to analyze `x` and store the results in a variable `C`.  The third plots the diagram.  Most of what you can do with Eirene is done with minor modifications to these commands.
 
@@ -75,7 +75,7 @@ julia> C = Eirene.eirene(x, model = "pc")
 
 Eirene computes persistent homology for three types of inputs: distance matrices, point clouds, and complexes.  Here are some formats these can come in, and how to analyze them.
 
-##### Distance matrices (matrices and file paths)
+##### Distance matrices
 
 ```
 julia> C = eirene(x, <keyword arguments>)
@@ -84,7 +84,7 @@ Formats for `x`
 * a symmetric matrix in Julia
 * a file path to a symmetric matrix, recorded in a comma or space-delimited text file (.csv or .txt)
 
-##### Point clouds (matrices and file paths)
+##### Point clouds
 
 ```
 julia> C = eirene(x, model = "pc", <keyword arguments>)
@@ -93,14 +93,59 @@ Formats for `x`
 * a numeric matrix in Julia (columns will be treated as points in Euclidean space)
 * a file path to a numeric matrix, recorded in a comma or space-delimited text file (.csv or .txt)
 
-##### Complexes (file format)
+##### Complexes
 
-Suppose we have a (cell) complex `E`, whose cells are enumerated `1, ..., N`.  
+There are several ways to format the data of a cell complex `E`.  Here are the main ingredients.
+
+* number the cells `1, ..., N` in ascending order, according to dimension
+* let `D` be the `N x N` zero/one matrix with `D[i,j] = 1` iff `i` is a face of cell `j`
+* store `D` as a sparse matrix in Julia (see Julia docs), and define
+```
+julia> rv = D.rowval
+julia> cp = D.colptr
+```
+
+Define vectors `dv`, `ev`, and `dp` such that
+
+* `dv[i]` is the dimension of cell `i`
+* `ev[k]` is the total number of cells with dimension `k-1`
+* `dp[k]` is *1 plus* the number of cells of dimension *strictly less than* `k-1`
+
+If in addition we have a nested sequence of complexes `E_0 ≤ ... ≤ E_n = E`, then let `fv` be the vector such that
+
+* `fv[i]` is the birthtime of cell `i`
+
+###### simple format (from file)
+
+The formats described below are great for efficiency, but they can be hard to read.  Alternatively, you can write a comma separated file with the following format
 
 ```
-julia> C = eirene(x, model = "complex", <keyword arguments>)
+dv[1], fv[1], <first face of cell 1>, <second face of cell 1>, ...
+dv[2], fv[2], <first face of cell 2>, <second face of cell 2>, ...
+...
+dv[N], fv[N], <first face of cell N>, <second face of cell N>, ...
 ```
-Here input `x` is a file path to a comma or space delimited file (.csv or .txt) with four lines:
+
+If this file is saved as `Users/Adam/ez.csv`, then to compute PH call
+
+```
+julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="sp")
+```
+
+
+###### sparse column format
+
+Eirene has a keyword argument for every vector defined above.  To compute PH:
+
+```
+julia> C = eirene(rv=rv,cp=cp,dv=dv,fv=fv)
+```
+You can use either `ev = ev` or `dp=dp` instead of `dv=dv`.  Eirene only needs one of the three.
+
+
+###### sparse column format (from file)
+
+You can store `E` as a comma separated .txt or .csv file with four lines
 
 ```
 dp_1, ..., dp_m
@@ -108,18 +153,18 @@ fv_1, ..., fv_n
 rv_1, ..., rv_p
 cp_1, ..., cp_q
 ```
-We will treat these lines as vectors `dp` (dimension pattern), `fv` (filtration value), `rv` (row value), and `cp` (column pattern).  Each vector should have numeric entries, and should satisfy the following three requirements. For convenience let's write `v{k}` for the set of all integers `j` such that `v[k] ≤ j < v[k+1]`.
-*  the maximal faces of cell `j` form the set `rv[cp{j}]`
-*  the filtration value of cell `k` is `fv[k]`
-*  the cells of dimension `i-1` form the set `dp{i}`
 
-##### Complexes (julia format)
+where line one is `dp`, line 2 is `fv`, line 3 is `rv`, and line 4 is `cp`.
+* If you know `D` and want to figure out what `rv` and `cp` should be, you can either view the Julia docs on sparse matrices or google "sparse column format".
+* Instead of `dp`, you can put either `dv` or `ev` in the first line.
+
+Say this file is saved as `Users/Adam/complex.csv`.  To compute PH, call
 
 ```
-julia> C = eirene(dp=dp, fv=fv, rv=rv, cp=cp, <keyword arguments>)
+julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="dp")
 ```
-The keyword values for `dp`, `fv`, `rv`, `cp` should be vectors complying with the three criteria set out in the *Complexes (file format)* section above.
 
+* Replace `"dp"` with either `"ev"` or `"dv"`, depending on what you've placed in the first line.
 
 
 ### Barcodes, Betti Curves, and Persistence Diagrams
@@ -185,13 +230,6 @@ which the user may specify with `embeddingobj = "hop"`. This option often create
 
 #### Point clouds and Vietoris Rips complexes
 
-
-
-
-
-
-
-
 PlotlyJS plots may be exported to the Plotly web API for sharing, storage, and advanced editing. Every function that generates
 a PlotlyJS visual in the Eirene library returns a PlotlyJS object which may be uploaded via the Plotly. post function. See the
 documentation for Plotly.jl to learn more.
@@ -239,7 +277,7 @@ The following are optional keyword arguments for the main funciton, `eirene`.
 
 Let us say that for any vector `v`, the symbol `v{k}` denotes the set of all integers `j` such that `v[k] ≤ j < v[k+1]` (you might recall that we used this convention when we explained how to format data for an arbitrary complex).  Now let us suppose we have a matrix `M` with 0 - 1 entries.  To save `M` in computer memory, it suffices to record which rows of each column have nonzero entries.  In particular, suppose we are given two vectors, `rv` (row values) and `cp` (column pattern).  If for all `p` the set `rv[cp{p}]` equals the set of rows where column `p` is nonzero, then we can (essentially) record `M` in computer memory by saving `rv` and `cp`.  We call this the **column sparse format** of `M`.
 
-When we runn the command
+When we run the command
 ```
 C = eirene(rv=rv, cp=cp, fv=fv, dp=dp, <keyword arguments>)
 ```
