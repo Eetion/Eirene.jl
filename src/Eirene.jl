@@ -1549,6 +1549,8 @@ function persistf2complex(filepath::String;
 		maxdim 		= 	length(dp)-3
 	end
 
+	println("hello")#######################################################################################################################
+	println(maxdim) #######################################################################################################################
 	C  				= 	persistf2complex(
 						rv = rv,
 						cp = cp,
@@ -4785,6 +4787,8 @@ function getbetticurve(D::Dict,sd;ocf = false)
 	else
 		u = Array(1:maxrad)
 	end
+	printval(length(u),"length(u)")
+	printval(length(v),"length(v)")
 	return hcat(u,v)
 end
 
