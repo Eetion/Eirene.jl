@@ -65,6 +65,7 @@ julia> C = Eirene.eirene(x, model = "pc")
 `numrad = N`
 * Divide the interval from `minrad` to `maxrad` into `N` equally spaced steps, and compute the homology of each step.  If the value of numrad is set to `Inf`, then homology will computed at every time point.
 * Possible values: any positive integer, or `Inf`.  Default value: `Inf`.
+* This keyword argument is currently only available for `model = "vr"`.
 
 `record = "cyclerep", "none"`
 * Determines wether or not to compute generators.  
