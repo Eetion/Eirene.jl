@@ -1,23 +1,29 @@
 # Documentation
 
-## One example says it all (almost)
+## Installation and use in one example
 
 Installing Julia is easy.  Download the latest version of the
 [Julia Language](https://julialang.org/downloads/), open a
 Julia REPL, and enter
 
 ```
-julia> Pkg.clone("https://github.com/Eetion/Eirene.jl.git")
+julia> Pkg.add("Eirene")
 julia> using Eirene
 ```
 
-It's fairly common to get error messages when you do this.  Generally they will want you to install additional (supporting) packages.  Read these messages, and follow the instructions.  When in doubt, *FIRST* check that you are running the latest version of Eirene, and use
+It's fairly common to get error messages when you do this.  Generally they will want you to install additional (supporting) packages.  Read these messages, and follow the instructions.  When in doubt, *FIRST* check that you are running the latest version of Julia, and use
 
 ```
 julia> Pkg.update()
 ```
 
-to ensure that you are using the latest versions of the supporting packages.  *SECOND*, close the Julia shell.  Some updates will only take effect in new windows.
+to ensure that you are using the latest versions of the supporting packages.  *SECOND*, close the Julia shell.  Some updates will only take effect after re-opening.  
+
+**Note 0** Homebrew and other installers tend to install very old versions, for some reason.  The only way to effectively check that you are running the most recent version of Julia is to visit the downloads page (https://julialang.org/downloads/) and compare with your current install.
+
+**Note 1** Pay special attention to red error messages.  You can solve nine out of ten installation problems by copy/pasting text from these directly into the REPL.
+
+**Note 2** Wait times of an hour or more have been reported.  The install will finish eventually!
 
 Now let's plot the 1d persistence diagram for 50 points sampled from the uniform distribution on R<sup>20</sup>.  The first line below generates 20x50 iid matrix and stores it in a variable `x`.  The second asks Eirene to analyze `x` and store the results in a variable `C`.  The third plots the diagram.  Most of what you can do with Eirene is done with minor modifications to these commands.
 
@@ -26,9 +32,9 @@ julia> x = rand(20,50)
 julia> C = eirene(x, model = "pc")
 julia> plotpersistencediagram_pjs(C,dim=1)
 ```
-**Note 1**  Check out `EXAMPLES.md` for more examples!
+**Note 3**  Check out `EXAMPLES.md` for more examples!
 
-**Note 2**  If you encounter error messages like the following
+**Note 4**  If you encounter error messages like the following
 
 ```
 ERROR: UndefVarError: eirene not defined
