@@ -1,12 +1,29 @@
 # Documentation
 
-## Installation and use in one example
+## Recent Advisories 
 
-Installing Julia is easy.  Download the latest version of the
-[Julia Language](https://julialang.org/downloads/), open a
-Julia REPL, and enter
+**Note 0** Eirene is not yet stable for Julia 0.7 and above.  **Please ensure you are running Julia 0.6.4**.
+
+**Note 1** Pending patches to PlotlyJS, ploting capabilities are only available from the Jupyter notebook.  To start a new Jupyter notebook, enter
 
 ```
+julia> Pkg.add("IJulia")
+julia> using IJulia
+julia> notebook()
+```
+
+in a Julia REPL.  See https://github.com/JuliaLang/IJulia.jl for more details.
+
+**Note 2** Thanks to Brad Nelson for providing timely aid for plotting!
+
+## Installation and use in one example
+
+Installing Julia is easy.  Download Julia 0.6.4 (https://julialang.org/downloads/), open a
+Jupyter notebook (see above), and enter
+
+```
+julia> Pkg.clone("https://github.com/bnels/PlotlyJS.jl.git")
+julia> Pkg.checkout("PlotlyJS","fix-jsstring")
 julia> Pkg.add("Eirene")
 julia> using Eirene
 ```
