@@ -3,124 +3,137 @@ module Eirene
 #     You should have received a copy of the GNU General Public License
 #     along with Eirene.  If not, see <http://www.gnu.org/licenses/>.
 
-print("\n
-Eirene Library for Homological Algebra
-Copyright (C) 2016, 2017, 2018  Gregory Henselman
-www.gregoryhenselman.org
-
-Eirene is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-Eirene is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Eirene.  If not, see <http://www.gnu.org/licenses/>.
-
-")
-print_with_color(:blue,"
-WELCOME TO EIRENE!
-v$(Pkg.installed("Eirene"))
-
-Please help us document Eirene's recent work! Bibtex entries and
-contact information for teaching and outreach can be found at the
-Eirene homepage, http://gregoryhenselman.org/eirene.\n\n
-")
+# print("\n
+# Eirene Library for Homological Algebra
+# Copyright (C) 2016, 2017, 2018  Gregory Henselman
+# www.gregoryhenselman.org
+#
+# Eirene is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Eirene is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Eirene.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ")
+# print_with_color(:blue,"
+# WELCOME TO EIRENE!
+# v$(Pkg.installed("Eirene"))
+#
+# Please help us document Eirene's recent work! Bibtex entries and
+# contact information for teaching and outreach can be found at the
+# Eirene homepage, http://gregoryhenselman.org/eirene.\n\n
+# ")
 
 ##########################################################################################
 
 #### 	REQUIREMENTS
 
 ##########################################################################################
+#
+# if typeof(Pkg.installed("Distances")) == Void
+# print_with_color(:green,"Please Note: Distances.jl may not be installed. This package is required
+# for use with Euclidean point cloud data. To install, enter the foll-
+# owing at the Julia prompt:
+#
+# Pkg.add(\"Distances\")
+# using Distances \n\n
+# ")
+# else
+# 	using Distances
+# end
+#
+# if typeof(Pkg.installed("JLD")) == Void
+# print_with_color(:green,"Please Note: JLD.jl may not be installed. This package is not required, but
+# it is the best means of saving Eirene output. To install, enter the
+# following at the Julia prompt:
+#
+# Pkg.add(\"JLD\")
+# using JLD \n\n
+# ")
+# else
+# 	using JLD
+# end
+#
+# if typeof(Pkg.installed("Blink")) == Void
+# print_with_color(:green,"Please Note: Blink.jl may not be installed. This package is required for
+# all Eirene functions ending in _pjs. To install, enter the following
+# at the Julia prompt:
+#
+# Pkg.add(\"Blink\")
+# using Blink
+# Blink.AtomShell.install() \n\n
+# ")
+# else
+# 	using Blink
+# end
+#
+# if typeof(Pkg.installed("PlotlyJS")) == Void
+# print_with_color(:green,"Please Note: PlotlyJS.jl may not be installed. This package is required
+# for all Eirene functions ending in _pjs. To install, enter the foll-
+# owing at the Julia prompt
+#
+# Pkg.add(\"PlotlyJS\")
+# using PlotlyJS \n\n
+# ")
+# else
+# 	using PlotlyJS
+# end
+#
+# if typeof(Pkg.installed("Plotly")) == Void
+# print_with_color(:green,"Please Note: Plotly.jl may not be installed. This package is required to
+# interface with the Plotly web API. To install, enter the foll-
+# owing at the Julia prompt
+#
+# Pkg.add(\"Plotly\")
+# using Plotly \n\n
+# ")
+# else
+# 	using Plotly
+# end
+#
+# if typeof(Pkg.installed("MultivariateStats")) == Void
+# print_with_color(:green,"Please Note: MultivariateStats.jl may not be installed. This package is required for
+# some operations pertaining to multidimensional scaling, but is not required.
+# To install, enter the following at the Julia prompt:
+#
+# Pkg.add(\"MultivariateStats\")
+# using MultivariateStats \n\n
+# ")
+# else
+# 	using MultivariateStats
+# end
+#
+# if typeof(Pkg.installed("Colors")) == Void
+# print_with_color(:green,"Please Note: Colors.jl may not be installed. This package is required for
+# some operations pertaining to plotting barcodes, but is not required.
+# To install, enter the following at the Julia prompt:
+#
+# Pkg.add(\"Colors\")
+# using MultivariateStats \n\n
+# ")
+# else
+# 	using Colors
+# end
 
-if typeof(Pkg.installed("Distances")) == Void
-print_with_color(:green,"Please Note: Distances.jl may not be installed. This package is required
-for use with Euclidean point cloud data. To install, enter the foll-
-owing at the Julia prompt:
-
-Pkg.add(\"Distances\")
-using Distances \n\n
-")
-else
-	using Distances
-end
-
-if typeof(Pkg.installed("JLD")) == Void
-print_with_color(:green,"Please Note: JLD.jl may not be installed. This package is not required, but
-it is the best means of saving Eirene output. To install, enter the
-following at the Julia prompt:
-
-Pkg.add(\"JLD\")
-using JLD \n\n
-")
-else
-	using JLD
-end
-
-if typeof(Pkg.installed("Blink")) == Void
-print_with_color(:green,"Please Note: Blink.jl may not be installed. This package is required for
-all Eirene functions ending in _pjs. To install, enter the following
-at the Julia prompt:
-
-Pkg.add(\"Blink\")
+using Pkg
+using Distances
+using JLD
 using Blink
-Blink.AtomShell.install() \n\n
-")
-else
-	using Blink
-end
-
-if typeof(Pkg.installed("PlotlyJS")) == Void
-print_with_color(:green,"Please Note: PlotlyJS.jl may not be installed. This package is required
-for all Eirene functions ending in _pjs. To install, enter the foll-
-owing at the Julia prompt
-
-Pkg.add(\"PlotlyJS\")
-using PlotlyJS \n\n
-")
-else
-	using PlotlyJS
-end
-
-if typeof(Pkg.installed("Plotly")) == Void
-print_with_color(:green,"Please Note: Plotly.jl may not be installed. This package is required to
-interface with the Plotly web API. To install, enter the foll-
-owing at the Julia prompt
-
-Pkg.add(\"Plotly\")
-using Plotly \n\n
-")
-else
-	using Plotly
-end
-
-if typeof(Pkg.installed("MultivariateStats")) == Void
-print_with_color(:green,"Please Note: MultivariateStats.jl may not be installed. This package is required for
-some operations pertaining to multidimensional scaling, but is not required.
-To install, enter the following at the Julia prompt:
-
-Pkg.add(\"MultivariateStats\")
-using MultivariateStats \n\n
-")
-else
-	using MultivariateStats
-end
-
-if typeof(Pkg.installed("Colors")) == Void
-print_with_color(:green,"Please Note: Colors.jl may not be installed. This package is required for
-some operations pertaining to plotting barcodes, but is not required.
-To install, enter the following at the Julia prompt:
-
-Pkg.add(\"Colors\")
-using MultivariateStats \n\n
-")
-else
-	using Colors
-end
+using PlotlyJS
+using Plotly
+using MultivariateStats
+using Colors
+using SparseArrays
+using LinearAlgebra
+using Dates
+using Statistics
 
 ##########################################################################################
 
@@ -169,7 +182,7 @@ function vertexrealization(farfaces,firstv,facecardinality,facenames)
 	m::Int64 = length(firstv[2])-1
 	preallocationspace = 0
 	loci::Array{Int64,1} = copy(facenames)
-	vrealization = Array{Int64}(facecardinality,numfaces)
+	vrealization = Array{Int64}(undef,facecardinality,numfaces)
 	post0::Int64 = 1
 	post1::Int64 = 1
 
@@ -278,12 +291,12 @@ end
 function buildclosefromclose(lrowval,lcolptr,lclosefaces,hrowval,hcolptr;facecard = size(lclosefaces,1)+1)
 	m = length(hcolptr)-1
 	n = length(hrowval)
-	hclosefaces = Array{Int64}(facecard,n)
+	hclosefaces = Array{Int64}(undef,facecard,n)
 	if n == 0
 		return hclosefaces
 	else
 		rowdepth = facecard-1
-		rosettacol = Array{Int64}(maximum(lrowval))
+		rosettacol = Array{Int64}(undef,maximum(lrowval))
 		for i = 1:m
 			rosettacol[lrowval[cran(lcolptr,i)]]=cran(lcolptr,i)
 			for j = cran(hcolptr,i)
@@ -327,13 +340,13 @@ function buildallfromclose(lrowval,lcolptr,lclosefaces,hrowval,hcolptr,selectedc
 	numselected = length(selectedcolumnindices)
 	rowdepth = size(lclosefaces,1)
 	sd = rowdepth+1
-	hclosefaces = Array{Int64}(sd+1,numselected)
+	hclosefaces = Array{Int64}(undef,sd+1,numselected)
 	if numselected == 0
 		return hclosefaces
 	end
-	rosettacol = Array{Int64}(maximum(lrowval))
+	rosettacol = Array{Int64}(undef,maximum(lrowval))
 	columnsupp = falses(numhigs)
-	columnsupp[selectedcolumnindices]=true
+	columnsupp[selectedcolumnindices].=true
 	columnmarker = 0
 	for i = 1:m
 		rosettacol[lrowval[cran(lcolptr,i)]]=cran(lcolptr,i)
@@ -357,7 +370,7 @@ function buildclosefaces!(lrowval,lcolptr,lclosefaces,lfarfaces,hrowval,hcolptr,
 	n = length(hrowval)
 	rowdepth = size(lclosefaces,1)
 	sd = rowdepth+1
-	rosettacol = Array{Int64}(maximum(lrowval))
+	rosettacol = Array{Int64}(undef,maximum(lrowval))
 	for i = 1:m
 		rosettacol[lrowval[cran(lcolptr,i)]]=cran(lcolptr,i)
 		for j = cran(hcolptr,i)
@@ -378,11 +391,11 @@ end
 function buildclosefromfar(farfaces,firstv,sd)
 	m = length(firstv[1])-1
 	n = length(farfaces[sd])
-	# destinationmatrix = Array{Int64}(sd,n)
+	# destinationmatrix = Array{Int64}(undef,sd,n)
 	if sd == 1
-		return Array{Int64}(0,m)
+		return Array{Int64}(undef,0,m)
 	end
-	lclosefaces = Array{Int64}(1,firstv[2][end]-1)
+	lclosefaces = Array{Int64}(undef,1,firstv[2][end]-1)
 	for i = 1:m
 		lclosefaces[cran(firstv[2],i)]=i
 	end
@@ -399,9 +412,9 @@ function buildclosefromfar(farfaces,firstv,sd,columnsinorder)
 	m = length(firstv[1])-1
 	n = length(farfaces[sd])
 	if sd == 1
-		return Array{Int64}(0,m)
+		return Array{Int64}(undef,0,m)
 	end
-	lclosefaces = Array{Int64}(1,firstv[2][end]-1)
+	lclosefaces = Array{Int64}(undef,1,firstv[2][end]-1)
 	for i = 1:m
 		lclosefaces[cran(firstv[2],i)]=i
 	end
@@ -418,13 +431,13 @@ end
 function buildallfromfar(farfaces,firstv,sd,columnsinorder;verbose = false)
 	m = length(firstv[1])-1
 	n = length(farfaces[sd])
-	# destinationmatrix = Array{Int64}(sd,n)
+	# destinationmatrix = Array{Int64}(undef,sd,n)
 	if sd == 1
-		return Array{Int64}(0,m)
+		return Array{Int64}(undef,0,m)
 	end
-	lclosefaces = Array{Int64}(1,firstv[2][end]-1)
+	lclosefaces = Array{Int64}(undef,1,firstv[2][end]-1)
 	for i = 1:m
-		lclosefaces[cran(firstv[2],i)]=i
+		lclosefaces[cran(firstv[2],i)].=i
 	end
 	if sd == 2
 		return vcat(lclosefaces[columnsinorder]',farfaces[sd][columnsinorder]')
@@ -439,10 +452,10 @@ function buildallfromfar(farfaces,firstv,sd,columnsinorder;verbose = false)
 end
 
 function ff2boundary(farfaces,firstv;sd=1)
-	rv = Array{Int64}(0)
+	rv = Array{Int64}(undef,0)
 	cp = [1]
 	if sd == 1
-		rv = Array{Int64}(0)
+		rv = Array{Int64}(undef,0)
 		cp = ones(Int64,length(farfaces[1])+1)
 	else
 		n = length(farfaces[sd])
@@ -455,11 +468,11 @@ function ff2boundary(farfaces,firstv;sd=1)
 end
 
 function ff2complex(farfaces,firstv;maxsd = length(farfaces))
-	Nrv 	= fill(Array{Int64}(0),maxsd)
-	Ncp 	= fill(Array{Int64}(0),maxsd)
+	Nrv 	= fill(Array{Int64}(undef,0),maxsd)
+	Ncp 	= fill(Array{Int64}(undef,0),maxsd)
 	Nrv		= convert(Array{Array{Int64,1}},Nrv)
 	Ncp		= convert(Array{Array{Int64,1}},Ncp)
-	Nrv[1] 	= Array{Int64}(0)
+	Nrv[1] 	= Array{Int64}(undef,0)
 	Ncp[1]	= fill(1,length(farfaces[1])+1)
 	for sd = 2:maxsd
 		Nrv[sd],Ncp[sd] = ff2boundary(farfaces,firstv,sd=sd)
@@ -483,7 +496,7 @@ end
 
 function ocff2of(grain::Array{Int64},ocg2rad::Array{Int64})
 	m = length(grain)
-	filt = Array{Int64}(m)
+	filt = Array{Int64}(undef,m)
 	for i = 1:m
 		filt[i] = ocg2rad[grain[i]]
 	end
@@ -493,13 +506,13 @@ end
 function ff2aflight_sc2(farfaces,firstv,columns)
 	sd = 2
 	if isempty(farfaces[sd])
-		return Array{Int64}(2,0)
+		return Array{Int64}(undef,2,0)
 	end
 	f0faces::Array{Int64,1} = farfaces[sd]
 	colptr::Array{Int64,1} = firstv[2]
 	columnpost::Int64   = 1
 	columnpostp1::Int64 = 2
-	faces::Array{Int64,2} = Array{Int64}(2,length(columns))
+	faces::Array{Int64,2} = Array{Int64}(undef,2,length(columns))
 
 	for fp = 1:length(columns)
 		f0 = columns[fp]
@@ -524,7 +537,7 @@ function ff2aflight_sc3(farfaces,firstv,columns)
 	sd = 3
 
 	if isempty(farfaces[sd])
-		return Array{Int64}(3,0)
+		return Array{Int64}(undef,3,0)
 	end
 
 	fcfaces::Array{Int64,2} = buildclosefromfar(farfaces,firstv,sd-1,1:length(farfaces[2]))
@@ -537,9 +550,9 @@ function ff2aflight_sc3(farfaces,firstv,columns)
 	fvscm2::Array{Int64,1}  = firstv[sd-2]
 
 	holdi=[1];holdip1=[2]
-	t1::Array{Int64,1} = Array{Int64}(fvscm2[end]-1);t1[crows(fvscm1,f1faces,1)]=cran(fvscm1,1)
+	t1::Array{Int64,1} = Array{Int64}(undef,fvscm2[end]-1);t1[crows(fvscm1,f1faces,1)]=cran(fvscm1,1)
 
-	faces::Array{Int64,2} = Array{Int64}(3,length(columns))
+	faces::Array{Int64,2} = Array{Int64}(undef,3,length(columns))
 	for fp = 1:length(columns)
 		f0 = columns[fp]
 		f1 = f0faces[f0]
@@ -556,7 +569,7 @@ end
 function ff2aflight_scgt3(farfaces,firstv,sd,columns)
 
 	if isempty(farfaces[sd])
-		return Array{Int64}(sd,0)
+		return Array{Int64}(undef,sd,0)
 	end
 
 	f0faces::Array{Int64,1} = farfaces[sd]
@@ -570,11 +583,11 @@ function ff2aflight_scgt3(farfaces,firstv,sd,columns)
 	fvscm3::Array{Int64,1}  = firstv[sd-3]
 
 	holdi=[1];holdip1=[2];holdj=[1];holdjp1=[2]
-	t1::Array{Int64,1} = Array{Int64}(fvscm2[end]-1);t1[crows(fvscm1,f1faces,1)]=cran(fvscm1,1)
-	t2::Array{Int64,1} = Array{Int64}(fvscm3[end]-1);t2[crows(fvscm2,f2faces,1)]=cran(fvscm2,1)
+	t1::Array{Int64,1} = Array{Int64}(undef,fvscm2[end]-1);t1[crows(fvscm1,f1faces,1)]=cran(fvscm1,1)
+	t2::Array{Int64,1} = Array{Int64}(undef,fvscm3[end]-1);t2[crows(fvscm2,f2faces,1)]=cran(fvscm2,1)
 
 	scm0::Int64 = sd; scm1::Int64 = sd-1; scm2::Int64 = sd-2
-	faces::Array{Int64,2} = Array{Int64}(sd,length(columns))
+	faces::Array{Int64,2} = Array{Int64}(undef,sd,length(columns))
 
 	for fp = 1:length(columns)
 		f0 = columns[fp]
@@ -628,7 +641,7 @@ end
 
 function ff2aflight(farfaces,firstv,sd,columns)
 	if sd == 1
-		return Array{Int64}(0,length(columns))
+		return Array{Int64}(undef,0,length(columns))
 	elseif sd == 2
 		return ff2aflight_sc2(farfaces,firstv,columns)
 	elseif sd == 3
@@ -662,13 +675,13 @@ submatrix of the total boundary operator indexed by cells of dimension sd-1
 (along the columns) and sd-2 (along the rows).
 
 =#
-function filteredmatrixfromfarfaces{Tv}(
+function filteredmatrixfromfarfaces(
 	farfaces,
 	firstv,
 	prepairs,
 	grain,
 	sd::Integer,
-	lowbasisnames::Array{Tv,1};
+	lowbasisnames::Array{Int64,1};
 	verbose = false)
 
 	numhigs = length(farfaces[sd])
@@ -686,8 +699,8 @@ function filteredmatrixfromfarfaces{Tv}(
 	Ml = numlows - length(lpls)
 	Mh = numhigs - length(hphs)
 
-	higtranslator = zeros(Tv,numnhph)
-	lowtranslator = zeros(Tv,numlows)
+	higtranslator = zeros(Int64,numnhph)
+	lowtranslator = zeros(Int64,numlows)
 	lowtranslator[pplows] = 1:numppair
 
 	# if !isempty(nplows) && sd > 2
@@ -709,7 +722,7 @@ function filteredmatrixfromfarfaces{Tv}(
 
 	lowtranslator[nplows] = nporder
 	higsinpointorder = intervalcomplementuniqueunsortedinput(hphs,numhigs)
-	lowlab = Array{Int64}(Ml)
+	lowlab = Array{Int64}(undef,Ml)
 	lowlab[1:numppair]=pplows
 	lowlab[nporder]=nplows
 	higlab = vcat(pphigs,nphigs)
@@ -734,7 +747,7 @@ function filteredmatrixfromfarfaces{Tv}(
 		end
 	end
 	ppsupp = falses(numhigs)
-	ppsupp[pphigs]=true
+	ppsupp[pphigs].=true
 	ppmarker = 0
 	nppmarker = numppair
 	for i = 1:numnhph
@@ -807,7 +820,7 @@ end
 
 function ocff2of(grain::Array{Int64},ocg2rad::Array{Float64})
 	m = length(grain)
-	filt = Array{Float64}(m)
+	filt = Array{Float64}(undef,m)
 	for i = 1:m
 		filt[i] = ocg2rad[grain[i]]
 	end
@@ -871,7 +884,7 @@ function 	schurit4!(	Mrv,Mcp,Mm,Mn,Mn0,
 	end
 
 	keptlist = finddownstreamelements_embeddedupperunitriangularmatrix(
-					Mrv,Mcp,Mm0,find(rowsum),Jprows[1:numjunpairs[1]],Jpcols[1:numjunpairs[1]];verbose=verbose
+					Mrv,Mcp,Mm0,findall(rowsum),Jprows[1:numjunpairs[1]],Jpcols[1:numjunpairs[1]];verbose=verbose
 					)
 
 	if verbose
@@ -880,8 +893,8 @@ function 	schurit4!(	Mrv,Mcp,Mm,Mn,Mn0,
 	end
 
 	keptmarker = length(keptlist)
-	prows = Array{Int64}(keptmarker)
-	pcols = Array{Int64}(keptmarker)
+	prows = Array{Int64}(undef,keptmarker)
+	pcols = Array{Int64}(undef,keptmarker)
 	for i = 1:keptmarker
 		keptindex = keptlist[i]
 		prows[i] = Jprows[keptindex]
@@ -893,7 +906,7 @@ function 	schurit4!(	Mrv,Mcp,Mm,Mn,Mn0,
 	Lrv,Lcp = copycolumnsubmatrix(Trv,Tcp,pcols)
 	Rrv,Rcp = copycolumnsubmatrix(Trv,Tcp,compcols)
 
-	translator = Array{Int64}(Mm0)
+	translator = Array{Int64}(undef,Mm0)
 	translator[prows]=1:keptmarker
 	yafterx!(translator,Arv)
 	yafterx!(translator,Brv)
@@ -937,7 +950,7 @@ notes on morselu!
 -	the first (rank of M) elements of tlab index the complete set
 	of nonzero columns in the reduced matrix
 =#
-function morselu!{Tv<:Integer}(
+function morselu!(
 	Mrv::Array{Tv,1},
 	Mrowgrain::Array{Tv,1},
 	Mcp::Array{Tv,1},
@@ -949,7 +962,7 @@ function morselu!{Tv<:Integer}(
 	Mm::Integer;
 	storetransform = true,
 	verbose = false,
-	diagnostic = false)
+	diagnostic = false) where Tv<:Integer
 
  	rowlab = higlab;collab = lowlab
 
@@ -959,13 +972,13 @@ function morselu!{Tv<:Integer}(
 	maxnz = Mcp[Mn[1]+1]
 
 	maxnumpairs = min(Mm[1],Mn[1]); numjunpairs = [length(pplow)]; numsenpairs = [0]
-	Sprows=Array{Tv}(maxnumpairs);Spcols=Array{Tv}(maxnumpairs);
-	Jprows=Array{Tv}(maxnumpairs);Jpcols=Array{Tv}(maxnumpairs);
+	Sprows=Array{Tv}(undef,maxnumpairs);Spcols=Array{Tv}(undef,maxnumpairs);
+	Jprows=Array{Tv}(undef,maxnumpairs);Jpcols=Array{Tv}(undef,maxnumpairs);
 	Jprows[1:numjunpairs[1]]=pphig;Jpcols[1:numjunpairs[1]]=pplow
 	comprows = convert(Array{Tv,1},(numjunpairs[1]+1):Mm[1])
 	compcols = convert(Array{Tv,1},(numjunpairs[1]+1):Mn[1])
 
-	Trv=Array{Tv}(0);Srv = Array{Tv}(0)
+	Trv=Array{Tv}(undef,0);Srv = Array{Tv}(undef,0)
 	Tcp=ones(Tv,Mn[1]+1);Scp=ones(Tv,Mn[1]+1)
 
 	if diagnostic
@@ -991,7 +1004,7 @@ function morselu!{Tv<:Integer}(
 		end
 	end
 	#gc()
-	rowfilt = Array{Tv}(length(comprows)); colfilt = Array{Tv}(length(compcols))
+	rowfilt = Array{Tv}(undef,length(comprows)); colfilt = Array{Tv}(undef,length(compcols))
 	counter = 0
 	while Mcp[Mn[1]+1]>1
 		if verbose
@@ -1030,7 +1043,7 @@ function morselu!{Tv<:Integer}(
 	deleteat!(Tcp,(Mn[1]+2):length(Tcp))
 	deleteat!(Sprows,(numsenpairs[1]+1):maxnumpairs)
 	deleteat!(Spcols,(numsenpairs[1]+1):maxnumpairs)
-	Tcp+=lastSrowmarker
+	Tcp.+=lastSrowmarker
 	append!(Scp,Tcp)
 	append!(Srv,Trv[1:lastTrowmarker])
   	tlab = Spcols[1:numsenpairs[1]]
@@ -1045,68 +1058,67 @@ function persistf2_core_cell(
 	maxsd = length(Nrv),
 	record="cyclerep",
 	verbose=false,
-	prepairs = fill(Array{Int64}(0),maxsd+1)
+	prepairs = fill(Array{Int64}(undef,0),maxsd+1)
 	)
 	if record == "all" || record == "cyclerep"
 		storetransform = true
 	else
 		storetransform = false
 	end
-	tcp::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1)
-	trv::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1)
-	phi::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1)
-	plo::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1)
-	tid::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1)
+	tcp::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1)
+	trv::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1)
+	phi::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1)
+	plo::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1)
+	tid::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1)
 	for i in [1,maxsd+1]
 		tcp[i] 				=[1]
-		trv[i]				=Array{Int64}(0)
-		phi[i]				=Array{Int64}(0)
-		plo[i]				=Array{Int64}(0)
-		tid[i]				=Array{Int64}(0)
+		trv[i]				=Array{Int64}(undef,0)
+		phi[i]				=Array{Int64}(undef,0)
+		plo[i]				=Array{Int64}(undef,0)
+		tid[i]				=Array{Int64}(undef,0)
 	end
 	maxnzs 									=zeros(Int64,maxsd+1)
 	m 										=length(Ncp[1])-1
 	for sd = 2:maxsd
 		if sd > length(Nrv)
-			trv[sd] = Array{Int64}(0)
+			trv[sd] = Array{Int64}(undef,0)
 			tcp[sd] = ones(Int64,1)
-			tid[sd] = Array{Int64}(0)
-			plo[sd] = Array{Int64}(0)
-			phi[sd] = Array{Int64}(0)
+			tid[sd] = Array{Int64}(undef,0)
+			plo[sd] = Array{Int64}(undef,0)
+			phi[sd] = Array{Int64}(undef,0)
 			continue
 		elseif sd>2
 			lowbasisnames = phi[sd-1]
 		else
-			lowbasisnames = Array{Int64}(0)
+			lowbasisnames = Array{Int64}(undef,0)
 		end
 		Mrv 			= Nrv[sd] # temporary
 		Mcp 			= Ncp[sd] # temporary
 		if isempty(Mrv)
-			plo[sd] 	= Array{Int64}(0)
-			phi[sd] 	= Array{Int64}(0)
-			tid[sd] 	= Array{Int64}(1:numcols(Ncp[sd-1]))
+			plo[sd] 	= Array{Int64}(undef,0)
+			phi[sd] 	= Array{Int64}(undef,0)
+			tid[sd] 	= Array{Int64}(undef,1:numcols(Ncp[sd-1]))
 						  deleteat!(tid[sd],sort(phi[sd-1]))
 		    perm 		= sortperm(grain[sd-1][tid[sd]],alg=MergeSort)
 			tid[sd] 	= tid[sd][perm]
-			trv[sd] 	= Array{Int64}(0)
+			trv[sd] 	= Array{Int64}(undef,0)
 			tcp[sd] 	= ones(Int64,1+length(tid[sd]))
 			continue
 		end
-		Mm0				= maximum(Mrv) # only used for the definition of the low-translator, which I believe is only there for debugging purposes
-		Mm				= [maximum(Mrv)]  # temporary
-		Mn 				= [length(Mcp)-1] # temporary
+		Mm0				= length(Ncp[sd-1])-1
+		Mn0 			= length(Ncp[sd  ])-1
+		Mm				= [Mm0]  					# temporary
+		Mn 				= [Mn0] 					# temporary
 		higlab			= convert(Array{Int64},1:Mn[1])	# we'll assume prepairs to be empty, for now
-		lowlab	 		= intervalcomplementuniqueunsortedinput(lowbasisnames,Mm[1])	# temporary, and we'll assume prepairs is empty for now
+		lowlab	 		= intervalcomplementuniqueunsortedinput(lowbasisnames,Mm0)	# temporary, and we'll assume prepairs is empty for now
 		nporder			= sortperm(grain[sd-1][lowlab],alg=MergeSort)
 		lowlab			= lowlab[nporder]
 		Mrv,Mcp			= transposeLighter_submatrix(
 							Mrv, 					# the Arv argument
 							Mcp, 					# the Acp argument
-							maximum(Mrv), 			# the Am argument
+							Mm0, 					# the Am argument
 							rows = lowlab,			# the rows selected
 							cols = higlab)			# the columns selected
-		Mn[1]			= length(Mcp)-1
-		Mm[1] 			= maximum(Mrv)
  		lowlabtemp 		= convert(Array{Int64,1},1:length(lowlab))
  		higlabtemp 		= convert(Array{Int64,1},1:length(higlab))
  		higfilttemp 	= grain[sd][higlab]
@@ -1164,17 +1176,17 @@ function persistf2_core_vr(
 
 	m = length(firstv[1])-1
 
-	trv::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1);
-	tcp::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1);
-	phi::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1);
-	plo::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1);
-	tid::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(maxsd+1);
+	trv::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1);
+	tcp::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1);
+	phi::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1);
+	plo::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1);
+	tid::Array{Array{Int64,1},1}			=Array{Array{Int64,1},1}(undef,maxsd+1);
 	for i in [1,maxsd+1]
 		tcp[i]  			=[1];
-		trv[i]				=Array{Int64}(0)
-		tid[i]				=Array{Int64}(0)
-		phi[i]				=Array{Int64}(0)
-		plo[i]				=Array{Int64}(0)
+		trv[i]				=Array{Int64}(undef,0)
+		tid[i]				=Array{Int64}(undef,0)
+		phi[i]				=Array{Int64}(undef,0)
+		plo[i]				=Array{Int64}(undef,0)
 	end
 
 	maxnzs 									=zeros(Int64,maxsd+1);
@@ -1185,7 +1197,7 @@ function persistf2_core_vr(
 		elseif sd>2
 			lowbasisnames = phi[sd-1]
 		else
-			lowbasisnames = Array{Int64}(0)
+			lowbasisnames = Array{Int64}(undef,0)
 		end
 		Mrv::Array{Int64,1},
 		Mcp::Array{Int64,1},
@@ -1332,7 +1344,7 @@ function persistf2vr(
 		"fastop"		=> fastop,
 		"record"	 	=> record,
 		"filfun" 		=> filfun,
-		"version" 		=> Pkg.installed("Eirene"),
+		# "version" 		=> Pkg.installed("Eirene"),
 		"date"			=> string(Dates.Date(now())),
 		"time"			=> string(Dates.Time(now()))
 		)
@@ -1384,7 +1396,7 @@ function persistf2vr(
 	################################################################################
 
 	if fastop
-		maxrad_alt 	= 	minimum(maximum(d,1))
+		maxrad_alt 	= 	minimum(maximum(d,dims=1))
 		maxrad_alt  = 	min(maxrad_alt,maxrad)
 	else
 		maxrad_alt 	= 	maxrad
@@ -1400,15 +1412,15 @@ function persistf2vr(
 	# <trueordercanonicalform> is a bit like <integersinsameorder>, just valid for floating point inputs, and with a bit more data in the output
 	t,ocg2rad 	= 	trueordercanonicalform(d,factor=true)
 
-	t 			= 	1+maximum(t)-t
-	ocg2rad 	= 	flipdim(ocg2rad,1)
+	t 			= 	(1+maximum(t)).-t
+	ocg2rad 	= 	reverse(ocg2rad,dims=1)
 
 	if 	any(d.>maxrad)
 		t 		= 	t-1
 		deleteat!(ocg2rad,1)
 	end
 
-	vertices2keep 	= 	find(diag(t).!=0)  # this step is necessary in order to cover the case where some vertices never enter the filtration
+	vertices2keep 	= 	findall(diag(t).!=0)  # this step is necessary in order to cover the case where some vertices never enter the filtration
 	t 				= 	t[vertices2keep,vertices2keep]
 
 	#### Build the complex
@@ -1424,7 +1436,7 @@ function persistf2vr(
 
 		fv 	= 	Array{Array{Float64,1}}(maxsd) # fv stands for filtration values
 		for sd = 1:maxsd
-			fv[sd] 	= 	Array{Float64}(length(D["farfaces"][sd]))
+			fv[sd] 	= 	Array{Float64}(undef,length(D["farfaces"][sd]))
 			for p 	= 	1:length(D["grain"][sd])
 				# syntax reminder: vertexrealization(D::Dict,facecardinality,facenames)
 				fv[sd][p] 	= 	filfun(vertexrealization(D,sd,[p]))
@@ -1433,7 +1445,7 @@ function persistf2vr(
 
 		ocg,ocg2rad 	= 	trueordercanonicalform(cat(1,fv...),factor=true) # ocg stands for order canonical grain
 		ocg 			= 	1+maximum(ocg)-ocg
-		ocg2rad 		= 	flipdim(ocg2rad,1)
+		ocg2rad 		= 	reverse(ocg2rad,dims=1)
 
 
 		D["ocg2rad"]	=	ocg2rad
@@ -1590,8 +1602,8 @@ function humanreadablefilepath2unsegmentedfilteredcomplex(filepath)
 	m 					= 	size(M,1)
 	endpoints 			= 	csvimport2linends(M)
 
-	dv 					= 	Array{Int64}(M[:,1])
-	fv 					= 	Array{Float64}(M[:,2])
+	dv 					= 	Array{Int64}(undef,M[:,1])
+	fv 					= 	Array{Float64}(undef,M[:,2])
 	dp 					= 	dimensionvalues2dimensionpattern(dv)
 
 	nrv 				= 	sum(endpoints)-2*m
@@ -1619,9 +1631,9 @@ function humanreadablefilepath2unsegmentedfilteredcomplex(filepath)
 	return dp,fv,rv,cp
 end
 
-function segmentarray{Tv}(vr::Tv,vp)
+function segmentarray(vr::Tv,vp) where Tv
 	m 	= 	length(vp)-1
-	u 	= 	Array{Tv}(m)
+	u 	= 	Array{Tv}(undef,m)
 	for 	p 	=	1:m
 		u[p] 	= 	crows(vp,vr,p)
 	end
@@ -1653,8 +1665,8 @@ function unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ncd=Inf
 	m 		= 	min(nsd,ncd)
 
 	fvc     = Array{Array{Float64,1}}(ncd)
-	rvc     = Array{Array{Int64,1}}(ncd)
-	cpc     = Array{Array{Int64,1}}(ncd)
+	rvc     = Array{Array{Int64,1}}(undef,ncd)
+	cpc     = Array{Array{Int64,1}}(undef,ncd)
 
 	# remarks:
 	# (a) #{cells of dimension ≤ (p   = k+1)} 				= dp[k+2]-1		= 	dp[p+1]-1
@@ -1848,7 +1860,7 @@ function persistf2complex(	;
 		maxsd = ncd,
 		record=record,
 		verbose=false,
-		prepairs = convert(Array{Array{Int64,1},1},fill(Array{Int64}(0),ncd))
+		prepairs = convert(Array{Array{Int64,1},1},fill(Array{Int64}(undef,0),ncd))
 		)
 
 	### Create the dictionary that stores all relevant data
@@ -1935,18 +1947,18 @@ function boundarylimit_core(brv,bcp,trv,tcp,tid,numl,nump,numnlpl)
 	trv = copy(trv)
 	yafterx!(lowtranslator,trv)
 	#################################################################################
-	if !issorted(tcp)
-		println("error: tcp is not sorted")
-		sleep(2)
-	end
-	if length(trv) != tcp[end]-1
-		println("error: tcp appears to end in the wrong place")
-		sleep(2)
-	end
-	if tcp[1] != 1
-		println("error: tcp does not begin with 1")
-		sleep(2)
-	end
+	# if !issorted(tcp)
+	# 	println("error: tcp is not sorted")
+	# 	sleep(2)
+	# end
+	# if length(trv) != tcp[end]-1
+	# 	println("error: tcp appears to end in the wrong place")
+	# 	sleep(2)
+	# end
+	# if tcp[1] != 1
+	# 	println("error: tcp does not begin with 1")
+	# 	sleep(2)
+	# end
 	#################################################################################
 	Lirv,Licp	= morseInverseF2orderedColsUnsortedRowsSilentInSilentOut(trv,tcp)
 	Lirv,Licp   = transposeLighter(Lirv,Licp,numnlpl)
@@ -2028,9 +2040,9 @@ function unpack!(D::Dict)
 	# l = length(D["grain"])
 	maxsd = D["input"]["maxdim"]+2 # grain2maxsd(D["grain"])
 
-	Lirv = Array{Array{Int64,1},1}(maxsd);  Licp = Array{Array{Int64,1},1}(maxsd)
-	Lrv  = Array{Array{Int64,1},1}(maxsd);  Lcp  = Array{Array{Int64,1},1}(maxsd)
-	Rrv  = Array{Array{Int64,1},1}(maxsd);  Rcp  = Array{Array{Int64,1},1}(maxsd)
+	Lirv = Array{Array{Int64,1},1}(undef,maxsd);  Licp = Array{Array{Int64,1},1}(undef,maxsd)
+	Lrv  = Array{Array{Int64,1},1}(undef,maxsd);  Lcp  = Array{Array{Int64,1},1}(undef,maxsd)
+	Rrv  = Array{Array{Int64,1},1}(undef,maxsd);  Rcp  = Array{Array{Int64,1},1}(undef,maxsd)
 
 	if 	D["input"]["record"] == "all"
 		N 	= 	maxsd
@@ -2056,9 +2068,9 @@ function unpack!(D::Dict)
 		end
 	end
 
-	Lirv[1]		=Array{Int64}(0)
-	Lrv[1]		=Array{Int64}(0);
-	Rrv[1]		=Array{Int64}(0)
+	Lirv[1]		=Array{Int64}(undef,0)
+	Lrv[1]		=Array{Int64}(undef,0);
+	Rrv[1]		=Array{Int64}(undef,0)
 	Licp[1]		=ones(Int64,1)
 	Lcp[1]		=ones(Int64,1)
 	Rcp[1]		=ones(Int64,1)
@@ -2070,7 +2082,7 @@ function unpack!(D::Dict)
 	D["Rrv"] = Rrv
 	D["Rcp"] = Rcp
 
-	D["cyclerep"] = fill(Array{Array{Int64,1},1}(0),maxsd)  # for each dimension one stores an array of arrays
+	D["cyclerep"] = fill(Array{Array{Int64,1},1}(undef,0),maxsd)  # for each dimension one stores an array of arrays
 
 	for i = 2:maxsd
 		dim = i-2
@@ -2087,22 +2099,22 @@ end
 
 ##########################################################################################
 
-function morseInverseF2orderedColsUnsortedRowsInSilentOut{Tv<:Integer}(Arowval::Array{Tv,1},Acolptr::Array{Tv,1})
+function morseInverseF2orderedColsUnsortedRowsInSilentOut(Arowval::Array{Tv,1},Acolptr::Array{Tv,1}) where Tv<:Integer
 	mA = length(Acolptr)-1
-	const colptrA = Acolptr
-	const rowvalA = Arowval
-    const preallocationIncrement = colptrA[end]
+	colptrA = Acolptr
+	rowvalA = Arowval
+    preallocationIncrement = colptrA[end]
 
-    colptrC = Array{Tv}(mA+1); colptrC[1]=1
+    colptrC = Array{Tv}(undef,mA+1); colptrC[1]=1
 	rowSupp = zeros(Tv, mA)
-	rowList = Array{Tv}( mA)
-	rowvalCj = Array{Bool}( mA)
-	rowvalC = Array{Tv}( mA)
+	rowList = Array{Tv}(undef,mA)
+	rowvalCj = Array{Bool}(undef,mA)
+	rowvalC = Array{Tv}(undef,mA)
     totalrowscounter = 0
     onepast = 0
 	for i in 1:mA
 		if colptrC[i]+mA > length(rowvalC)+1
-			append!(rowvalC, Array{Int64}(preallocationIncrement))
+			append!(rowvalC, Array{Int64}(undef,preallocationIncrement))
 		end
 		if colptrA[i]+1 == colptrA[i+1]
 			colptrC[i+1] = colptrC[i]
@@ -2157,13 +2169,13 @@ function morseInverseF2orderedColsUnsortedRowsInSilentOut{Tv<:Integer}(Arowval::
 	return rowvalC, colptrC
 end
 
-function morseInverseF2orderedColsUnsortedRowsSilentInSilentOut{Tv<:Integer}(Arowval::Array{Tv,1},Acolptr::Array{Tv,1})
+function morseInverseF2orderedColsUnsortedRowsSilentInSilentOut(Arowval::Array{Tv,1},Acolptr::Array{Tv,1}) where Tv<:Integer
 	mA = length(Acolptr)-1
-	const colptrA = Acolptr
-	const rowvalA = Arowval
-    const preallocationIncrement = colptrA[end]
+	colptrA = Acolptr
+	rowvalA = Arowval
+    preallocationIncrement = colptrA[end]
 
-    colptrC = Array{Tv}(mA+1); colptrC[1]=1
+    colptrC = Array{Tv}(undef,mA+1); colptrC[1]=1
 	rowSupp = zeros(Tv, mA)
 	rowList = Array{Tv}( mA)
 	rowvalCj = Array{Bool}( mA)
@@ -2172,7 +2184,7 @@ function morseInverseF2orderedColsUnsortedRowsSilentInSilentOut{Tv<:Integer}(Aro
     onepast = 0
 	for i in 1:mA
 		if colptrC[i]+mA > length(rowvalC)+1
-			append!(rowvalC, Array{Int64}(preallocationIncrement))
+			append!(rowvalC, Array{Int64}(undef,preallocationIncrement))
 		end
 		if colptrA[i] == colptrA[i+1]
 			colptrC[i+1] = colptrC[i]
@@ -2241,12 +2253,12 @@ function addcol!(
 	end
 end
 
-function spmmF2{Tv<:Integer}(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Array{Tv,1},Bcolptr::Array{Tv,1},Am)
-    const mA = Am
-    const nB = length(Bcolptr)-1
-    const rowvalA = Arowval; colptrA = Acolptr
-    const rowvalB = Browval; colptrB = Bcolptr
-    const preallocationIncrement = colptrA[end]+colptrB[end]
+function spmmF2(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Array{Tv,1},Bcolptr::Array{Tv,1},Am) where Tv<:Integer
+    mA = Am
+    nB = length(Bcolptr)-1
+    rowvalA = Arowval; colptrA = Acolptr
+    rowvalB = Browval; colptrB = Bcolptr
+    preallocationIncrement = colptrA[end]+colptrB[end]
 
 	colptrC = Array{Tv}( nB+1)
     colptrC[1] = 1
@@ -2310,19 +2322,19 @@ function spmmF2_testfun()
 	print("test complete - no errors detected")
 end
 
-function spmmF2silentLeft{Tv<:Integer}(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Array{Tv,1},Bcolptr::Array{Tv,1},Am)
-    const mA = Am
-    const nB = length(Bcolptr)-1
-    const rowvalA = Arowval; colptrA = Acolptr
-    const rowvalB = Browval; colptrB = Bcolptr
-    const preallocationIncrement = colptrA[end]+colptrB[end]
+function spmmF2silentLeft(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Array{Tv,1},Bcolptr::Array{Tv,1},Am) where Tv<:Integer
+    mA = Am
+    nB = length(Bcolptr)-1
+    rowvalA = Arowval; colptrA = Acolptr
+    rowvalB = Browval; colptrB = Bcolptr
+    preallocationIncrement = colptrA[end]+colptrB[end]
 
-	colptrC = Array{Tv}( nB+1)
+	colptrC = Array{Tv}(undef,nB+1)
     colptrC[1] = 1
-	rowSupp = zeros(Tv, mA)
-	rowList = Array{Tv}( mA)
-	rowvalCj = Array{Bool}( mA)
-	rowvalC = Array{Tv}( preallocationIncrement)
+	rowSupp = zeros(Tv,mA)
+	rowList = Array{Tv}(undef,mA)
+	rowvalCj = Array{Bool}(undef,mA)
+	rowvalC = Array{Tv}(undef,preallocationIncrement)
 	for i in 1:nB
 		newrowscounter = 0
 		eyerange = cran(Bcolptr,i)
@@ -2347,7 +2359,7 @@ function spmmF2silentLeft{Tv<:Integer}(Arowval::Array{Tv,1},Acolptr::Array{Tv,1}
 				end
 			end
 		end
-		nzRows = find(rowvalCj[rowList[1:newrowscounter]])
+		nzRows = findall(rowvalCj[rowList[1:newrowscounter]])
 		colptrC[i+1] = colptrC[i]+length(nzRows)
 
 		if colptrC[i+1] > length(rowvalC)+1
@@ -2365,8 +2377,8 @@ function blockprodsumWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mcp,preallocation
 	Mcp[1]=1
 
 	rowSupp = zeros(Int64, Dm)
-	rowList = Array{Int64}( Dm)
-	rowvalCj = BitArray(Dm)
+	rowList = Array{Int64}(undef, Dm)
+	rowvalCj = BitArray(undef,Dm)
 	for i in 1:Dn
 		if length(Mrv)<Mcp[i]+Dm
 			extend!(Mrv,length(Mrv)+Dm+preallocationIncrement)
@@ -2414,8 +2426,8 @@ function blockprodsumsilenticolsleftWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mc
 	Mcp[1]=1
 
 	rowSupp = zeros(Int64, Dm)
-	rowList = Array{Int64}( Dm)
-	rowvalCj = BitArray(Dm)
+	rowList = Array{Int64}(undef,Dm)
+	rowvalCj = BitArray(undef,Dm)
 	for i in 1:Dn
 		if length(Mrv)<Mcp[i]+Dm
 			extend!(Mrv,length(Mrv)+Dm+preallocationIncrement)
@@ -2599,19 +2611,19 @@ function findcol(cp,k)
 	return i-1
 end
 
-function extend!{Tv}(x::Array{Tv,1},n::Integer)
+function extend!(x::Array{Tv,1},n::Integer) where Tv
 	if length(x)<n
-		append!(x,Array{Tv}(n-length(x)))
+		append!(x,Array{Tv}(undef,n-length(x)))
 	end
 end
 
-function copycolumnsubmatrix{Tv<:Integer}(Arv::Array{Tv,1},Acp,columnindices)
+function copycolumnsubmatrix(Arv::Array{Tv,1},Acp,columnindices) where Tv<:Integer
 	allocationspace = 0
 	for j in columnindices
 		allocationspace+= Acp[j+1]-Acp[j]
 	end
-	Brv = Array{Tv}(allocationspace)
-	Bcp = Array{Int64}(length(columnindices)+1)
+	Brv = Array{Tv}(undef,allocationspace)
+	Bcp = Array{Int64}(undef,length(columnindices)+1)
 	Bcp[1]=1
 	for jp = 1:length(columnindices)
 		j = columnindices[jp]
@@ -2629,8 +2641,8 @@ end
 # 	for j in columnindices
 # 		allocationspace+= Acp[j+1]-Acp[j]
 # 	end
-# 	Brv = Array{Tv}(allocationspace)
-# 	Bcp = Array{Tv}(length(columnindices)+1)
+# 	Brv = Array{Tv}(undef,allocationspace)
+# 	Bcp = Array{Tv}(undef,length(columnindices)+1)
 # 	Bcp[1]=1
 # 	for jp = 1:length(columnindices)
 # 		j = columnindices[jp]
@@ -2640,16 +2652,16 @@ end
 # 	return Brv,Bcp
 # end
 
-function copycolind2colind!{Tv<:Integer}(rowvalA::Array{Tv,1},colptrA::Array{Tv,1},columnindices,rowvalB::Array{Tv,1},colptrB::Array{Tv,1},startingDestination::Integer,growthIncrement::Integer)
+function copycolind2colind!(rowvalA::Array{Tv,1},colptrA::Array{Tv,1},columnindices,rowvalB::Array{Tv,1},colptrB::Array{Tv,1},startingDestination::Integer,growthIncrement::Integer)  where Tv<:Integer
 	numnewrows = 0
 	for col in columnindices
 		numnewrows+=colptrA[col+1]-colptrA[col]
 	end
 	if length(rowvalB)<colptrB[startingDestination]+numnewrows-1
-		append!(rowvalB,Array{Tv}(numnewrows+growthIncrement))
+		append!(rowvalB,Array{Tv}(undef,numnewrows+growthIncrement))
 	end
 	if length(colptrB)<startingDestination+length(columnindices)
-		append!(colptrB,Array{Tv}(startingDestination+length(columnindices)))
+		append!(colptrB,Array{Tv}(undef,startingDestination+length(columnindices)))
 	end
 	colptrB[1]=1
 	for i = 1:length(columnindices)
@@ -2660,19 +2672,19 @@ function copycolind2colind!{Tv<:Integer}(rowvalA::Array{Tv,1},colptrA::Array{Tv,
 	end
 end
 
-function extendcolumnlight!{Ti}(rowval::Array{Ti,1},colptr::Array{Ti,1},v::Array{Ti},k::Ti,growthincrement::Ti)
+function extendcolumnlight!(rowval::Array{Ti,1},colptr::Array{Ti,1},v::Array{Ti},k::Ti,growthincrement::Ti) where Ti
 	r = rowval
 	c = colptr
 	startpoint = copy(c[k+1])
 	c[k+1]=c[k]+length(v)
 	if length(r)<c[k+1]-1
-		append!(r,Array{Int64}(max(growthincrement,length(v))))
+		append!(r,Array{Int64}(undef,max(growthincrement,length(v))))
 	end
 	r[startpoint:(c[k+1]-1)]=v
 end
 
 # colsinorder must be in sorted order
-function supportedmatrix!{Tv<:Integer}(Mrowval::Array{Tv},Mcolptr::Array{Tv,1},rows1,colsinorder,Mm::Tv)
+function supportedmatrix!(Mrowval::Array{Tv},Mcolptr::Array{Tv,1},rows1,colsinorder,Mm::Tv) where Tv<:Integer
 	n = length(colsinorder)
 	suppcol1 = falses(Mm)
 	suppcol1[rows1]=true
@@ -2694,18 +2706,19 @@ function supportedmatrix!{Tv<:Integer}(Mrowval::Array{Tv},Mcolptr::Array{Tv,1},r
 	deleteat!(Mrowval,Mcolptr[end]:length(Mrowval))
 end
 
-function stackedsubmatrices{Tv<:Integer}(
+function stackedsubmatrices(
 	Mrowval,#::Array{Tv,1},
 	Mcolptr,#::Array{Tv,1},
 	rows1,#::Array{Tv,1},
 	rows2,#::Array{Tv,1},
 	cols,#::Array{Tv,1},
-	Mm::Tv)
+	Mm::Tv)  where Tv<:Integer
+
 	n = length(cols)
 	suppcol1 = falses(Mm)
 	suppcol2 = falses(Mm)
-	suppcol1[rows1]=true
-	suppcol2[rows2]=true
+	suppcol1[rows1].=true
+	suppcol2[rows2].=true
 	nz1 = 0; nz2 = 0
 	for jp = 1:n
 		for ip in cran(Mcolptr,cols[jp])
@@ -2717,10 +2730,10 @@ function stackedsubmatrices{Tv<:Integer}(
 			end
 		end
 	end
-	rv1 = Array{Tv}(nz1)
-	rv2 = Array{Tv}(nz2)
-	cp1 = Array{Tv}(n+1); cp1[1]=1
-	cp2 = Array{Tv}(n+1); cp2[1]=1
+	rv1 = Array{Tv}(undef,nz1)
+	rv2 = Array{Tv}(undef,nz2)
+	cp1 = Array{Tv}(undef,n+1); cp1[1]=1
+	cp2 = Array{Tv}(undef,n+1); cp2[1]=1
 	nz1 = 0; nz2 = 0
 	for jp = 1:n
 		for ip in cran(Mcolptr,cols[jp])
@@ -2745,7 +2758,7 @@ end
 
 ##########################################################################################
 
-function transposeLighter{Ti}(Arowval::Array{Ti},Acolptr::Array{Ti},Am)
+function transposeLighter(Arowval::Array{Ti},Acolptr::Array{Ti},Am) where Ti
     Annz = Acolptr[end]-1
     An = length(Acolptr)-1
     # Attach destination matrix
@@ -2784,14 +2797,14 @@ function transposeLighter{Ti}(Arowval::Array{Ti},Acolptr::Array{Ti},Am)
 	return Crowval, Ccolptr
 end
 
-function transposeLighter{Tv,Ti}(Arowval::Array{Ti},Acolptr::Array{Ti},Anzval::Array{Tv},Am::Integer)
+function transposeLighter(Arowval::Array{Ti},Acolptr::Array{Ti},Anzval::Array{Tv},Am::Integer) where {Tv, Ti}
     Annz = Acolptr[end]-1
     An = length(Acolptr)-1
     Cm = An
     Cn = Am
     Ccolptr = Array{Ti}(Am+1)
     Crowval = Array{Ti}(Annz)
-    Cnzval = Array{Tv}(Annz)
+    Cnzval = Array{Tv}(undef,Annz)
     # Compute the column counts of C and store them shifted forward by one in Ccolptr
     Ccolptr[1:end] = 0
     @inbounds for k in 1:Annz
@@ -2829,7 +2842,7 @@ end
 - 	Does not assume that the entries of <rows> appear in sorted order.
 - 	I *believe* that repeated rows and columns are allowed.
 =#
-function transposeLighter_submatrix{Ti}(Arowval::Array{Ti},Acolptr::Array{Ti},Am;rows = 1:Am,cols = 1:length(Acolptr)-1)
+function transposeLighter_submatrix(Arowval::Array{Ti},Acolptr::Array{Ti},Am;rows = 1:Am,cols = 1:length(Acolptr)-1) where Ti
 	if rows == 1:Am && cols == 1:(length(Acolptr)-1)
 		Crowval, Ccolptr = transposeLighter(Arowval::Array{Ti},Acolptr::Array{Ti},Am)
 		return Crowval, Ccolptr
@@ -2885,15 +2898,16 @@ col02col1translator.  This function returns the data specifying a sparse
 zero-one matrix whose support is
 { [c[j],r[i]] : [i,j] \in N and neither c[j] nor r[i] are zero }.
 =#
-function presparsefull2unsortedsparsetranspose{Tv<:Integer}(
+function presparsefull2unsortedsparsetranspose(
 	M::Array{Tv,2},
 	row02row1translator,
 	col02col1translator;
-	verbose::Bool=false)
+	verbose::Bool=false) where Tv<:Integer
+
 	Mm,Mn = size(M)
 
 	if Mn == 0
-		rowval1 = Array{Int64}(0)
+		rowval1 = Array{Int64}(undef,0)
 		if isempty(row02row1translator)
 			colptr1 = ones(Int64,1)
 		else
@@ -2914,12 +2928,12 @@ function presparsefull2unsortedsparsetranspose{Tv<:Integer}(
 			rowcounter[k]+=1
 		end
 	end
-	colptr1 = Array{Int64}(m0+1)
+	colptr1 = Array{Int64}(undef,m0+1)
 	colptr1[1]=1
 	for i = 1:m0
 		colptr1[i+1]=colptr1[i]+rowcounter[i]
 	end
-	rowval1 = Array{Int64}(colptr1[end]-1)
+	rowval1 = Array{Int64}(undef,colptr1[end]-1)
 	placer = copy(colptr1)
 	if verbose
 		coverageTestVec = trues(colptr1[end]-1)
@@ -2997,9 +3011,9 @@ function sphere()
 	halfnumrings = 40
 	latitd = pi*(-halfnumrings:halfnumrings)/(2*halfnumrings)
 
-	x = Array{Float64}(0)
-	y = Array{Float64}(0)
-	z = Array{Float64}(0)
+	x = Array{Float64}(undef,0)
+	y = Array{Float64}(undef,0)
+	z = Array{Float64}(undef,0)
 
 	for t in latitd
 		numpts = round.(Int64,40*cos.(t))
@@ -3172,10 +3186,10 @@ function minmaxceil!(S;minrad=minimum(N),maxrad=maximum(N),numrad=Inf)
 		minrad = minimum(offdiagmin(S))
 	end
 
-	S[S.<minrad] 	= 	minrad
-	S[S.>maxrad] 	= 	Inf
+	S[S.<minrad] 	.= 	minrad
+	S[S.>maxrad] 	.= 	Inf
 
-	fi 	= 	find(isfinite,S) # stands for finite indices
+	fi 	= 	(LinearIndices(S))[findall(isfinite,S)] # stands for finite indices
 	fv 	= 	S[fi]
 
 	if isempty(fv)
@@ -3189,7 +3203,7 @@ function minmaxceil!(S;minrad=minimum(N),maxrad=maximum(N),numrad=Inf)
 		maxrad 	= 	maximum(fv)
 	end
 	if numrad 	== 	1
-		S[fi]	= 	maxrad
+		S[fi]	.= 	maxrad
 		return 	S
 	end
 	if numrad 	== 	Inf
@@ -3197,7 +3211,7 @@ function minmaxceil!(S;minrad=minimum(N),maxrad=maximum(N),numrad=Inf)
 	end
 
 	ran 		= 	linspace(minrad,maxrad,numrad)
-	ran 		= 	Array{Float64}(ran)
+	ran 		= 	Array{Float64}(undef,ran)
 	ran[end] 	= 	maxrad
 
 	fvr 		= 	ceil2grid(fv,ran)
@@ -3362,7 +3376,7 @@ function ocfcheckfun3()
 					end
 
 					if publicmax < publicmin
-						ocf2[j] = zeros(Int64,m,m),Array{Float64}(0)
+						ocf2[j] = zeros(Int64,m,m),Array{Float64}(undef,0)
 					elseif b == 1 && c
 						privatemax = minimum(maximum(LL,1))
 						if publicmax >= privatemax
@@ -3456,14 +3470,14 @@ end
 
 # NB: Assumes that the input array S has only finite entries.
 # NB: The value for keyword <numrad> must be either a positive integer or Inf
-function ordercanonicalform_3{Tv}(
+function ordercanonicalform_3(
 	S::Array{Tv};
 	maxrad=Inf,
 	minrad=-Inf,
 	numrad=Inf,
 	vscale="default",
 	fastop::Bool=true,
-	verbose::Bool=false)
+	verbose::Bool=false) where Tv
 
     if size(S,1) == 0
     	ocf 		= 	zeros(Int64,0,0)
@@ -3520,7 +3534,7 @@ function ordercanonicalform_3{Tv}(
 
 	# It's important that this precede the other cases
 	if publicmax < publicmin
-		return zeros(Int64,m,m),Array{Float64}(0)
+		return zeros(Int64,m,m),Array{Float64}(undef,0)
 	end
 
 	# This covers all remaining cases where numrad ==1
@@ -3573,7 +3587,7 @@ function ordercanonicalform_3{Tv}(
 
 	# Compute the ocf
 	val						= publicmin
-	ocg2rad 				= Array{Float64}(binom(m,2)+m) #the plus 1 covers values taken from the diagonal
+	ocg2rad 				= Array{Float64}(undef,binom(m,2)+m) #the plus 1 covers values taken from the diagonal
 	ocg2rad[1]				= val
 	post 					= 1
 	exceededmax 			= false
@@ -3615,7 +3629,7 @@ function ordercanonicalform_3{Tv}(
 		cutoff = post+1
 	end
 	deleteat!(ocg2rad,cutoff:length(ocg2rad))
-	ocg2rad = flipdim(ocg2rad,1)
+	ocg2rad = reverse(ocg2rad,dims=1)
 	ocf = cutoff - ocf
 	return ocf,ocg2rad # additional outputs for diagnostic purposes -> #,privatemax,S,maxrad,publicmax,publicmin,maxrad
 end
@@ -3678,7 +3692,7 @@ end
 #
 # 	# Compute the ocf
 # 	val						= minval
-# 	ocg2rad 				= Array{Float64}(size(A,1)*size(A,2)) #the plus 1 covers values taken from the diagonal
+# 	ocg2rad 				= Array{Float64}(undef,size(A,1)*size(A,2)) #the plus 1 covers values taken from the diagonal
 # 	ocg2rad[1]				= val
 # 	post 					= 1
 # 	exceededmax 			= false
@@ -3720,17 +3734,17 @@ end
 # 		cutoff = post+1
 # 	end
 # 	deleteat!(ocg2rad,cutoff:length(ocg2rad))
-# 	ocg2rad = flipdim(ocg2rad,1)
+# 	ocg2rad = reverse(ocg2rad,dims=1)
 # 	ocf = cutoff - ocf
 # end
 
-function ordercanonicalform{Tv}(
+function ordercanonicalform(
 	S::Array{Tv};
 	minrad=-Inf,
 	maxrad=Inf,
 	numrad=Inf,
 	fastop::Bool=true,
-	verbose::Bool=false)
+	verbose::Bool=false) where Tv
 
     symmat_float = convert(Array{Float64},copy(S))
     symmat = copy(S)
@@ -3860,7 +3874,7 @@ function trueordercanonicalform(	M;
 					numvals 	+= 	1
 				end
 			end
-			oca2rad 			= 	Array{Float64}(numvals)
+			oca2rad 			= 	Array{Float64}(undef,numvals)
 			oca2rad[1] 			= 	M[perm[1]]
 		end
 
@@ -3938,7 +3952,7 @@ function fv2ocff_1(	fv=fv,
 	for p 			= 	1:maxsd
 	numcells   += 	complexdim(p)
 	end
-	filt1 = Array{Float64}(numcells)
+	filt1 = Array{Float64}(undef,numcells)
 	numcells = 0
 	for p 								= 	1:maxsd
 	l 								= 	complexdim(p)
@@ -3948,7 +3962,7 @@ function fv2ocff_1(	fv=fv,
 
 	# Convert to order canonical form
 	filt2 = integersinoppositeorder_nonunique(filt1)
-	ocff = fill(Array{Int64}(0),maxsd+3)
+	ocff = fill(Array{Int64}(undef,0),maxsd+3)
 	numcells = 0
 	for i = 1:maxsd
 	l = length(fv[i])
@@ -3958,7 +3972,7 @@ function fv2ocff_1(	fv=fv,
 
 	# Compute the grain translator
 	ocg2rad = sort(unique(filt1))
-	ocg2rad = flipdim(ocg2rad,1)
+	ocg2rad = reverse(ocg2rad,dims=1)
 end
 
 function fv2ocff_2(	fv=fv,
@@ -3980,7 +3994,7 @@ function fv2ocff_2(	fv=fv,
 
 	ocg,ocg2rad 	= 	trueordercanonicalform(fvo,factor=true)
 	ocg 			= 	maximum(ocg)+1-ocg
-	ocg2rad			= 	flipdim(ocg2rad,1)
+	ocg2rad			= 	reverse(ocg2rad,dims=1)
 
 end
 ################################################################################
@@ -4018,11 +4032,11 @@ function getstartweights_subr2(symmat::Array{Int64,2},w::Array{Int64,1},m::Int64
 	for i = 1:m
 		s[i,i]=0
 	end
-	l = Array{Int64}(m)
-	lDown = Array{Int64}(m)
-	val 		= Array{Array{Int64,1}}(m)
-	supp 		= Array{Array{Int64,1}}(m)
-	suppDown 	= Array{Array{Int64,1}}(m)
+	l = Array{Int64}(undef,m)
+	lDown = Array{Int64}(undef,m)
+	val 		= Array{Array{Int64,1}}(undef,m)
+	supp 		= Array{Array{Int64,1}}(undef,m)
+	suppDown 	= Array{Array{Int64,1}}(undef,m)
 	for i = 1:m
 		supp[i] = find(s[:,i])
 		suppDown[i] = i+find(s[(i+1):end,i])
@@ -4062,17 +4076,17 @@ end
 ##########################################################################################
 
 function intervalcomplementuniquesortedinput(sortedVecOfUniqueIntegers,intervalEndpoint)
-	const v = sortedVecOfUniqueIntegers
-	const n = intervalEndpoint
-	const L = length(v)
+	v = sortedVecOfUniqueIntegers
+	n = intervalEndpoint
+	L = length(v)
 	if L==0
 		return 1:n
 	elseif L==n
-		return Array{Int64}(0)
+		return Array{Int64}(undef,0)
 	else
 		boundMarker = 1
 		upperBound = v[boundMarker]
-		complement = Array{Int64}(n-L)
+		complement = Array{Int64}(undef,n-L)
 		marker = 0
 		for i = 1:(v[end]-1)
 			if i<upperBound
@@ -4089,17 +4103,17 @@ function intervalcomplementuniquesortedinput(sortedVecOfUniqueIntegers,intervalE
 end
 
 function intervalcomplementuniqueunsortedinput(uniquepositiveintegers,intervalEndpoint)
-	const v = uniquepositiveintegers
-	const n = intervalEndpoint
-	const L = length(v)
+	v = uniquepositiveintegers
+	n = intervalEndpoint
+	L = length(v)
 	if L==0
 		return 1:n
 	elseif L==n
-		return Array{Int64}(0)
+		return Array{Int64}(undef,0)
 	else
 		complementsupport = trues(n)
-		complementsupport[v]=false
-		complement = Array{Int64}(n-L)
+		complementsupport[v].=false
+		complement = Array{Int64}(undef,n-L)
 		marker = 0
 		for i = 1:n
 			if complementsupport[i]
@@ -4117,7 +4131,7 @@ function integersinsameorder!(v::Array{Int64,1},maxradue::Int64)
 	for i = 1:m
 		x[v[i]]+=1
 	end
-	y = Array{Int64}(maxradue+1)
+	y = Array{Int64}(undef,maxradue+1)
 	y[1] = 1
 	for i = 1:maxradue
 		y[i+1]=y[i]+x[i]
@@ -4135,7 +4149,7 @@ function integersinsameorder(v::Array{Int64,1})
 	# (a) v[i] < v[j], or
 	# (b) v[i] = v[j] and i < j
 	if isempty(v)
-		z = Array{Int64}(0)
+		z = Array{Int64}(undef,0)
 		return z
 	else
 		m = length(v)
@@ -4143,7 +4157,7 @@ function integersinsameorder(v::Array{Int64,1})
 		minv = minimum(v)
 		minv = minv-1;
 		x = zeros(Int64,maxv-minv)
-		z = Array{Int64}(length(v))
+		z = Array{Int64}(undef,length(v))
 		for i = 1:m
 			x[v[i]-minv]+=1
 		end
@@ -4167,7 +4181,7 @@ function integersinsameorder!(v::Array{Int64,1})
 	# (a) v[i] < v[j], or
 	# (b) v[i] = v[j] and i < j
 	if isempty(v)
-		z = Array{Int64}(0)
+		z = Array{Int64}(undef,0)
 		return z
 	else
 		m = length(v)
@@ -4175,7 +4189,7 @@ function integersinsameorder!(v::Array{Int64,1})
 		minv = minimum(v)
 		minv = minv-1;
 		x = zeros(Int64,maxv-minv)
-		z = Array{Int64}(length(v))
+		z = Array{Int64}(undef,length(v))
 		for i = 1:m
 			x[v[i]-minv]+=1
 		end
@@ -4198,7 +4212,7 @@ function integersinoppositeorder_nonunique(v)
 		return Array{Int64,1}(0)
 	end
 	p 			= sortperm(v,alg=MergeSort)
-	u 			= Array{Int64}(length(v))
+	u 			= Array{Int64}(undef,length(v))
 	epsilon 	= v[p[end]]
 	c			= 1
 	for i = length(v):-1:1
@@ -4219,9 +4233,9 @@ function integersinoppositeorder_nonunique_test()
 		v = rand(10000)
 		u = unique(v)
 		u = sort(u)
-		u = flipdim(u,1)
+		u = reverse(u,dims=1)
 		l = length(v)
-		w = Array{Int64}(l)
+		w = Array{Int64}(undef,l)
 		for i = 1:l
 			w[i] = findfirst(u,v[i])
 		end
@@ -4238,9 +4252,9 @@ function integersinsameorderbycolumn(v::Array{Int64,1},maxradue::Int64,colptr)
 	# (b) crows(colptr,v[z],j) is an array in sorted order
 	numcols = length(colptr)-1
 	m = length(v)
-	x = Array{Int64}(maxradue)
-	y = Array{Int64}(maxradue+1)
-	z = Array{Int64}(length(v))
+	x = Array{Int64}(undef,maxradue)
+	y = Array{Int64}(undef,maxradue+1)
+	z = Array{Int64}(undef,length(v))
 	for j = 1:numcols
 		x[:] = 0
 		for i = colptr[j]:(colptr[j+1]-1)
@@ -4270,9 +4284,9 @@ end
 function integersinsameorderbycolumn2(v::Array{Int64,1},colptr)
 	numcols = length(colptr)-1
 	m = length(v)
-	v = v-minimum(v)+1
+	v = v.-(minimum(v)+1)
 	x = zeros(Int64,maximum(v))
-	z = Array{Int64}(length(v))
+	z = Array{Int64}(undef,length(v))
 	for j = 1:numcols
 		if colptr[j] == colptr[j+1]
 			continue
@@ -4316,7 +4330,7 @@ end
 =#
 function integersinsameorderbycolumn3(v::Array{Int64,1},colptr)
 	numcols = length(colptr)-1
-	z 	    = Array{Int64}(length(v))
+	z 	    = Array{Int64}(undef,length(v))
 	for i = 1:numcols
 		z[cran(colptr,i)] = colptr[i]-1+integersinsameorder(crows(colptr,v,i))
 	end
@@ -4326,7 +4340,7 @@ end
 function integersortperm(v::Array{Int64,1},maxradue::Int64)
 	l = length(v)
 	u = integersinsameorder(v)
-	w = Array{Int64}(l)
+	w = Array{Int64}(undef,l)
 	for i = 1:l
 		w[u[i]] = i
 	end
@@ -4339,7 +4353,7 @@ end
 
 ##########################################################################################
 
-function getPairsLightWrite2!{Tv<:Integer}(
+function getPairsLightWrite2!(
 	rowval::Array{Tv,1},
 	colptr::Array{Tv,1},
 	rowfilt::Array{Tv,1},
@@ -4349,7 +4363,7 @@ function getPairsLightWrite2!{Tv<:Integer}(
 	prows::Array{Tv,1},
 	pcols::Array{Tv,1},
 	numpairs::Array{Tv,1};
-	verbose = false)
+	verbose = false)  where Tv<:Integer
 
 	col2firstplace = zeros(Tv,n)
 	rowwisesum = zeros(Tv,m)
@@ -4380,7 +4394,7 @@ function getPairsLightWrite2!{Tv<:Integer}(
 	colwisesum = colsupportsum(colptr,n) # note allow extra on end
 	colfiltptr = getcolptr2(colfilt,n)	# note allow extra on end
 	colwisesumlinearized = integersinsameorderbycolumn2(colwisesum,colfiltptr)
-	colnamesinorder = Array{Tv}(n)
+	colnamesinorder = Array{Tv}(undef,n)
 	colnamesinorder[colwisesumlinearized]=1:n
 	ncoveredsupp = trues(m)
 	pairmarker = 0
@@ -4440,15 +4454,15 @@ function finddownstreamelements_embeddedupperunitriangularmatrix(
 		print("length of p doesn't match length of q")
 		return
 	elseif length(prows)==0
-		return Array{Int64}(0)
+		return Array{Int64}(undef,0)
 	end
 	n = length(prows)
-	rowtranslator = Array{Int64}(Mm)
+	rowtranslator = Array{Int64}(undef,Mm)
 	for i = 1:n
 		rowtranslator[prows[i]]=i
 	end
 	prowsupp = falses(Mm)
-	prowsupp[prows]=true
+	prowsupp[prows].=true
 	downstreamsupport = falses(n)
 	for i = 1:length(initialelements)
 		row = initialelements[i]
@@ -4478,7 +4492,7 @@ function finddownstreamelements_embeddedupperunitriangularmatrix(
 			counter+=1
 		end
 	end
-	downstreamelements = Array{Int64}(counter)
+	downstreamelements = Array{Int64}(undef,counter)
 	counter = 0
 	for i = 1:n
 		if downstreamsupport[i]
@@ -4584,7 +4598,7 @@ function getbetticurve(D::Dict,sd;ocf = false)
 	# NB: the ocf barcode takes values in [0, #{grains}-1]
 
 	if length(D["farfaces"][sd])==0
-		return Array{Float64}(0,2)
+		return Array{Float64}(undef,0,2)
 	end
 
 	# the plus 1 is for the zero grain, the "s" in ngrains is for "shifted",
@@ -4679,7 +4693,7 @@ end
 
 function getcycle_cell(rv,cp,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cyclenumber::Array{Int64,1})
 	numclasses 	= length(cyclenumber)
-	rep 	 	= Array{Array{Int64,1},1}(numclasses)
+	rep 	 	= Array{Array{Int64,1},1}(undef,numclasses)
 	for p 		= 1:numclasses
 		rep[p] 	= getcycle_cell(rv,cp,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cyclenumber[p])
 	end
@@ -4696,8 +4710,8 @@ function getcycle(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cycle
 	numnlpl = length(farfaces[sd-1])-length(plo[sd-1])
 
 	numclasses = length(cyclenumber)
-	summands = Array{Array{Int64,1},1}(numclasses)
-	rep 	 = Array{Array{Int64,1},1}(numclasses)
+	summands = Array{Array{Int64,1},1}(undef,numclasses)
+	rep 	 = Array{Array{Int64,1},1}(undef,numclasses)
 	summandsupp = falses(numlows)
 	for i = 1:numclasses
 		summands[i] = tid[sd][crows(Licp[sd],Lirv[sd],cyclenumber[i])]
@@ -4714,7 +4728,7 @@ function getcycle(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cycle
 
 	supp = falses(numlowlows)
 	m = size(lowfacemat,1)
-	plow2phigtranslator = Array{Int64}(numlowlows)
+	plow2phigtranslator = Array{Int64}(undef,numlowlows)
 	plow2phigtranslator[plo[sd-1]]=phi[sd-1]
 	for i = 1:numclasses
 
@@ -4779,8 +4793,8 @@ function getcyclesize(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,c
 	numnlpl = length(farfaces[sd-1])-length(plo[sd-1])
 
 	numclasses = length(cyclenumber)
-	summands = Array{Array{Int64,1},1}(numclasses)
-	rep 	 = Array{Int64}(numclasses)
+	summands = Array{Array{Int64,1},1}(undef,numclasses)
+	rep 	 = Array{Int64}(undef,numclasses)
 	summandsupp = falses(numlows)
 	for i = 1:numclasses
 		summands[i] = tid[sd][crows(Licp[sd],Lirv[sd],cyclenumber[i])]
@@ -4797,7 +4811,7 @@ function getcyclesize(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,c
 
 	supp = falses(numlowlows)
 	m = size(lowfacemat,1)
-	plow2phigtranslator = Array{Int64}(numlowlows)
+	plow2phigtranslator = Array{Int64}(undef,numlowlows)
 	plow2phigtranslator[plo[sd-1]]=phi[sd-1]
 	for i = 1:numclasses
 
@@ -4845,7 +4859,7 @@ function getrepsize(D::Dict,classnumber;dim=1)
 		return length(D["cyclerep"][dim+2][classnumber])
 	else
 		l = length(classnumber)
-		rsize = Array{Int64}(l)
+		rsize = Array{Int64}(undef,l)
 		for i = 1:l
 			rsize[i] = length(D["cyclerep"][dim+2][classnumber[i]])
 		end
@@ -4998,7 +5012,7 @@ function boundarymatrix(C;dim=1,rows="a",cols="a")
 								rv,
 								cp,
 								rows,
-								Array{Int64}(0),
+								Array{Int64}(undef,0),
 								cols,
 								max(empteval(maximum,rows,0),empteval(maximum,rv,0))
 								)
@@ -5152,7 +5166,7 @@ function barcode(D::Dict;dim = 1,ocf = false)
 
 	if !ocf
 		bcc 				= 	copy(bc)
-		bc 					= 	Array{Float64}(bc)
+		bc 					= 	Array{Float64}(undef,bc)
 		bc[finran] 			= 	D["ocg2rad"][bcc[finran]]
 		bc[evergrran,2] 	= 	Inf
 	else
@@ -5187,7 +5201,7 @@ function getpersistencediagramprimitives(
 	end
 
 	if showsize
-		barsizes = Array{Int64}(numbrs)
+		barsizes = Array{Int64}(undef,numbrs)
 		for i = 1:numbrs
 			barsizes[i] = length(C["cyclerep"][sd][i])
 		end
@@ -5361,7 +5375,7 @@ function classrep_pjs(
 	if (classcolor == "spectral") | (embeddingobj == "hop")
 		vrealization = vertexrealization(D,dim=dim,class=class)
  		vrealization = D["nvl2ovl"][vrealization]
-		vertexinverter = Array{Int64}(maximum(classvinoldspace))
+		vertexinverter = Array{Int64}(undef,maximum(classvinoldspace))
 		vertexinverter[classvinoldspace]=1:length(classvinoldspace)
 		classedges = d1faces(vrealization)
 		edges_orderverts = vertexinverter[classedges]
@@ -5986,7 +6000,7 @@ function d1faces(facesbycol)
 	end
 	vertices = find(supp)
 	numverts = length(vertices)
-	translator = Array{Int64}(M)
+	translator = Array{Int64}(undef,M)
 	translator[vertices]=1:numverts
 	supp = falses(numverts,numverts)
 	for i = 1:facecard-1
@@ -5999,7 +6013,7 @@ function d1faces(facesbycol)
 		end
 	end
 	numedges = countnz(supp)
-	edges = Array{Int64}(2,numedges)
+	edges = Array{Int64}(undef,2,numedges)
 	counter = 1
 	for j = 1:numverts
 		for i = (j+1):numverts
@@ -6092,7 +6106,7 @@ end
 
 function ezlabel(y)
 	l = length(y)
-	x = Array{String,1}(l)
+	x = Array{String,1}(undef,l)
 	for i = 1:l
 		x[i] = try
 			convert(String,y[i])
@@ -6165,14 +6179,14 @@ function binom_float(x,y)
 	return k
 end
 
-function yafterx!{Tv<:Integer}(y::Array{Tv,1},x::Array{Tv,1})
+function yafterx!(y::Array{Tv,1},x::Array{Tv,1}) where Tv<:Integer
 	for i = 1:length(x)
 		x[i] = y[x[i]]
 	end
 end
 
-function yafterx{Tv}(y::AbstractVector{Tv},x)
-	z = Array{Tv}(length(x))
+function yafterx(y::AbstractVector{Tv},x) where Tv
+	z = Array{Tv}(undef,length(x))
 	for i = 1:length(x)
 		z[i] = y[x[i]]
 	end
@@ -6229,7 +6243,7 @@ function sparsifydesparsifytest(m,n)
 end
 
 function colsupportsum(colptr,n::Integer)
-	x = Array{Int64}(n)
+	x = Array{Int64}(undef,n)
 	@inbounds begin
 	for i = 1:n
 		x[i] = colptr[i+1]-colptr[i]
@@ -6248,13 +6262,13 @@ function rowsupportsum(Arv,Acp,Am::Int64,cols)
 	return x
 end
 
-function getcolptr2{Tv<:Integer}(orderedpositiveintegerlist::Array{Tv,1},howfartolookbeforestopping::Tv)
+function getcolptr2(orderedpositiveintegerlist::Array{Tv,1},howfartolookbeforestopping::Tv) where Tv<:Integer
 	#### please note: order can be ascending or descending
 	v = orderedpositiveintegerlist
 	if isempty(v)
 		return []
 	end
-	colptr = Array{Int64}(length(v)+1)
+	colptr = Array{Int64}(undef,length(v)+1)
 	colptr[1] = 1
 	transitioncounter = 1
 	currentvalue = v[1]
@@ -6270,7 +6284,7 @@ function getcolptr2{Tv<:Integer}(orderedpositiveintegerlist::Array{Tv,1},howfart
 	return colptr
 end
 
-function addinteger!{Tv}(v::Array{Tv,1},k::Int64)
+function addinteger!(v::Array{Tv,1},k::Int64) where Tv
 	for i = 1:length(v)
 		v[i]+=k
 	end
@@ -6283,7 +6297,7 @@ function sparseadjacencymatrix(A;inputis = "adjacencymatrix")
 			return
 		end
 		m = size(A,1)
-		rv = Array{Int64}(0)
+		rv = Array{Int64}(undef,0)
 		cp = zeros(Int64,m+1)
 		cp[1] = 1
 		for i = 1:m
@@ -6358,17 +6372,17 @@ end
 
 ##########################################################################################
 
-function buildcomplex3{Tv}(symmat::Array{Tv},maxsd; dictionaryoutput = true, verbose = false)
+function buildcomplex3(symmat::Array{Tv},maxsd; dictionaryoutput = true, verbose = false) where Tv
 
-	grain = Array{Array{Int64,1}}(maxsd+1)
-	farfaces = Array{Array{Int64,1}}(maxsd+1)
-	prepairs = Array{Array{Int64,1}}(maxsd+1)
-	firstv = Array{Array{Int64,1}}(maxsd+1)
+	grain = Array{Array{Int64,1}}(undef,maxsd+1)
+	farfaces = Array{Array{Int64,1}}(undef,maxsd+1)
+	prepairs = Array{Array{Int64,1}}(undef,maxsd+1)
+	firstv = Array{Array{Int64,1}}(undef,maxsd+1)
 
-	farfaces[maxsd+1] = Array{Int64}(0)
+	farfaces[maxsd+1] = Array{Int64}(undef,0)
 	firstv[maxsd+1] = ones(Int64,1)
-	grain[maxsd+1] = Array{Int64}(0)
-	prepairs[maxsd+1] = Array{Int64}(0)
+	grain[maxsd+1] = Array{Int64}(undef,0)
+	prepairs[maxsd+1] = Array{Int64}(undef,0)
 
 	m = size(symmat,1)
 	w = vec(offdiagmean(symmat,defaultvalue=0)) 	# modified 02/12/2018
@@ -6379,13 +6393,13 @@ function buildcomplex3{Tv}(symmat::Array{Tv},maxsd; dictionaryoutput = true, ver
 	farfaces[1] = convert(Array,1:m)
 	firstv[1] = convert(Array,1:(m+1))
 	grain[1] = diag(symmat)
-	prepairs[1] = Array{Int64}(0)
+	prepairs[1] = Array{Int64}(undef,0)
 
 	r,c,z = generate2faces(symmat)
 	farfaces[2] = r
 	firstv[2] = c
 	grain[2] = z
-	prepairs[2] = Array{Int64}(0)
+	prepairs[2] = Array{Int64}(undef,0)
 
 	if maxsd == 3
 		generate3faces!(farfaces,firstv,grain,prepairs,m,symmat;verbose = verbose)
@@ -6403,8 +6417,8 @@ function buildcomplex3{Tv}(symmat::Array{Tv},maxsd; dictionaryoutput = true, ver
 		end
 	end
 
-	fpi = Array{Int64}(0)
-	ff2pv = Array{Int64}(0)
+	fpi = Array{Int64}(undef,0)
+	ff2pv = Array{Int64}(undef,0)
 	pmhist = zeros(Int64,m,m)
 
 	for sd = 3:maxsd
@@ -6420,39 +6434,39 @@ function buildcomplex3{Tv}(symmat::Array{Tv},maxsd; dictionaryoutput = true, ver
 		stepsize = min(10^7,Int(ceil(nl/4)))
 
 		npsupp = trues(nl)
-		pflist = Array{Int64}(nl)
+		pflist = Array{Int64}(undef,nl)
 		jrv = farfaces[sd-1]
 		jcp = firstv[sd-1]
 		jz = grain[sd-1]
 		zll= grain[sd-2]
 		izfull = Array{Int}(nll)
-		r = Array{Int64}(startlength)
-		z = Array{Int64}(startlength)
-		c = Array{Int64}(m+1)
+		r = Array{Int64}(undef,startlength)
+		z = Array{Int64}(undef,startlength)
+		c = Array{Int64}(undef,m+1)
 		c[1]=1
 		numpairs = [0]
 		facecount = [0]
 		if sd == maxsd-1
-			ff2pv = Array{Int64}(nl)
+			ff2pv = Array{Int64}(undef,nl)
 			ff2pv[:] = m+1
 		end
 		if sd == maxsd
 			#### sort j-matrix by grain
-			alterweight = Array{Int64}(length(zll));
+			alterweight = Array{Int64}(undef,length(zll));
 			maxweight = maximum(zll);
 			for i = 1:length(alterweight)
 				alterweight[i] = 1+maxweight-zll[i]
 			end
 			lowfilt = yafterx(alterweight,jrv)
 			invertiblevec = integersinsameorderbycolumn2(lowfilt,jcp)
-			inversevec0 = Array{Int64}(nl)
+			inversevec0 = Array{Int64}(undef,nl)
 			inversevec0[invertiblevec]=1:nl
 			jrv = yafterx(jrv,inversevec0)
 			jz = yafterx(jz,inversevec0)
 
 			lowfilt = yafterx(ff2pv,jrv)
 			invertiblevec = integersinsameorderbycolumn2(lowfilt,jcp)
-			inversevec1 = Array{Int64}(nl)
+			inversevec1 = Array{Int64}(undef,nl)
 			inversevec1[invertiblevec]=1:nl
 			jrv = yafterx(jrv,inversevec1)
 			jz = yafterx(jz,inversevec1)
@@ -6468,10 +6482,10 @@ function buildcomplex3{Tv}(symmat::Array{Tv},maxsd; dictionaryoutput = true, ver
 
 			#### reset ff2pv for next round
 			ff2pvold = copy(ff2pv)
-			ff2pv = Array{Int64}(nl)
+			ff2pv = Array{Int64}(undef,nl)
 			ff2pv[:] = m+1
 
-			oldclaw = Array{Int64}(m)
+			oldclaw = Array{Int64}(undef,m)
 		end
 
 		for i = 1:m
@@ -6581,9 +6595,9 @@ function buildcomplex3{Tv}(symmat::Array{Tv},maxsd; dictionaryoutput = true, ver
 		if isempty(farfaces[sd])
 			for nextcard = (sd+1):maxsd
 				firstv[nextcard] = [1;1]
-				farfaces[nextcard] = Array{Int64}(0)
-				prepairs[nextcard] = Array{Int64}(0)
-				grain[nextcard] = Array{Int64}(0)
+				farfaces[nextcard] = Array{Int64}(undef,0)
+				prepairs[nextcard] = Array{Int64}(undef,0)
+				grain[nextcard] = Array{Int64}(undef,0)
 			end
 			if verbose
 				println("no simplices of cardinality $(sd) or higher")
@@ -6837,23 +6851,23 @@ end
 function faceupdate!(facecount::Array{Int64,1},r::Array{Int64,1},z::Array{Int64,1},k::Int64,farfilt::Int64,stepsize::Int64)
 	facecount[1]+=1
 	if facecount[1]>length(r)
-		append!(r,Array{Int64}(stepsize))
-		append!(z,Array{Int64}(stepsize))
+		append!(r,Array{Int64}(undef,stepsize))
+		append!(z,Array{Int64}(undef,stepsize))
 	end
-	r[facecount]= k
-	z[facecount]= farfilt
+	r[facecount].= k
+	z[facecount].= farfilt
 end
 
 function faceupdatedeluxe!(facecount::Array{Int64,1},r::Array{Int64,1},z::Array{Int64,1},k::Int64,farfilt::Int64,stepsize::Int64,s::Array{Int64,1},i::Int64)
 	facecount[1]+=1
 	if facecount[1]>length(r)
-		append!(r,Array{Int64}(stepsize))
-		append!(z,Array{Int64}(stepsize))
-		append!(s,Array{Int64}(stepsize))
+		append!(r,Array{Int64}(undef,stepsize))
+		append!(z,Array{Int64}(undef,stepsize))
+		append!(s,Array{Int64}(undef,stepsize))
 	end
-	r[facecount]= k
-	z[facecount]= farfilt
-	s[facecount]= i
+	r[facecount].= k
+	z[facecount].= farfilt
+	s[facecount].= i
 end
 
 function saveface(ct::Array{Int64,1},kk::Int64,colsum::Array{Int64,1},farfilt::Int64,oldclaw::Array{Int64,1},rt::Array{Int64,1},zt::Array{Int64,1})
@@ -6909,9 +6923,9 @@ function generate2faces(symmat)
 				end
 			end
 		end
-		rowval = Array{Int64}(L)
-		nzval = Array{Int64}(L)
-		colptr = Array{Int64}(m+1)
+		rowval = Array{Int64}(undef,L)
+		nzval = Array{Int64}(undef,L)
+		colptr = Array{Int64}(undef,m+1)
 		marker = 0
 		colptr[1] = 1
 		for i = 1:m
@@ -6947,13 +6961,13 @@ function generate3faces!(
 	facecount= [0]
 	numpairs = 0
 
-	closefaces = Array{Int64}(numedges)
+	closefaces = Array{Int64}(undef,numedges)
 	for i = 1:m
-		closefaces[cran(firstv,i)]=i
+		closefaces[cran(firstv,i)].=i
 	end
 	iso = integersinsameorder(farfaces)
-	closefaces_higsorted = 	Array{Int64}(numedges)
-	grain_higsorted = 	Array{Int64}(numedges)
+	closefaces_higsorted = 	Array{Int64}(undef,numedges)
+	grain_higsorted = 	Array{Int64}(undef,numedges)
 	closefaces_higsorted[iso] = closefaces
 	grain_higsorted[iso] = grain
 
@@ -6966,22 +6980,22 @@ function generate3faces!(
 		firstv_hs[i] = firstv_hs[i-1]+firstv_hs[i]
 	end
 
-	adist = Array{Int64}(m)
-	idist = Array{Int64}(m)
-	r = Array{Int64}(numedges)
-	z = Array{Int64}(numedges)
-	s = Array{Int64}(numedges)
+	adist = Array{Int64}(undef,m)
+	idist = Array{Int64}(undef,m)
+	r = Array{Int64}(undef,numedges)
+	z = Array{Int64}(undef,numedges)
+	s = Array{Int64}(undef,numedges)
 
-	clawvec = Array{Int64}(m)
+	clawvec = Array{Int64}(undef,m)
 	ncheckedges = trues(numedges)
 
 	for a = 1:m
-		adist[:]=0
+		adist[:].=0
 		adist[crows(firstv,farfaces,a)] = crows(firstv,grain,a)
 		for ip = cran(firstv,a)
 			i = farfaces[ip]
 			dai = grain[ip]
-			idist[:]=0
+			idist[:].=0
 			idist[crows(firstv,farfaces,i)]	= crows(firstv,grain,i)
 			idist[crows(firstv_hs,closefaces_higsorted,i)] = crows(firstv_hs,grain_higsorted,i)
 			for jp = cran(firstv,i)
@@ -6991,13 +7005,13 @@ function generate3faces!(
 					if dij <= dai && dij <= adist[j] # note this condition bakes in the req. that j be adjacent to a
 						numpairs+=1
 						ncheckedges[jp] = false
-						clawvec[1:i] = 0
+						clawvec[1:i] .= 0
 						for lp = cran(firstv_hs,j)
 							l = closefaces_higsorted[lp]
 							if l >= i
 								break
 							elseif idist[l]!=0
-								clawvec[l] = min(idist[l],grain_higsorted[lp])
+								clawvec[l] .= min(idist[l],grain_higsorted[lp])
 							end
 						end
 						for kp = cran(firstv,j)
@@ -7028,17 +7042,17 @@ function generate3faces!(
 		end
 	end
 	holdi = 0
-	for edge = find(ncheckedges)
+	for edge = findall(ncheckedges)
 		i = closefaces[edge]
 		j = farfaces[edge]
 		dij = grain[edge]
 		if i != holdi
-			idist[:]=0
+			idist[:].=0
 			idist[crows(firstv,farfaces,i)]	= crows(firstv,grain,i)
 			idist[crows(firstv_hs,closefaces_higsorted,i)] = crows(firstv_hs,grain_higsorted,i)
 			holdi = i
 		end
-		clawvec[1:i] = 0
+		clawvec[1:i] .= 0
 		for lp = cran(firstv_hs,j)
 			l = closefaces_higsorted[lp]
 			if l >= i
@@ -7094,7 +7108,7 @@ function generate3faces!(
 
 	pairmarker = 0
 	npes = trues(numedges)
-	prepairs = Array{Int64}(numedges)
+	prepairs = Array{Int64}(undef,numedges)
 	for i = 1:num3faces
 		edge = r[i]
 		if npes[edge] && z[i] == grain[edge]
@@ -7110,9 +7124,9 @@ function generate3faces!(
 	grain_cell[3]=z
 	prepairs_cell[3]=prepairs
 
-	buffer1 = Array{Array{Int64,1},1}(1)
-	buffer2 = Array{Array{Int64,1},1}(1)
-	buffer1[1] = Array{Int64}(0)
+	buffer1 = Array{Array{Int64,1},1}(undef,1)
+	buffer2 = Array{Array{Int64,1},1}(undef,1)
+	buffer1[1] = Array{Int64}(undef,0)
 	buffer2[1] = ones(Int64,numverts+1)
 	append!(farfaces_cell,buffer1)
 	append!(grain_cell,buffer1)
@@ -7296,7 +7310,7 @@ end
 
 function persistencestats(x)
 	L = length(x)
-	A = Array{Float64}(8,L)
+	A = Array{Float64}(undef,8,L)
 	for ip = 1:L
 		i = x[ip]
 		println(i)
@@ -7956,7 +7970,7 @@ function ceil2grid_overflowparameters(	N;
 		return 			minrad,maxrad,mingrid,maxgrid
 	end
 
-	S 								= 	Array{Float64}(copy(N)) #NB it has been verified experimentally that it is VERY important to use the copy function here
+	S 								= 	Array{Float64}(undef,copy(N)) #NB it has been verified experimentally that it is VERY important to use the copy function here
 
 	if 	minrad 						== 	"minedge"
 		minrad 						= 	minimum(offdiagmin(S))
@@ -8010,7 +8024,7 @@ function makegrid(mingrid,maxgrid,numrad)
 		grid 		= 	"all"
 	else
 		grid 		= 	linspace(mingrid,maxgrid,numrad)
-		grid 		= 	Array{Float64}(grid)
+		grid 		= 	Array{Float64}(undef,grid)
 		grid[end] 	= 	maxgrid # this identity might not hold if we did not enforce it, due to numerical imprecision
 	end
 	return grid
@@ -8116,7 +8130,7 @@ function minmaxceilroundsright(	N;
 		print(typeof(maxrad0))
 		print(typeof(numrad))
 		ran0 				= 	linspace(minrad0,maxrad0,numrad)
-		ran0 				= 	Array{Float64}(ran0)
+		ran0 				= 	Array{Float64}(undef,ran0)
 		ran0[1]				= 	minrad0
 		ran0[end]			= 	maxrad0
 		append!(ran0,Inf)
@@ -8434,7 +8448,7 @@ function 	diagonalentries(x)
 	return 		v
 end
 
-function 	offdiagmin{Tv}(d::Array{Tv})
+function 	offdiagmin(d::Array{Tv}) where Tv
 	if 	size(d,1) != size(d,2)
 		println()
 		println("error: d should be square")
@@ -8466,11 +8480,11 @@ function vrmat(C::Dict)
 	end
 	nvl2ovl 			= 	C["nvl2ovl"]
 	numpts 				= 	length(nvl2ovl)
-	ovl2nvl 			= 	Array{Int64}(numpts)
+	ovl2nvl 			= 	Array{Int64}(undef,numpts)
 	ovl2nvl[nvl2ovl] 	=   1:numpts
 	symmat 				= 	copy(C["symmat"])
 	symmat 				= 	symmat[ovl2nvl,ovl2nvl]
-	s 					= 	Array{Float64}(symmat)
+	s 					= 	Array{Float64}(undef,symmat)
 	for p 				= 	1:length(s)
 		if symmat[p]	==   0
 			s[p] 		= 	Inf
@@ -8520,7 +8534,7 @@ function 	ceil2grid(M;origin=0,stepsize=1,numsteps=Inf)
 	end
 
 	N 				= 	copy(M)
-	N 				= 	Array{Float64}(N)
+	N 				= 	Array{Float64}(undef,N)
 	N  				= 	(N - origin)./stepsize
 	N 				= 	ceil.(N)
 	N 				= 	N*stepsize+origin
@@ -9062,7 +9076,7 @@ function perseusjl(
 
 	D = Dict(
 			:barcodes 			=> 	Array{Array{Float64,2},1}(maxdim+1),
-			:betti   			=> 	Array{Int64}(0,maxdim+1),
+			:betti   			=> 	Array{Int64}(undef,0,maxdim+1),
 			:model 				=>	model,
 			:maxdim 			=> 	maxdim,
 			:perseusjlversion 	=>  "0.0.0"
@@ -9070,7 +9084,7 @@ function perseusjl(
 
 	# si stands for shifted index; since peresus ouptput starts indexing at 0 and arrays are 1-indexed, the true barcode of dimension r is D[:filtvalssi][D[:barcodes][r]+1]
 	if fr
-		D[:filtvalssi] 	=	flipdim(ocg2rad,1)
+		D[:filtvalssi] 	=	reverse(ocg2rad,dims=1)
 	else
 		D[:filtvalssi] 	=	minrad:stepsz:(minrad+(1+nsteps)*stepsz)
 	end
