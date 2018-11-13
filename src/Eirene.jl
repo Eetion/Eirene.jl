@@ -2286,7 +2286,7 @@ function spmmF2(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Array{Tv,1},B
 		colptrC[i+1] = colptrC[i]+length(nzRows)
 
 		if colptrC[i+1] > length(rowvalC)+1
-			append!(rowvalC, Array{Int}(preallocationIncrement))
+			append!(rowvalC, Array{Int}(undef,preallocationIncrement))
 		end
 		rowvalC[colptrC[i]:(colptrC[i+1]-1)] = sort(rowList[nzRows])
 	end
@@ -2363,7 +2363,7 @@ function spmmF2silentLeft(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Arr
 		colptrC[i+1] = colptrC[i]+length(nzRows)
 
 		if colptrC[i+1] > length(rowvalC)+1
-			append!(rowvalC, Array{Int}(preallocationIncrement))
+			append!(rowvalC, Array{Int}(undef,preallocationIncrement))
 		end
 		rowvalC[colptrC[i]:(colptrC[i+1]-1)] = sort(rowList[nzRows])
 	end
@@ -4282,9 +4282,12 @@ end
 	- crows(colptr,v[z],j) is an array in sorted order
 =#
 function integersinsameorderbycolumn2(v::Array{Int64,1},colptr)
+	###################################################################################
+	print("waypoint 6 ",any(colptr.<0),"OR",any(v.<0))
+	###################################################################################
 	numcols = length(colptr)-1
 	m = length(v)
-	v = v.-(minimum(v)+1)
+	v = v.-(minimum(v)-1)
 	x = zeros(Int64,maximum(v))
 	z = Array{Int64}(undef,length(v))
 	for j = 1:numcols
@@ -4732,7 +4735,7 @@ function getcycle(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cycle
 	plow2phigtranslator[plo[sd-1]]=phi[sd-1]
 	for i = 1:numclasses
 
-		supp[:] = false
+		supp[:] .= false
 		for j = 1:length(summands[i])
 			for k = 1:m
 				kk = lowfacemat[k,translator[summands[i][j]]]
@@ -6439,7 +6442,7 @@ function buildcomplex3(symmat::Array{Tv},maxsd; dictionaryoutput = true, verbose
 		jcp = firstv[sd-1]
 		jz = grain[sd-1]
 		zll= grain[sd-2]
-		izfull = Array{Int}(nll)
+		izfull = Array{Int}(undef,nll)
 		r = Array{Int64}(undef,startlength)
 		z = Array{Int64}(undef,startlength)
 		c = Array{Int64}(undef,m+1)
