@@ -416,7 +416,7 @@ function buildclosefromfar(farfaces,firstv,sd,columnsinorder)
 	end
 	lclosefaces = Array{Int64}(undef,1,firstv[2][end]-1)
 	for i = 1:m
-		lclosefaces[cran(firstv[2],i)]=i
+		lclosefaces[cran(firstv[2],i)].=i
 	end
 	if sd == 2
 		return lclosefaces[columnsinorder]'
@@ -829,7 +829,7 @@ end
 
 function ocff2of(grain::Array{Array{Int64,1},1},ocg2rad::Array{Float64})
 	n = length(grain)
-	filt = Array{Array{Float64}}(n)
+	filt = Array{Array{Float64}}(undef,n)
 	for i = 1:n
 		filt[i] = ocff2of(grain[i],ocg2rad)
 	end
@@ -1620,7 +1620,7 @@ function humanreadablefilepath2unsegmentedfilteredcomplex(filepath)
 		fillran_b 		= 	rvpost+numval
 		fillran 		= 	fillran_a:fillran_b
 
-		vals 			= 	Array{Int64,1}(M[p,readran])
+		vals 			= 	Array{Int64,1}(undef,M[p,readran])
 		rv[fillran] 	= 	vals
 		cp[cppost+1] 	= 	cp[cppost]+numval
 
@@ -1664,7 +1664,7 @@ function unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ncd=Inf
 	end
 	m 		= 	min(nsd,ncd)
 
-	fvc     = Array{Array{Float64,1}}(ncd)
+	fvc     = Array{Array{Float64,1}}(undef,ncd)
 	rvc     = Array{Array{Int64,1}}(undef,ncd)
 	cpc     = Array{Array{Int64,1}}(undef,ncd)
 
@@ -1827,7 +1827,7 @@ function persistf2complex(	;
 	### Record the input parameters
 	input = Dict(
 		"model"			=> "complex",
-		"version" 		=> Pkg.installed("Eirene"),
+		# "version" 		=> Pkg.installed("Eirene"),
 		"date"			=> string(Dates.Date(now())),
 		"time"			=> string(Dates.Time(now())),
 		"maxdim"		=> ncd-2,
@@ -1843,7 +1843,7 @@ function persistf2complex(	;
 								rev=true)
 	else
 	 	ocg,ocg2rad			=   trueordercanonicalform(
-								cat(1,fv...),
+								cat(fv...,dims=1),
 								firstval=1,
 								factor=true,
 								rev=true)
@@ -2051,20 +2051,20 @@ function unpack!(D::Dict)
 		if maxsd >= 2
 			Lirv[maxsd],Licp[maxsd] = boundarylimit_Lionly(D["trv"],D["tcp"],D["tid"],maxsd)
 		elseif maxsd == 1
-			Lirv[maxsd] = Array{Int64,1}(0)
+			Lirv[maxsd] = Array{Int64,1}(undef,0)
 			Licp[maxsd] = ones(Int64,1)
 		end
-		Lrv[maxsd]=Array{Int64,1}(0)
-		Lcp[maxsd]=Array{Int64,1}(0)
-		Rrv[maxsd]=Array{Int64,1}(0)
-		Rcp[maxsd]=Array{Int64,1}(0)
+		Lrv[maxsd]=Array{Int64,1}(undef,0)
+		Lcp[maxsd]=Array{Int64,1}(undef,0)
+		Rrv[maxsd]=Array{Int64,1}(undef,0)
+		Rcp[maxsd]=Array{Int64,1}(undef,0)
 	end
 
 	for i = 2:N
 		Lrv[i],Lcp[i],Lirv[i],Licp[i],Rrv[i],Rcp[i] = boundarylimit(D,i)
 		if isempty(Lcp[i])
 			println()
-			println("ERROR MESSAGE IN unpack!: Lcp[i] = 0 and i = $(i)")
+			println("ERROR MESSAGE IN unpack!: Lcp[i] .= 0 and i = $(i)")
 		end
 	end
 
@@ -2147,7 +2147,7 @@ function morseInverseF2orderedColsUnsortedRowsInSilentOut(Arowval::Array{Tv,1},A
 							rowSupp[k] = i
 							newRowsCounter +=1
 							rowList[newRowsCounter] = k
-							rowvalCj[k] = true
+							rowvalCj[k] .= true
 						else
 							rowvalCj[k] = !rowvalCj[k]
 						end
@@ -2177,9 +2177,9 @@ function morseInverseF2orderedColsUnsortedRowsSilentInSilentOut(Arowval::Array{T
 
     colptrC = Array{Tv}(undef,mA+1); colptrC[1]=1
 	rowSupp = zeros(Tv, mA)
-	rowList = Array{Tv}( mA)
-	rowvalCj = Array{Bool}( mA)
-	rowvalC = Array{Tv}( mA)
+	rowList = Array{Tv}(undef,mA)
+	rowvalCj = Array{Bool}(undef,mA)
+	rowvalC = Array{Tv}(undef,mA)
     totalrowscounter = 0
     onepast = 0
 	for i in 1:mA
@@ -2210,7 +2210,7 @@ function morseInverseF2orderedColsUnsortedRowsSilentInSilentOut(Arowval::Array{T
 						rowSupp[k] = i
 						newRowsCounter +=1
 						rowList[newRowsCounter] = k
-						rowvalCj[k] = true
+						rowvalCj[k] .= true
 					else
 						rowvalCj[k] = !rowvalCj[k]
 					end
@@ -2246,7 +2246,7 @@ function addcol!(
 			peakcounter[1]+=1
 			flippedlist[peakcounter]=ii
 			shoreline[ii] = watermark
-			oddfloods[ii] = true
+			oddfloods[ii] .= true
 		else
 			oddfloods[ii] = !oddfloods[ii]
 		end
@@ -2260,12 +2260,12 @@ function spmmF2(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Array{Tv,1},B
     rowvalB = Browval; colptrB = Bcolptr
     preallocationIncrement = colptrA[end]+colptrB[end]
 
-	colptrC = Array{Tv}( nB+1)
+	colptrC = Array{Tv}(undef,nB+1)
     colptrC[1] = 1
 	rowSupp = zeros(Tv, mA)
-	rowList = Array{Tv}( mA)
-	rowvalCj = Array{Bool}( mA)
-	rowvalC = Array{Tv}( preallocationIncrement)
+	rowList = Array{Tv}(undef,mA)
+	rowvalCj = Array{Bool}(undef,mA)
+	rowvalC = Array{Tv}(undef,preallocationIncrement)
 	for i in 1:nB
 		newrowscounter = 0
 		for jp in colptrB[i]:(colptrB[i+1] - 1)
@@ -2276,7 +2276,7 @@ function spmmF2(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Array{Tv,1},B
 					rowSupp[k] = i
 					newrowscounter +=1
 					rowList[newrowscounter] = k
-					rowvalCj[k] = true
+					rowvalCj[k] .= true
 				else
 					rowvalCj[k] = !rowvalCj[k]
 				end
@@ -2353,7 +2353,7 @@ function spmmF2silentLeft(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Arr
 					rowSupp[k] = i
 					newrowscounter +=1
 					rowList[newrowscounter] = k
-					rowvalCj[k] = true
+					rowvalCj[k] .= true
 				else
 					rowvalCj[k] = !rowvalCj[k]
 				end
@@ -2390,7 +2390,7 @@ function blockprodsumWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mcp,preallocation
 			rowSupp[row]=i
 			newrowscounter+=1
 			rowList[newrowscounter]=row
-			rowvalCj[row] = true
+			rowvalCj[row] .= true
 		end
 		if Bcp[i]<Bcp[Dn+1]
 			for jp in Bcp[i]:(Bcp[i+1] - 1)
@@ -2401,7 +2401,7 @@ function blockprodsumWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mcp,preallocation
 						rowSupp[row] = i
 						newrowscounter +=1
 						rowList[newrowscounter] = row
-						rowvalCj[row] = true
+						rowvalCj[row] .= true
 					else
 						rowvalCj[row] = !rowvalCj[row]
 					end
@@ -2439,7 +2439,7 @@ function blockprodsumsilenticolsleftWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mc
 			rowSupp[row]=i
 			newrowscounter+=1
 			rowList[newrowscounter]=row
-			rowvalCj[row] = true
+			rowvalCj[row] .= true
 		end
 		for jp in Bcp[i]:(Bcp[i+1] - 1)
 			j = Brv[jp]
@@ -2448,7 +2448,7 @@ function blockprodsumsilenticolsleftWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mc
 				rowSupp[row] = i
 				newrowscounter +=1
 				rowList[newrowscounter] = row
-				rowvalCj[row] = true
+				rowvalCj[row] .= true
 			else
 				rowvalCj[row] = !rowvalCj[row]
 			end
@@ -2461,7 +2461,7 @@ function blockprodsumsilenticolsleftWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mc
 					rowSupp[row] = i
 					newrowscounter +=1
 					rowList[newrowscounter] = row
-					rowvalCj[row] = true
+					rowvalCj[row] .= true
 				else
 					rowvalCj[row] = !rowvalCj[row]
 				end
@@ -2687,7 +2687,7 @@ end
 function supportedmatrix!(Mrowval::Array{Tv},Mcolptr::Array{Tv,1},rows1,colsinorder,Mm::Tv) where Tv<:Integer
 	n = length(colsinorder)
 	suppcol1 = falses(Mm)
-	suppcol1[rows1]=true
+	suppcol1[rows1].=true
 	cpHolder = 1
 	nz1 = 0
 	for jp = 1:n
@@ -2764,11 +2764,11 @@ function transposeLighter(Arowval::Array{Ti},Acolptr::Array{Ti},Am) where Ti
     # Attach destination matrix
     Cm = An
     Cn = Am
-    Ccolptr = Array{Ti}(Am+1)
-    Crowval = Array{Ti}(Annz)
+    Ccolptr = Array{Ti}(undef,Am+1)
+    Crowval = Array{Ti}(undef,Annz)
     # Compute the column counts of C and store them shifted forward by one in
 	# Ccolptr
-    Ccolptr[1:end] = 0
+    Ccolptr[1:end] .= 0
     @inbounds for k in 1:Annz
         Ccolptr[Arowval[k]+1] += 1
     end
@@ -2802,11 +2802,11 @@ function transposeLighter(Arowval::Array{Ti},Acolptr::Array{Ti},Anzval::Array{Tv
     An = length(Acolptr)-1
     Cm = An
     Cn = Am
-    Ccolptr = Array{Ti}(Am+1)
-    Crowval = Array{Ti}(Annz)
+    Ccolptr = Array{Ti}(undef,Am+1)
+    Crowval = Array{Ti}(undef,Annz)
     Cnzval = Array{Tv}(undef,Annz)
     # Compute the column counts of C and store them shifted forward by one in Ccolptr
-    Ccolptr[1:end] = 0
+    Ccolptr[1:end] .= 0
     @inbounds for k in 1:Annz
         Ccolptr[Arowval[k]+1] += 1
     end
@@ -2850,15 +2850,15 @@ function transposeLighter_submatrix(Arowval::Array{Ti},Acolptr::Array{Ti},Am;row
     # Attach destination matrix
     Cm = length(cols)
     Cn = length(rows)
-    Ccolptr = Array{Ti}(Cn+1)
+    Ccolptr = Array{Ti}(undef,Cn+1)
     # Compute the column counts of C and store them shifted forward by one in Ccolptr
-    Ccolptr[1:end] = 0
+    Ccolptr[1:end] .= 0
 	rs = rowsupportsum(Arowval,Acolptr,Am,cols)
 	for i = 1:Cn
 	    Ccolptr[i+1] = rs[rows[i]]
 	end
 	Cnnz = sum(Ccolptr)
-    Crowval = Array{Ti}(Cnnz)
+    Crowval = Array{Ti}(undef,Cnnz)
     # From these column counts, compute C's column pointers
     # and store them shifted forward by one in Ccolptr
     countsum = 1
@@ -3069,15 +3069,15 @@ function chessboardcomplex_symmat(;numrows=3,numcols=4)
 				for jj = 1:n
 					if ii != i && jj !=j
 						rooknum2 = (ii-1)*m+jj
-						symmat[rooknum1,rooknum2] = 0
-						symmat[rooknum2,rooknum1] = 0
+						symmat[rooknum1,rooknum2] .= 0
+						symmat[rooknum2,rooknum1] .= 0
 					end
 				end
 			end
 		end
 	end
 	for k = 1:numrooks
-		symmat[k,k] = 0
+		symmat[k,k] .= 0
 	end
 	return symmat
 end
@@ -3779,13 +3779,13 @@ function ordercanonicalform(
 					symmat[i,j]=1
 					symmat[j,i]=1
 				else
-					symmat[i,j] = 0
-					symmat[j,i] = 0
+					symmat[i,j] .= 0
+					symmat[j,i] .= 0
 				end
 			end
 		end
 		for i = 1:m
-			symmat[i,i] = 0
+			symmat[i,i] .= 0
 		end
 		ocg2rad = [1]
 		return round.(Int65,symmat),ocg2rad
@@ -4209,7 +4209,7 @@ end
 
 function integersinoppositeorder_nonunique(v)
 	if isempty(v)
-		return Array{Int64,1}(0)
+		return Array{Int64,1}(undef,0)
 	end
 	p 			= sortperm(v,alg=MergeSort)
 	u 			= Array{Int64}(undef,length(v))
@@ -4256,7 +4256,7 @@ function integersinsameorderbycolumn(v::Array{Int64,1},maxradue::Int64,colptr)
 	y = Array{Int64}(undef,maxradue+1)
 	z = Array{Int64}(undef,length(v))
 	for j = 1:numcols
-		x[:] = 0
+		x[:] .= 0
 		for i = colptr[j]:(colptr[j+1]-1)
 			x[v[i]]+=1
 		end
@@ -4282,9 +4282,6 @@ end
 	- crows(colptr,v[z],j) is an array in sorted order
 =#
 function integersinsameorderbycolumn2(v::Array{Int64,1},colptr)
-	###################################################################################
-	print("waypoint 6 ",any(colptr.<0),"OR",any(v.<0))
-	###################################################################################
 	numcols = length(colptr)-1
 	m = length(v)
 	v = v.-(minimum(v)-1)
@@ -4317,7 +4314,7 @@ function integersinsameorderbycolumn2(v::Array{Int64,1},colptr)
 			x[u]+=1
 		end
 		for i = minv:maxv
-			x[i] = 0
+			x[i] .= 0
 		end
 	end
 	return z
@@ -4470,7 +4467,7 @@ function finddownstreamelements_embeddedupperunitriangularmatrix(
 	for i = 1:length(initialelements)
 		row = initialelements[i]
 		if prowsupp[row]
-			downstreamsupport[rowtranslator[row]] = true
+			downstreamsupport[rowtranslator[row]] .= true
 		end
 	end
 	for jp = n:-1:1
@@ -4482,7 +4479,7 @@ function finddownstreamelements_embeddedupperunitriangularmatrix(
 				for kp in ran
 					rawrow = Mrv[kp]
 					if prowsupp[rawrow]
-						downstreamsupport[rowtranslator[rawrow]] = true
+						downstreamsupport[rowtranslator[rawrow]] .= true
 					end
 				end
 				break
@@ -4562,7 +4559,7 @@ function barname2cyclename(D::Dict,barnumber = [1];dim = 1)
 		plo = D["plo"][sd]
 		phi = D["phi"][sd]
 		nummortals = length(plo)
-		nzcycles = find(D["grain"][sd][phi].!= D["grain"][sd-1][plo])
+		nzcycles = findall(D["grain"][sd][phi].!= D["grain"][sd-1][plo])
 		append!(nzcycles,nummortals+1:length(tid))
 		return nzcycles[barnumber]
 	elseif typeof(barnumber)<:Number
@@ -4642,7 +4639,7 @@ function getcycle(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cycle
 		supp[k] = !supp[k]
 	end
 
-	brv = find(supp[tid[sd-1]])
+	brv = findall(supp[tid[sd-1]])
 	bcp = [1,length(brv)+1]
 	brv,bcp = spmmF2silentLeft(Lrv[sd-1],Lcp[sd-1],brv,bcp,numnlpl)
 	brv,bcp = spmmF2silentLeft(Rrv[sd-1],Rcp[sd-1],brv,bcp,numnlpl)
@@ -4683,7 +4680,7 @@ function getcycle_cell(rv,cp,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cyclenumbe
 			supp[i] = !supp[i]
 		end
 	end
-	brv 				= find(supp[tid[sd-1]])
+	brv 				= findall(supp[tid[sd-1]])
 	bcp 				= [1,length(brv)+1]
 	brv,bcp 			= spmmF2silentLeft(Lrv[sd-1],Lcp[sd-1],brv,bcp,numnlpll)
 	brv,bcp 			= spmmF2silentLeft(Rrv[sd-1],Rcp[sd-1],brv,bcp,numnlpll)
@@ -4719,10 +4716,10 @@ function getcycle(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cycle
 	for i = 1:numclasses
 		summands[i] = tid[sd][crows(Licp[sd],Lirv[sd],cyclenumber[i])]
 		append!(summands[i],[tid[sd][cyclenumber[i]]])
-		summandsupp[summands[i]]=true
+		summandsupp[summands[i]].=true
 	end
 
-	lowgenerators = find(summandsupp)
+	lowgenerators = findall(summandsupp)
 	numlowgenerators = length(lowgenerators)
 	translator = zeros(Int64,numlows)
 	translator[lowgenerators] = 1:length(lowgenerators)
@@ -4743,7 +4740,7 @@ function getcycle(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,cycle
 			end
 		end
 
-		brv = find(supp[tid[sd-1]])
+		brv = findall(supp[tid[sd-1]])
 		bcp = [1,length(brv)+1]
 		brv,bcp = spmmF2silentLeft(Lrv[sd-1],Lcp[sd-1],brv,bcp,numlowlows)
 		brv,bcp = spmmF2silentLeft(Rrv[sd-1],Rcp[sd-1],brv,bcp,numlowlows)
@@ -4826,7 +4823,7 @@ function getcyclesize(farfaces,firstv,Lirv,Licp,Lrv,Lcp,Rrv,Rcp,plo,phi,tid,sd,c
 			end
 		end
 
-		brv = find(supp[tid[sd-1]])
+		brv = findall(supp[tid[sd-1]])
 		bcp = [1,length(brv)+1]
 		brv,bcp = spmmF2silentLeft(Lrv[sd-1],Lcp[sd-1],brv,bcp,numnlpl)
 		brv,bcp = spmmF2silentLeft(Rrv[sd-1],Rcp[sd-1],brv,bcp,numnlpl)
@@ -5145,7 +5142,7 @@ function barcode(D::Dict;dim = 1,ocf = false)
 	mortalprimagrain 	= 	lg[plo]
 	mortalultragrain 	= 	hg[phi]
 
-	finind 				= 	find(mortalprimagrain .!= mortalultragrain)
+	finind 				= 	findall(mortalprimagrain .!= mortalultragrain)
 	numfin 				= 	length(finind)
 	numinf 				= 	length(tid)-length(plo)
 
@@ -5163,15 +5160,15 @@ function barcode(D::Dict;dim = 1,ocf = false)
 							# tid[ebergrbran] = [array of evergreen classes]
 
 	bc 					= 	zeros(Int64,numfin+numinf,2)
-	bc[mortalran,1] 	= 	mortalprimagrain
-	bc[mortalran,2] 	= 	mortalultragrain
+	bc[mortalran,1]    .= 	mortalprimagrain
+	bc[mortalran,2]    .= 	mortalultragrain
 	bc[evergrran,1] 	= 	lg[tid[evrgrbran]]
 
 	if !ocf
 		bcc 				= 	copy(bc)
-		bc 					= 	Array{Float64}(undef,bc)
+		bc 					= 	Array{Float64}(bc)
 		bc[finran] 			= 	D["ocg2rad"][bcc[finran]]
-		bc[evergrran,2] 	= 	Inf
+		bc[evergrran,2]    .= 	Inf
 	else
 		bc 					= 	length(D["ocg2rad"])-bc
 	end
@@ -5457,7 +5454,7 @@ function classrep_pjs(
 		subset = classvinoldspace,
 		textlabels = textlabels,
 		showlabels = showlabtemp)
-	T1["marker_cmin"] = 0
+	T1["marker_cmin"] .= 0
 	T1["marker_cmax"] = 1
 	T1["marker_color"] = classcolor1
 	T1["marker_line_color"] = classcolor2
@@ -5649,7 +5646,7 @@ function submatrixsublevellaplacianeivenstats(A;indices=1:size(A,1),threshold = 
 	for j = 1:m
 		for i = 1:m
 			if L[i,j] > threshold
-				L[i,j] = 0
+				L[i,j] .= 0
 			end
 		end
 	end
@@ -5811,7 +5808,7 @@ function maketrace_pjs(
 		end
 		v = v - minimum(v)
 		v = v/maximum(v)
-		T["marker_cmin"] = 0
+		T["marker_cmin"] .= 0
 		T["marker_cmax"] = 1
 		T["marker_color"] = v
 		T["marker_colorscale"] = colorscale
@@ -5999,9 +5996,9 @@ function d1faces(facesbycol)
 	M = maximum(facesbycol)
 	supp = falses(M)
 	for m in facesbycol
-		supp[m] = true
+		supp[m] .= true
 	end
-	vertices = find(supp)
+	vertices = findall(supp)
 	numverts = length(vertices)
 	translator = Array{Int64}(undef,M)
 	translator[vertices]=1:numverts
@@ -6318,7 +6315,7 @@ function sparseadjacencymatrix(A;inputis = "adjacencymatrix")
 		for i = 1:size(A,2)
 			adjmat[A[1,i],A[2,i]]=true
 		end
-		adjmat[find(transpose(adjmat))] = true
+		adjmat[find(transpose(adjmat))] .= true
 		return sparseadjacencymatrix(adjmat)
 	end
 end
@@ -6329,9 +6326,9 @@ function hopdistance_sparse(rv,cp)
 	for i = 1:m
 		c = 0
 		metnodes = falses(m)
-		metnodes[i] = true
+		metnodes[i] .= true
 		fringenodes = falses(m)
-		fringenodes[i] = true
+		fringenodes[i] .= true
 		fringelist = [i]
 
 		while !isempty(fringelist)
@@ -6339,8 +6336,8 @@ function hopdistance_sparse(rv,cp)
 			for j in fringelist
 				for k in crows(cp,rv,j)
 					if !metnodes[k]
-						metnodes[k] = true
-						fringenodes[k] = true
+						metnodes[k] .= true
+						fringenodes[k] .= true
 						H[k,i] = c
 					end
 				end
@@ -7655,18 +7652,36 @@ function eirenevrVeirenepc(numits,maxdim)
 	return 				[]
 end
 
-function 	eirenevrVeirenecomplex(numits,maxdim)
+function eirenevrVeirenecomplex(numits,maxdim,verbose=false)
 	for p 			= 	1:numits
 		numpts 		= 	rand(50:60,1)
 		numpts 		= 	numpts[1]
 		d 			= 	vertexlifemat(numpts,model="rand")
 		Cvr 		= 	eirene(d,maxdim=maxdim,model="vr")
 
+		if verbose
+			println("eirenevrVeirenecomplex - waypoint 1")
+		end
+
 		rv,cp 		= 	boundarymatrices(Cvr)
 		fv 			= 	ocff2of(Cvr["grain"],Cvr["ocg2rad"])
+
+		if verbose
+			println("eirenevrVeirenecomplex - waypoint 2")
+		end
+
 		Ccx		 	= 	eirene(rv=rv,cp=cp,fv=fv,model = "complex",maxdim=maxdim)
 
+		if verbose
+			println("eirenevrVeirenecomplex - waypoint 3")
+		end
+
 		i,j 		= 	firstbcdiff([Cvr Ccx],maxdim=maxdim)
+
+		if verbose
+			println("eirenevrVeirenecomplex - waypoint 4")
+		end
+
 		if 	i 			!= 	0
 			return 	 	Cvr, Ccx, i
 		end
@@ -8424,8 +8439,8 @@ end
 
 function firstbcdiff(A,B;maxdim=1,offset=0) # stands for first barcode difference
 	for	r 			= 		0:maxdim
-		Ba 			= 		sortrows(barcode(A,dim=r))
-		Bb 			= 		sortrows(barcode(B,dim=r+offset))
+		Ba 			= 		sortslices(barcode(A,dim=r),		dims=1)
+		Bb 			= 		sortslices(barcode(B,dim=r+offset),	dims=1)
 		if 	Ba 		!= 		Bb
 			return 	r
 		end
@@ -8699,7 +8714,7 @@ function solutionkey(		;
 end
 
 function suspend!(rv,cp,fv;degree=1)
-	F 	= 	fill(Array{Int64,1}(0),degree)
+	F 	= 	fill(Array{Int64,1}(undef,0),degree)
 	v   = 	fill([1],degree)
 	prepend!(rv,F)
 	prepend!(cp,v)
