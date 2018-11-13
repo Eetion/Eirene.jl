@@ -1864,7 +1864,7 @@ function persistf2complex(	;
 		)
 
 	### Create the dictionary that stores all relevant data
-	D = Dict(
+	D = Dict{String,Any}(
 		"rv" 		=> rv,
 		"cp" 		=> cp,
 		"grain"		=> ocg,
@@ -6404,7 +6404,7 @@ function buildcomplex3(symmat::Array{Tv},maxsd; dictionaryoutput = true, verbose
 	if maxsd == 3
 		generate3faces!(farfaces,firstv,grain,prepairs,m,symmat;verbose = verbose)
 		if dictionaryoutput == true
-			D = Dict(
+			D = Dict{String,Any}(
 				"farfaces" => farfaces,
 				"firstv" => firstv,
 				"grain" => grain,
@@ -6611,7 +6611,7 @@ function buildcomplex3(symmat::Array{Tv},maxsd; dictionaryoutput = true, verbose
 	end
 	#gc()
 	if dictionaryoutput == true
-		D = Dict(
+		D = Dict{String,Any}(
 			"farfaces" => farfaces,
 			"firstv" => firstv,
 			"grain" => grain,
