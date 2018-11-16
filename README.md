@@ -1,6 +1,6 @@
 # Documentation
 
-## Recent Advisories 
+## Recent Advisories
 
 **Note 0** Eirene is not yet stable for Julia 0.7 and above.  **Please ensure you are running Julia 0.6.4**.
 
@@ -119,14 +119,17 @@ Formats for `x`
 
 ##### Complexes
 
+**Note 0** Julia is ***1-indexed***.  For an example, `v[1]` is the first entry of a list or vector `v`.  Thus, when assigning unique ID numbers to cells, numbering should start at 1, not 0.
+
 There are several ways to format the data of a cell complex `E`.  Here are the main ingredients.
 
 * number the cells `1, ..., N` in ascending order, according to dimension
 * let `D` be the `N x N` zero/one matrix with `D[i,j] = 1` iff `i` is a face of cell `j`
-* store `D` as a sparse matrix in Julia (see Julia docs), and define
+* define vectors `rv` and `cp` by the following procedure (see Julia for a more direct interpretation)
 ```
-julia> rv = D.rowval
-julia> cp = D.colptr
+julia> S  = sparse(D)
+julia> rv = S.rowval
+julia> cp = S.colptr
 ```
 
 Define vectors `dv`, `ev`, and `dp` such that
@@ -139,6 +142,44 @@ If in addition we have a nested sequence of complexes `E_0 ≤ ... ≤ E_n = E`
 
 * `fv[i]` is the birthtime of cell `i`
 
+**Example 0** Consider a topological space with vertices, `v1` and `v2`, and one edge between them, `e1`.  To wit, this is a combinatorial graph *G*. We assign unique ID numbers to the cells of `G` as follows. *ID numbers must be assigned in ascending order with respect to the dimension of cells (e.g. cells of dimension 0 receive lower id numbers than cells of dimension 1). NUMBERING MUST START AT 1.*
+
+```
+i = id number (user-assigned)   |   cell    |   original cell label
+------------------------------------------------------------------
+0                               | undefined |   undefined
+1                               |   c1      |   v1
+2                               |   c2      |   v2
+3                               |   c3      |   e1
+```
+
+These ID numbers determine the entries of `D`.  For example, `D[1,3] = 1` because `c1` is a face of `c3`, and `D[1,2] = 0` because `c1` is not a face of `c2`.
+
+```
+julia> D = [0 0 1; 0 0 1; 0 0 0]
+3×3 Array{Int64,2}:
+ 0  0  1
+ 0  0  1
+ 0  0  0
+```
+Suppose that *G* is the last in a nested sequence of graphs `G1, G2, G3` where `G1` is just the vertex `v1` and `G2` is the (unconnected) pair of vertices `v1, v2`.  Suppose that `G1`, `G2`, and `G3` appear at times `t1`, `t2`, and `t3`, respectively.  Then
+```
+i = id number   |   fv[i]   |   dv[i]   |   ev[i]   |   dp[i]   |
+-----------------------------------------------------------------
+0                 undefined   undefined   undefined   undefined
+1                   t1          0           2           1
+2                   t2          0           1           3
+3                   t3          1           0           4
+4                 undefined   undefined   undefined     4
+5                 undefined   undefined   undefined   undefined
+```
+That is,
+```
+fv = [t1,t2,t3]
+dv = [0,0,1]
+ev = [2,1,0]
+dp = [1,2,4,4]
+```
 ###### simple format (from file)
 
 The formats described below are great for efficiency, but they can be hard to read.  Alternatively, you can write a comma separated file with the following format
@@ -156,6 +197,13 @@ If this file is saved as `Users/Adam/ez.csv`, then to compute PH call
 julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="sp")
 ```
 
+***EXAMPLE***  For our example space, this file would take form:
+
+```
+0, t1
+0, t2
+1, t3, 1, 2
+```
 
 ###### sparse column format
 
