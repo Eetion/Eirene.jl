@@ -126,8 +126,8 @@ using Pkg
 using Distances
 using JLD
 using Blink
-using PlotlyJS
-using Plotly
+# using PlotlyJS
+# using Plotly
 using MultivariateStats
 using Colors
 using SparseArrays
@@ -2066,7 +2066,7 @@ function unpack!(D::Dict)
 		Lrv[i],Lcp[i],Lirv[i],Licp[i],Rrv[i],Rcp[i] = boundarylimit(D,i)
 		if isempty(Lcp[i])
 			println()
-			println("ERROR MESSAGE IN unpack!: Lcp[i] .= 0 and i = $(i)")
+			println("ERROR MESSAGE IN unpack!: Lcp[i] = 0 and i = $(i)")
 		end
 	end
 
@@ -2149,7 +2149,7 @@ function morseInverseF2orderedColsUnsortedRowsInSilentOut(Arowval::Array{Tv,1},A
 							rowSupp[k] = i
 							newRowsCounter +=1
 							rowList[newRowsCounter] = k
-							rowvalCj[k] .= true
+							rowvalCj[k] = true
 						else
 							rowvalCj[k] = !rowvalCj[k]
 						end
@@ -2212,7 +2212,7 @@ function morseInverseF2orderedColsUnsortedRowsSilentInSilentOut(Arowval::Array{T
 						rowSupp[k] = i
 						newRowsCounter +=1
 						rowList[newRowsCounter] = k
-						rowvalCj[k] .= true
+						rowvalCj[k] = true
 					else
 						rowvalCj[k] = !rowvalCj[k]
 					end
@@ -2248,7 +2248,7 @@ function addcol!(
 			peakcounter[1]+=1
 			flippedlist[peakcounter]=ii
 			shoreline[ii] = watermark
-			oddfloods[ii] .= true
+			oddfloods[ii] = true
 		else
 			oddfloods[ii] = !oddfloods[ii]
 		end
@@ -2278,7 +2278,7 @@ function spmmF2(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Array{Tv,1},B
 					rowSupp[k] = i
 					newrowscounter +=1
 					rowList[newrowscounter] = k
-					rowvalCj[k] .= true
+					rowvalCj[k] = true
 				else
 					rowvalCj[k] = !rowvalCj[k]
 				end
@@ -2355,7 +2355,7 @@ function spmmF2silentLeft(Arowval::Array{Tv,1},Acolptr::Array{Tv,1},Browval::Arr
 					rowSupp[k] = i
 					newrowscounter +=1
 					rowList[newrowscounter] = k
-					rowvalCj[k] .= true
+					rowvalCj[k] = true
 				else
 					rowvalCj[k] = !rowvalCj[k]
 				end
@@ -2392,7 +2392,7 @@ function blockprodsumWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mcp,preallocation
 			rowSupp[row]=i
 			newrowscounter+=1
 			rowList[newrowscounter]=row
-			rowvalCj[row] .= true
+			rowvalCj[row] = true
 		end
 		if Bcp[i]<Bcp[Dn+1]
 			for jp in Bcp[i]:(Bcp[i+1] - 1)
@@ -2403,7 +2403,7 @@ function blockprodsumWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mcp,preallocation
 						rowSupp[row] = i
 						newrowscounter +=1
 						rowList[newrowscounter] = row
-						rowvalCj[row] .= true
+						rowvalCj[row] = true
 					else
 						rowvalCj[row] = !rowvalCj[row]
 					end
@@ -2441,7 +2441,7 @@ function blockprodsumsilenticolsleftWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mc
 			rowSupp[row]=i
 			newrowscounter+=1
 			rowList[newrowscounter]=row
-			rowvalCj[row] .= true
+			rowvalCj[row] = true
 		end
 		for jp in Bcp[i]:(Bcp[i+1] - 1)
 			j = Brv[jp]
@@ -2450,7 +2450,7 @@ function blockprodsumsilenticolsleftWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mc
 				rowSupp[row] = i
 				newrowscounter +=1
 				rowList[newrowscounter] = row
-				rowvalCj[row] .= true
+				rowvalCj[row] = true
 			else
 				rowvalCj[row] = !rowvalCj[row]
 			end
@@ -2463,7 +2463,7 @@ function blockprodsumsilenticolsleftWrite2!(Crv,Ccp,Brv,Bcp,Drv,Dcp,Dm,Dn,Mrv,Mc
 					rowSupp[row] = i
 					newrowscounter +=1
 					rowList[newrowscounter] = row
-					rowvalCj[row] .= true
+					rowvalCj[row] = true
 				else
 					rowvalCj[row] = !rowvalCj[row]
 				end
@@ -3071,15 +3071,15 @@ function chessboardcomplex_symmat(;numrows=3,numcols=4)
 				for jj = 1:n
 					if ii != i && jj !=j
 						rooknum2 = (ii-1)*m+jj
-						symmat[rooknum1,rooknum2] .= 0
-						symmat[rooknum2,rooknum1] .= 0
+						symmat[rooknum1,rooknum2] = 0
+						symmat[rooknum2,rooknum1] = 0
 					end
 				end
 			end
 		end
 	end
 	for k = 1:numrooks
-		symmat[k,k] .= 0
+		symmat[k,k] = 0
 	end
 	return symmat
 end
@@ -3781,13 +3781,13 @@ function ordercanonicalform(
 					symmat[i,j]=1
 					symmat[j,i]=1
 				else
-					symmat[i,j] .= 0
-					symmat[j,i] .= 0
+					symmat[i,j]= 0
+					symmat[j,i]= 0
 				end
 			end
 		end
 		for i = 1:m
-			symmat[i,i] .= 0
+			symmat[i,i]= 0
 		end
 		ocg2rad = [1]
 		return round.(Int65,symmat),ocg2rad
@@ -4316,7 +4316,7 @@ function integersinsameorderbycolumn2(v::Array{Int64,1},colptr)
 			x[u]+=1
 		end
 		for i = minv:maxv
-			x[i] .= 0
+			x[i] = 0
 		end
 	end
 	return z
@@ -4469,7 +4469,7 @@ function finddownstreamelements_embeddedupperunitriangularmatrix(
 	for i = 1:length(initialelements)
 		row = initialelements[i]
 		if prowsupp[row]
-			downstreamsupport[rowtranslator[row]] .= true
+			downstreamsupport[rowtranslator[row]] = true
 		end
 	end
 	for jp = n:-1:1
@@ -4481,7 +4481,7 @@ function finddownstreamelements_embeddedupperunitriangularmatrix(
 				for kp in ran
 					rawrow = Mrv[kp]
 					if prowsupp[rawrow]
-						downstreamsupport[rowtranslator[rawrow]] .= true
+						downstreamsupport[rowtranslator[rawrow]] = true
 					end
 				end
 				break
@@ -5456,7 +5456,7 @@ function classrep_pjs(
 		subset = classvinoldspace,
 		textlabels = textlabels,
 		showlabels = showlabtemp)
-	T1["marker_cmin"] .= 0
+	T1["marker_cmin"] = 0
 	T1["marker_cmax"] = 1
 	T1["marker_color"] = classcolor1
 	T1["marker_line_color"] = classcolor2
@@ -5648,7 +5648,7 @@ function submatrixsublevellaplacianeivenstats(A;indices=1:size(A,1),threshold = 
 	for j = 1:m
 		for i = 1:m
 			if L[i,j] > threshold
-				L[i,j] .= 0
+				L[i,j] = 0
 			end
 		end
 	end
@@ -5810,7 +5810,7 @@ function maketrace_pjs(
 		end
 		v = v - minimum(v)
 		v = v/maximum(v)
-		T["marker_cmin"] .= 0
+		T["marker_cmin"] = 0
 		T["marker_cmax"] = 1
 		T["marker_color"] = v
 		T["marker_colorscale"] = colorscale
@@ -5998,7 +5998,7 @@ function d1faces(facesbycol)
 	M = maximum(facesbycol)
 	supp = falses(M)
 	for m in facesbycol
-		supp[m] .= true
+		supp[m] = true
 	end
 	vertices = findall(supp)
 	numverts = length(vertices)
@@ -6328,9 +6328,9 @@ function hopdistance_sparse(rv,cp)
 	for i = 1:m
 		c = 0
 		metnodes = falses(m)
-		metnodes[i] .= true
+		metnodes[i] = true
 		fringenodes = falses(m)
-		fringenodes[i] .= true
+		fringenodes[i] = true
 		fringelist = [i]
 
 		while !isempty(fringelist)
@@ -6338,8 +6338,8 @@ function hopdistance_sparse(rv,cp)
 			for j in fringelist
 				for k in crows(cp,rv,j)
 					if !metnodes[k]
-						metnodes[k] .= true
-						fringenodes[k] .= true
+						metnodes[k] = true
+						fringenodes[k] = true
 						H[k,i] = c
 					end
 				end
@@ -6959,7 +6959,7 @@ function generate3faces!(
 
 	numverts = length(firstv)-1
 	numedges = length(farfaces)
-	stepsize = 10^7
+	stepsize = size(symmat,1)^2
 	facecount= [0]
 	numpairs = 0
 
@@ -7013,7 +7013,7 @@ function generate3faces!(
 							if l >= i
 								break
 							elseif idist[l]!=0
-								clawvec[l] .= min(idist[l],grain_higsorted[lp])
+								clawvec[l] = min(idist[l],grain_higsorted[lp])
 							end
 						end
 						for kp = cran(firstv,j)
