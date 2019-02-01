@@ -1,9 +1,14 @@
-julia 0.6
-Colors
-MultivariateStats
-Plotly
-PlotlyJS
-Blink
-JLD
+Pkg
 Distances
-
+JLD
+Blink
+PlotlyJS
+Plotly
+MultivariateStats
+Colors
+SparseArrays
+LinearAlgebra
+Dates
+Statistics
+DelimitedFiles
+CSV

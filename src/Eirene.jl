@@ -1,9 +1,10 @@
 module Eirene
 
-#     You should have received a copy of the GNU General Public License
-#     along with Eirene.  If not, see <http://www.gnu.org/licenses/>.
-
-# print("\n
+# WELCOME TO EIRENE!
+#
+# You should have received a copy of the GNU General Public License along with
+# Eirene.  If not, please see <http://www.gnu.org/licenses/>.
+#
 # Eirene Library for Homological Algebra
 # Copyright (C) 2016, 2017, 2018  Gregory Henselman
 # www.gregoryhenselman.org
@@ -21,106 +22,15 @@ module Eirene
 # You should have received a copy of the GNU General Public License
 # along with Eirene.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ")
-# print_with_color(:blue,"
-# WELCOME TO EIRENE!
-# v$(Pkg.installed("Eirene"))
-#
-# Please help us document Eirene's recent work! Bibtex entries and
+# PLEASE HELP US DOCUMENT Eirene's recent work! Bibtex entries and
 # contact information for teaching and outreach can be found at the
-# Eirene homepage, http://gregoryhenselman.org/eirene.\n\n
-# ")
+# Eirene homepage, http://gregoryhenselman.org/eirene.
 
 ##########################################################################################
 
 #### 	REQUIREMENTS
 
 ##########################################################################################
-#
-# if typeof(Pkg.installed("Distances")) == Void
-# print_with_color(:green,"Please Note: Distances.jl may not be installed. This package is required
-# for use with Euclidean point cloud data. To install, enter the foll-
-# owing at the Julia prompt:
-#
-# Pkg.add(\"Distances\")
-# using Distances \n\n
-# ")
-# else
-# 	using Distances
-# end
-#
-# if typeof(Pkg.installed("JLD")) == Void
-# print_with_color(:green,"Please Note: JLD.jl may not be installed. This package is not required, but
-# it is the best means of saving Eirene output. To install, enter the
-# following at the Julia prompt:
-#
-# Pkg.add(\"JLD\")
-# using JLD \n\n
-# ")
-# else
-# 	using JLD
-# end
-#
-# if typeof(Pkg.installed("Blink")) == Void
-# print_with_color(:green,"Please Note: Blink.jl may not be installed. This package is required for
-# all Eirene functions ending in _pjs. To install, enter the following
-# at the Julia prompt:
-#
-# Pkg.add(\"Blink\")
-# using Blink
-# Blink.AtomShell.install() \n\n
-# ")
-# else
-# 	using Blink
-# end
-#
-# if typeof(Pkg.installed("PlotlyJS")) == Void
-# print_with_color(:green,"Please Note: PlotlyJS.jl may not be installed. This package is required
-# for all Eirene functions ending in _pjs. To install, enter the foll-
-# owing at the Julia prompt
-#
-# Pkg.add(\"PlotlyJS\")
-# using PlotlyJS \n\n
-# ")
-# else
-# 	using PlotlyJS
-# end
-#
-# if typeof(Pkg.installed("Plotly")) == Void
-# print_with_color(:green,"Please Note: Plotly.jl may not be installed. This package is required to
-# interface with the Plotly web API. To install, enter the foll-
-# owing at the Julia prompt
-#
-# Pkg.add(\"Plotly\")
-# using Plotly \n\n
-# ")
-# else
-# 	using Plotly
-# end
-#
-# if typeof(Pkg.installed("MultivariateStats")) == Void
-# print_with_color(:green,"Please Note: MultivariateStats.jl may not be installed. This package is required for
-# some operations pertaining to multidimensional scaling, but is not required.
-# To install, enter the following at the Julia prompt:
-#
-# Pkg.add(\"MultivariateStats\")
-# using MultivariateStats \n\n
-# ")
-# else
-# 	using MultivariateStats
-# end
-#
-# if typeof(Pkg.installed("Colors")) == Void
-# print_with_color(:green,"Please Note: Colors.jl may not be installed. This package is required for
-# some operations pertaining to plotting barcodes, but is not required.
-# To install, enter the following at the Julia prompt:
-#
-# Pkg.add(\"Colors\")
-# using MultivariateStats \n\n
-# ")
-# else
-# 	using Colors
-# end
 
 using Pkg
 using Distances
@@ -3937,10 +3847,9 @@ function checktrueordercanonicalform(numits)
 	return []
 end
 
-
 ################################################################################
-	# 	The following two functions appear to be unused as of 2018-04-15.
-
+	# 	BEGIN: The following two functions appear to be unused as of 2018-04-15.
+################################################################################
 function fv2ocff_1(	fv=fv,
 					dp=dp,
 					minrad=minrad,
@@ -4001,6 +3910,8 @@ function fv2ocff_2(	fv=fv,
 	ocg2rad			= 	reverse(ocg2rad,dims=1)
 
 end
+################################################################################
+	# 	END: The following two functions appear to be unused as of 2018-04-15.
 ################################################################################
 
 function checkoffdiagmean(numits)
@@ -8150,7 +8061,7 @@ end
 
 
 ####################################################################################
-####################### this function appears incomplete & is not in use
+ 	#	BEGIN: this function appears incomplete & is not in use
 ####################################################################################
 function minmaxceilroundsright(	N;
 								minrad=minimum(N),
@@ -8247,11 +8158,11 @@ function minmaxceilroundsright(	N;
 	return checkall
 end
 ####################################################################################
+ 	#	END: this function appears incomplete & is not in use
 ####################################################################################
 
-
 ####################################################################################
-##########  this function appears incomplete & is not in use
+ 	#	BEGIN: this function appears incomplete & is not in use
 ####################################################################################
 function 	checkrounding(numits,maxdim)
 	for p 	= 	1:numits
@@ -8292,6 +8203,8 @@ function 	checkrounding(numits,maxdim)
 	end
 	return ocfcheckfun3() == "passedtest"
 end
+####################################################################################
+ 	#	END: this function appears incomplete & is not in use
 ####################################################################################
 
 function generatorbdc(C;dim=0)
