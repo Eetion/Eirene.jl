@@ -1,37 +1,33 @@
 # Documentation
 
-## Recent Advisories
+## Contibutors
 
-**Note 0** Eirene is not yet stable for Julia 0.7 and above.  **Please ensure you are running Julia 0.6.4**.
+Eirene is made possible by the support of the following contributors.
 
-**Note 1** Pending patches to PlotlyJS, ploting capabilities are only available from the Jupyter notebook.  To start a new Jupyter notebook, enter
+Jean-Pierre Both <br>
+Paul Breiding <br>
+Robert Ghrist <br>
+Alan Hylton <br>
+Sara Kalisnik <br>
+Bradley Nelson <br>
+Janche Sang <br>
+Robert Short <br>
+Ann Sizemore <br>
+Primoz Skraba
+
+
+## Installation
+
+Installing Julia is simple.  Download the most recent version of Julia (1.1.0 at the time of this writing) at <https://julialang.org/downloads/>. Open a Julia shell, type `]` to enter the Package management environment, and run  `add Eirene`:
 
 ```
-julia> Pkg.add("IJulia")
-julia> using IJulia
-julia> notebook()
-```
-
-in a Julia REPL.  See https://github.com/JuliaLang/IJulia.jl for more details.
-
-**Note 2** Thanks to Brad Nelson for providing timely aid for plotting!
-
-## Installation and use in one example
-
-Installing Julia is easy.  Download Julia 0.6.4 (https://julialang.org/downloads/), open a
-Jupyter notebook (see above), and enter
-
-```
-julia> Pkg.clone("https://github.com/bnels/PlotlyJS.jl.git")
-julia> Pkg.checkout("PlotlyJS","fix-jsstring")
-julia> Pkg.add("Eirene")
-julia> using Eirene
-```
+(v1.1) pkg> add Eirene
+```  
 
 It's fairly common to get error messages when you do this.  Generally they will want you to install additional (supporting) packages.  Read these messages, and follow the instructions.  When in doubt, *FIRST* check that you are running the latest version of Julia, and use
 
 ```
-julia> Pkg.update()
+(v1.1) pkg> update
 ```
 
 to ensure that you are using the latest versions of the supporting packages.  *SECOND*, close the Julia shell.  Some updates will only take effect after re-opening.  
@@ -42,27 +38,20 @@ to ensure that you are using the latest versions of the supporting packages.  *S
 
 **Note 2** Wait times of an hour or more have been reported.  The install will finish eventually!
 
-Now let's plot the 1d persistence diagram for 50 points sampled from the uniform distribution on R<sup>20</sup>.  The first line below generates 20x50 iid matrix and stores it in a variable `x`.  The second asks Eirene to analyze `x` and store the results in a variable `C`.  The third plots the diagram.  Most of what you can do with Eirene is done with minor modifications to these commands.
+## Example
+
+Let's plot the 1d persistence diagram for a point cloud of 50 points sampled from the uniform distribution on the unit cube, [0,1]<sup>3</sup>.  The second line below generates 3x50 iid matrix and stores it in a variable `x`.  The third asks Eirene to analyze `x` and store the results in a variable `C`.  The fourth plots the barcode.   The fifth plots the persistence diagram.  The sixth plots a cycle representative for the first point in this diagram  (Eirene numbers the points automatically, so it 'makes sense' to talk about the 'first'). Most of what you can do with Eirene is done with minor modifications to these commands.
 
 ```
-julia> x = rand(20,50)
+julia> using Eirene
+julia> x = rand(3,50)
 julia> C = eirene(x, model = "pc")
+julia> plotbarcode_pjs(C,dim=1)
 julia> plotpersistencediagram_pjs(C,dim=1)
+julia> plotclassrep_pjs(C,dim=1,class=1)
 ```
 **Note 3**  Check out `EXAMPLES.md` for more examples!
 
-**Note 4**  If you encounter error messages like the following
-
-```
-ERROR: UndefVarError: eirene not defined
-ERROR: UndefVarError: plotpersistencediagram_pjs not defined
-```
-
-then you will want to append `Eirene.` to the beginning of each function in the Eirene package.  For example, in pace of line 2, you would enter
-
-```
-julia> C = Eirene.eirene(x, model = "pc")
-```
 
 ### Keywords
 <br>
