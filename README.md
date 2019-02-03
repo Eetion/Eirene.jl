@@ -1,6 +1,6 @@
 # Documentation
 
-## Contibutors
+## Contributors
 
 Eirene is made possible by the important contributions of the following individuals.
 
@@ -54,7 +54,7 @@ julia> plotclassrep_pjs(C,dim=1,class=1)
 
 
 ## Keywords
-<br>
+
   In the example above, the expression `model = "pc"` that sits inside `C = eirene(x, model = "pc")` functions as a declaration to Eirene. It asserts that the columns of `x` should be treated as points in a Euclidean point cloud. In this context, `model` is a *keyword argument*, and `"pc"` is its *value*.  Every keyword comes with a default value; you only have to declare a value if you want something other than a default.
 
 `model = "pc", "vr", "complex"`   
@@ -108,8 +108,11 @@ Formats for `x`
 
 ## Complexes
 
+### Roadmap for beginners
+If you're new to Julia and/or Eirene, formatting for complexes can be a bit overwhelming.  We suggest reading the *Example* and *General Formatting sections*, ***ignoring*** the content on `D`, `rv` and `cp`.  Then skip to the section entitled *Simple format (from file)*.  This should cover the needs of most users.
+
 ### Example
-This section gives a practical overview on customized (filtered) topological spaces.  For complete details, see the following section.  As an example of a (filtered) topological space, we'll use an undirected  graph with with two vertices, `v1` and `v2`, and one edge, `e1`.  To begin, let's assign unique ID numbers to the cells of `G` (see tabel below).
+This section gives a practical overview on customized (filtered) topological spaces.  For complete details, see the following section.  As an example of a (filtered) topological space, we'll use an undirected  graph with with two vertices, `v1` and `v2`, and one edge, `e1`.  To begin, let's assign unique ID numbers to the cells of `G` (see table below).
 
 **Debugging  tip** ID numbers must be assigned in ascending order with respect to the dimension of cells (e.g. cells of dimension 0 receive lower id numbers than cells of dimension 1). **
 
