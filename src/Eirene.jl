@@ -1,12 +1,10 @@
-module Eirene
-
 # WELCOME TO EIRENE!
 #
 # You should have received a copy of the GNU General Public License along with
 # Eirene.  If not, please see <http://www.gnu.org/licenses/>.
 #
 # Eirene Library for Homological Algebra
-# Copyright (C) 2016, 2017, 2018  Gregory Henselman
+# Copyright (C) 2016, 2017, 2018, 2019  Gregory Henselman
 # www.gregoryhenselman.org
 #
 # Eirene is free software: you can redistribute it and/or modify
@@ -25,6 +23,10 @@ module Eirene
 # PLEASE HELP US DOCUMENT Eirene's recent work! Bibtex entries and
 # contact information for teaching and outreach can be found at the
 # Eirene homepage, http://gregoryhenselman.org/eirene.
+
+__precompile__()
+
+module Eirene
 
 ##########################################################################################
 

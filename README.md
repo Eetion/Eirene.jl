@@ -2,7 +2,7 @@
 
 ## Contibutors
 
-Eirene is made possible by the support of the following contributors.
+Eirene is made possible by the important contributions of the following individuals.
 
 Jean-Pierre Both <br>
 Paul Breiding <br>
@@ -18,7 +18,9 @@ Primoz Skraba
 
 ## Installation
 
-Installing Julia is simple.  Download the most recent version of Julia (1.1.0 at the time of this writing) at <https://julialang.org/downloads/>. Open a Julia shell, type `]` to enter the Package management environment, and run  `add Eirene`:
+**Debugging Tip** *Homebrew and other installers tend to install very old versions, for some reason.  The only way to effectively check that you are running the most recent version of Julia is to visit the downloads page (https://julialang.org/downloads/) and compare with your current install.*
+
+Installing Julia is simple.  Download the most recent version of Julia at <https://julialang.org/downloads/>.  Open a Julia shell and type `]` to enter the Package management environment.  Then run  `add Eirene`:
 
 ```
 (v1.1) pkg> add Eirene
@@ -32,11 +34,9 @@ It's fairly common to get error messages when you do this.  Generally they will 
 
 to ensure that you are using the latest versions of the supporting packages.  *SECOND*, close the Julia shell.  Some updates will only take effect after re-opening.  
 
-**Note 0** Homebrew and other installers tend to install very old versions, for some reason.  The only way to effectively check that you are running the most recent version of Julia is to visit the downloads page (https://julialang.org/downloads/) and compare with your current install.
+**Debugging Tip** *Pay special attention to red error messages.  You can solve nine out of ten installation problems by copy/pasting text from these directly into the REPL.*
 
-**Note 1** Pay special attention to red error messages.  You can solve nine out of ten installation problems by copy/pasting text from these directly into the REPL.
-
-**Note 2** Wait times of an hour or more have been reported.  The install will finish eventually!
+**Debuggin Tip** *Wait times of an hour or more have been reported.  The install will finish eventually!*
 
 ## Example
 
@@ -50,12 +50,12 @@ julia> plotbarcode_pjs(C,dim=1)
 julia> plotpersistencediagram_pjs(C,dim=1)
 julia> plotclassrep_pjs(C,dim=1,class=1)
 ```
-**Note 3**  Check out `EXAMPLES.md` for more examples!
+**More examples** can be found in `EXAMPLES.md`!
 
 
-### Keywords
+## Keywords
 <br>
-  In the example above, the expression `model = "pc"` that sits inside `C = eirene(x, model = "pc")` declares that the columns of `x` should be treated as points in a Euclidean point cloud. We call `model` a *keyword argument*, and `"pc"` its *value*.  Every keyword comes with a default value; you only have to declare a value if you want something other than a default.
+  In the example above, the expression `model = "pc"` that sits inside `C = eirene(x, model = "pc")` functions as a declaration to Eirene. It asserts that the columns of `x` should be treated as points in a Euclidean point cloud. In this context, `model` is a *keyword argument*, and `"pc"` is its *value*.  Every keyword comes with a default value; you only have to declare a value if you want something other than a default.
 
 `model = "pc", "vr", "complex"`   
 * States format of the data.  
@@ -84,11 +84,11 @@ julia> plotclassrep_pjs(C,dim=1,class=1)
 * Possible values: `"cyclerep"`, `"none"`.  Default value: `"cyclerep"`.
 
 
-### Inputs
+## Inputs
 
 Eirene computes persistent homology for three types of inputs: distance matrices, point clouds, and complexes.  Here are some formats these can come in, and how to analyze them.
 
-##### Distance matrices
+#### Distance matrices
 
 ```
 julia> C = eirene(x, <keyword arguments>)
@@ -97,7 +97,7 @@ Formats for `x`
 * a symmetric matrix in Julia
 * a file path to a symmetric matrix, recorded in a comma or space-delimited text file (.csv or .txt)
 
-##### Point clouds
+## Point clouds
 
 ```
 julia> C = eirene(x, model = "pc", <keyword arguments>)
@@ -106,15 +106,63 @@ Formats for `x`
 * a numeric matrix in Julia (columns will be treated as points in Euclidean space)
 * a file path to a numeric matrix, recorded in a comma or space-delimited text file (.csv or .txt)
 
-##### Complexes
+## Complexes
 
-**Note 0** Julia is ***1-indexed***.  For an example, `v[1]` is the first entry of a list or vector `v`.  Thus, when assigning unique ID numbers to cells, numbering should start at 1, not 0.
+### Example
+This section gives a practical overview on customized (filtered) topological spaces.  For complete details, see the following section.  As an example of a (filtered) topological space, we'll use an undirected  graph with with two vertices, `v1` and `v2`, and one edge, `e1`.  To begin, let's assign unique ID numbers to the cells of `G` (see tabel below).
+
+**Debugging  tip** ID numbers must be assigned in ascending order with respect to the dimension of cells (e.g. cells of dimension 0 receive lower id numbers than cells of dimension 1). **
+
+**Debugging tip** Numbering must start at 1, not 0.**
+
+```
+i = cell id number (user-assigned)   |   new cell label    |   original cell label
+----------------------------------------------------------------------------------
+1                                    |   c1                |   v1
+2                                    |   c2                |   v2
+3                                    |   c3                |   e1
+0                                    |   n/a               |   n/a
+```
+
+These ID numbers determine the entries of the boundary matrix `D`.  For example, `D[1,3] = 1` because `c1` is a face of `c3`, and `D[1,2] = 0` because `c1` is not a face of `c2`.
+
+```
+julia> D = [0 0 1; 0 0 1; 0 0 0]
+3×3 Array{Int64,2}:
+ 0  0  1
+ 0  0  1
+ 0  0  0
+```
+Suppose that *G* is the last in a nested sequence of graphs `G1, G2, G3` where `G1` is just the vertex `v1` and `G2` is the (unconnected) pair of vertices `v1, v2`.  Suppose that `G1`, `G2`, and `G3` appear at times `t1 =0.01`, `t2 =0.02`, and `t3 =0.3`, respectively.  Then
+```
+i = cell id number   |   fv[i]   |   dv[i]   |   ev[i]   |   dp[i]   |   rv[i]   |   cp[i]   |
+----------------------------------------------------------------------------------------------
+0                      undefined   undefined   undefined   undefined   undefined   undefined
+1                        0.01        0           2           1           1           1
+2                        0.02        0           1           3           2           1
+3                        0.03        1           0           4         undefined     3
+4                      undefined   undefined   undefined     4         undefined   undefined
+5                      undefined   undefined   undefined   undefined   undefined   undefined
+```
+That is,
+```
+fv = [0.01,0.02,0.03]
+dv = [0,0,1]
+ev = [2,1,0]
+dp = [1,2,4,4]
+rv = [1,2]
+cp = [1,1,3]
+```
+
+### General Formats
+
+**Debugging Tip** Julia is ***1-indexed***.  For an example, `v[1]` is the first entry of a list or vector `v`.  Thus, when assigning unique ID numbers to cells, numbering should start at 1, not 0.
 
 There are several ways to format the data of a cell complex `E`.  Here are the main ingredients.
 
 * number the cells `1, ..., N` in ascending order, according to dimension
 * let `D` be the `N x N` zero/one matrix with `D[i,j] = 1` iff `i` is a face of cell `j`
-* define vectors `rv` and `cp` by the following procedure (see Julia for a more direct interpretation)
+* define vectors `rv` and `cp` by the following procedure (see Julia documentation for a more direct interpretation)
 ```
 julia> S  = sparse(D)
 julia> rv = S.rowval
@@ -131,80 +179,48 @@ If in addition we have a nested sequence of complexes `E_0 ≤ ... ≤ E_n = E`
 
 * `fv[i]` is the birthtime of cell `i`
 
-**Example 0** Consider a topological space with vertices, `v1` and `v2`, and one edge between them, `e1`.  To wit, this is a combinatorial graph *G*. We assign unique ID numbers to the cells of `G` as follows. *ID numbers must be assigned in ascending order with respect to the dimension of cells (e.g. cells of dimension 0 receive lower id numbers than cells of dimension 1). NUMBERING MUST START AT 1.*
+
+
+### Sparse column format
+
+Eirene has a keyword argument for every vector defined in the general formatting section.  In the example below, you can substitute either `ev = ev` or `dp=dp` in place of `dv=dv`.  Eirene only needs one of the three.
+
+***Example computation***
 
 ```
-i = id number (user-assigned)   |   cell    |   original cell label
-------------------------------------------------------------------
-0                               | undefined |   undefined
-1                               |   c1      |   v1
-2                               |   c2      |   v2
-3                               |   c3      |   e1
+julia> C = eirene(rv=rv,cp=cp,dv=dv,fv=fv)
 ```
 
-These ID numbers determine the entries of `D`.  For example, `D[1,3] = 1` because `c1` is a face of `c3`, and `D[1,2] = 0` because `c1` is not a face of `c2`.
+
+
+### Simple format (from file)
+
+This format is handy if you need to proof read, or write files by hand.
 
 ```
-julia> D = [0 0 1; 0 0 1; 0 0 0]
-3×3 Array{Int64,2}:
- 0  0  1
- 0  0  1
- 0  0  0
-```
-Suppose that *G* is the last in a nested sequence of graphs `G1, G2, G3` where `G1` is just the vertex `v1` and `G2` is the (unconnected) pair of vertices `v1, v2`.  Suppose that `G1`, `G2`, and `G3` appear at times `t1`, `t2`, and `t3`, respectively.  Then
-```
-i = id number   |   fv[i]   |   dv[i]   |   ev[i]   |   dp[i]   |
------------------------------------------------------------------
-0                 undefined   undefined   undefined   undefined
-1                   t1          0           2           1
-2                   t2          0           1           3
-3                   t3          1           0           4
-4                 undefined   undefined   undefined     4
-5                 undefined   undefined   undefined   undefined
-```
-That is,
-```
-fv = [t1,t2,t3]
-dv = [0,0,1]
-ev = [2,1,0]
-dp = [1,2,4,4]
-```
-###### simple format (from file)
-
-The formats described below are great for efficiency, but they can be hard to read.  Alternatively, you can write a comma separated file with the following format
-
-```
-dv[1], fv[1], <first face of cell 1>, <second face of cell 1>, ...
-dv[2], fv[2], <first face of cell 2>, <second face of cell 2>, ...
+dv[1], fv[1], <all id #'s for the faces of cell 1, separated by commas>
+dv[2], fv[2], <all id #'s for the faces of cell 1, separated by commas>
 ...
-dv[N], fv[N], <first face of cell N>, <second face of cell N>, ...
+dv[N], fv[N], <all id #'s for the faces of cell 1, separated by commas>
 ```
 
-If this file is saved as `Users/Adam/ez.csv`, then to compute PH call
+***Example file***  For our example space, this file would take form:
+
+```
+0, 0.01
+0, 0.02
+1, 0.03, 1, 2
+```
+
+***Example computation***  If this file is saved as `Users/Adam/ez.csv`, then to compute PH call
 
 ```
 julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="sp")
 ```
 
-***EXAMPLE***  For our example space, this file would take form:
-
-```
-0, t1
-0, t2
-1, t3, 1, 2
-```
-
-###### sparse column format
-
-Eirene has a keyword argument for every vector defined above.  To compute PH:
-
-```
-julia> C = eirene(rv=rv,cp=cp,dv=dv,fv=fv)
-```
-You can use either `ev = ev` or `dp=dp` instead of `dv=dv`.  Eirene only needs one of the three.
 
 
-###### sparse column format (from file)
+### sparse column format (from file)
 
 You can store `E` as a comma separated .txt or .csv file with four lines
 
@@ -219,16 +235,52 @@ where line one is `dp`, line 2 is `fv`, line 3 is `rv`, and line 4 is `cp`.
 * If you know `D` and want to figure out what `rv` and `cp` should be, you can either view the Julia docs on sparse matrices or google "sparse column format".
 * Instead of `dp`, you can put either `dv` or `ev` in the first line.
 
-Say this file is saved as `Users/Adam/complex.csv`.  To compute PH, call
+***Example files***
+
+Recall that
+```
+fv = [0.01,0.02,0.03]
+dv = [0,0,1]
+ev = [2,1,0]
+dp = [1,2,4,4]
+rv = [1,2]
+cp = [1,1,3]
+```
+
+To use the `dp` format option, you could write a file like so.
 
 ```
-julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="dp")
+1,2,4,4
+0.01, 0.02, 0.03
+1,2
+1,1,3
 ```
 
-* Replace `"dp"` with either `"ev"` or `"dv"`, depending on what you've placed in the first line.
+To use the `ev` format option, replace the top row with dv:
+
+```
+2,1,0
+0.01, 0.02, 0.03
+1,2
+1,1,3
+```
+
+***Example computations***
+
+Suppose the first file is saved as `desktop/DP.csv`.  To compute persistent homology, run:
+
+```
+julia> C =eirene("desktop/DP.csv",model="complex",  entryformat=  "dp")
+```
+
+Suppose the second file is saved as `desktop/EV.csv`.  To compute persistent homology, run:
+
+```
+julia> C =eirene("desktop/EV.csv",model="complex",  entryformat=  "ev")
+```
 
 
-### Barcodes, Betti Curves, and Persistence Diagrams
+## Barcodes, Betti Curves, and Persistence Diagrams
 <br>
 Eirene stores a list of every persistent homology class (that is, every bar) in the output variable `C`.  To find the birth and death times of each class, run
 
