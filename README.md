@@ -256,7 +256,7 @@ To use the `dp` format option, you could write a file like so.
 1,1,3
 ```
 
-To use the `ev` format option, replace the top row with dv:
+To use the `ev` format option, replace the top row with `ev`:
 
 ```
 2,1,0
