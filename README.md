@@ -157,7 +157,7 @@ rv = [1,2]
 cp = [1,1,3]
 ```
 
-### General Formats
+### General formats
 
 **Debugging Tip** Julia is ***1-indexed***.  For an example, `v[1]` is the first entry of a list or vector `v`.  Thus, when assigning unique ID numbers to cells, numbering should start at 1, not 0.
 
@@ -223,7 +223,7 @@ julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="sp")
 
 
 
-### sparse column format (from file)
+### Sparse column format (from file)
 
 You can store `E` as a comma separated .txt or .csv file with four lines
 
