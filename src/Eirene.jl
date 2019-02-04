@@ -5497,8 +5497,8 @@ function plotbarcode_pjs(C::Dict; dim = 0:C["input"]["maxdim"], sortby = "birth"
 
         # colors = Colors.distinguishable_colors(length(dim)+1,[RGB(1,1,1)])[2:end]
         cols = Colors.colormap("Blues", mid = 0.5)
-        range = Int.(round.(collect(range(50,stop=100,length=length(dim)+1))))
-        colors = map(r -> cols[r], range)
+        rangevar = Int.(round.(collect(range(50,stop=100,length=length(dim)+1))))
+        colors = map(r -> cols[r], rangevar)
 
         B = [barcode(C, dim = d) for d in dim]
         #upper_limit = maximum([maximum(b[b.< Inf]) for b in B])
@@ -5533,7 +5533,7 @@ function plotbarcode_pjs(C::Dict; dim = 0:C["input"]["maxdim"], sortby = "birth"
 
          for i = 2:length(traces)
              for j = 1:length(traces[i])
-                 traces[i][j][:y] = traces[i][j][:y] + traces[i-1][end][:y] + 10
+                 traces[i][j][:y] = traces[i][j][:y] + traces[i-1][end][:y] .+ 10
              end
          end
          traces = vcat(traces...)
@@ -5542,8 +5542,8 @@ function plotbarcode_pjs(C::Dict; dim = 0:C["input"]["maxdim"], sortby = "birth"
          y = maximum(vcat([t[:y] for t in traces]...))
 
          layout = PlotlyJS.Layout(;
-         xaxis = attr(range = [-.001, x+0.001], showgrid=false, zeroline =false, title = "ϵ"),
-         yaxis = attr(range = [0,y+0.1], showgrid=false, ticks = false))
+         xaxis = attr(rangevar = [-.001, x+0.001], showgrid=false, zeroline =false, title = "ϵ"),
+         yaxis = attr(rangevar = [0,y+0.1], showgrid=false, ticks = false))
          return PlotlyJS.plot(traces[end:-1:1], layout)
 end
 
