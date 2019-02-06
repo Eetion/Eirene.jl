@@ -226,25 +226,38 @@ function buildclosefromclose(lrowval,lcolptr,lclosefaces,hrowval,hcolptr;facecar
 	end
 end
 
-function buildclosefromclose_subr(rosettacol::Array{Int64,1},lrowval::Array{Int64,1},lcolptr::Array{Int64,1},hrowval::Array{Int64,1},hcolptr::Array{Int64,1},hclosefaces::Array{Int64,1},columnmarker::Int64,rowdepth::Integer)
-	for i = 1:m
-		rosettacol[lrowval[cran(lcolptr,i)]]=cran(lcolptr,i)
-		for j = cran(hcolptr,i)
-			if columnsupp[j]
-				columnmarker+=1
-				farface = hrowval[j]
-				buildclosefromclose_subr_subr(rowdepth::Integer,hclosefaces::Array{Int64,1},columnmarker::Int64,rowettacol::Array{Int64,1},lclosefaces::Array{Int64,1},farface::Int64)
-				hclosefaces[sd,columnmarker] = rosettacol[lrowval[farface]]
-			end
-		end
-	end
-end
-
-function buildclosefromclose_subr_subr(rowdepth::Integer,hclosefaces::Array{Int64,1},columnmarker::Int64,rowettacol::Array{Int64,1},lclosefaces::Array{Int64,1},farface::Int64)
-	for k = 1:rowdepth
-		hclosefaces[k,columnmarker]=rosettacol[lclosefaces[k,farface]]
-	end
-end
+################################################################################
+	# 	BEGIN: The following two functions appear to be unused as of 2019-02-05.
+################################################################################
+#
+#	NB: OUTSTANDING  ISSUES:
+#		(1)	undeclared variable m (in buildclosefromclose_subr)
+#		(2) undeclared variable columnsupp (in buildclosefromclose_subr)
+#		(3) undeclared variable rowettacol (should be rowettacol, passed as arg in buildclosefromclose_subr_subr)?)
+#
+# function buildclosefromclose_subr(rosettacol::Array{Int64,1},lrowval::Array{Int64,1},lcolptr::Array{Int64,1},hrowval::Array{Int64,1},hcolptr::Array{Int64,1},hclosefaces::Array{Int64,1},columnmarker::Int64,rowdepth::Integer)
+# 	for i = 1:m
+# 		rosettacol[lrowval[cran(lcolptr,i)]]=cran(lcolptr,i)
+# 		for j = cran(hcolptr,i)
+# 			if columnsupp[j]
+# 				columnmarker+=1
+# 				farface = hrowval[j]
+# 				buildclosefromclose_subr_subr(rowdepth::Integer,hclosefaces::Array{Int64,1},columnmarker::Int64,rowettacol::Array{Int64,1},lclosefaces::Array{Int64,1},farface::Int64)
+# 				hclosefaces[sd,columnmarker] = rosettacol[lrowval[farface]]
+# 			end
+# 		end
+# 	end
+# end
+#
+# function buildclosefromclose_subr_subr(rowdepth::Integer,hclosefaces::Array{Int64,1},columnmarker::Int64,rowettacol::Array{Int64,1},lclosefaces::Array{Int64,1},farface::Int64)
+# 	for k = 1:rowdepth
+# 		hclosefaces[k,columnmarker]=rosettacol[lclosefaces[k,farface]]
+# 	end
+# end
+#
+################################################################################
+	# 	END: The following two functions appear to be unused as of 2019-02-05.
+################################################################################
 
 function buildallfromclose(lrowval,lcolptr,lclosefaces,hrowval,hcolptr,selectedcolumnindices;verbose=false)
 	if verbose
@@ -1509,7 +1522,7 @@ function cscfilepath2unsegmentedfilteredcomplex(fp;toprow="dp")
 	#	error
 	else
 		println("Error: please check formatting of input file.")
-		printval(x,"missing values")
+		printval(xx,"missing values")
 
 	end
 
@@ -2909,10 +2922,10 @@ end
 
 function torus(;m = 100,n = 50,mrad=1,nrad = 0.2)
 	theta = (1:m)*2*pi/m;
-	torus1 = mrad*repmat(cos.(theta),1,n)
-	torus2 = mrad*repmat(sin.(theta),1,n)
-	torus3 = nrad*repmat(sin.(2*pi*(1:n)./n),1,m)'
-	torus4 = repmat(cos.(2*pi*(1:n)./n),1,m)'
+	torus1 = mrad*repeat(cos.(theta),1,n)
+	torus2 = mrad*repeat(sin.(theta),1,n)
+	torus3 = nrad*repeat(sin.(2*pi*(1:n)./n),1,m)'
+	torus4 = repeat(cos.(2*pi*(1:n)./n),1,m)'
 	torus1 = torus1+nrad*torus1.*torus4;
 	torus2 = torus2+nrad*torus2.*torus4;
 	return hcat(torus1[:],torus2[:],torus3[:])'
@@ -3704,7 +3717,7 @@ function ordercanonicalform(
 			symmat[i,i]= 0
 		end
 		ocg2rad = [1]
-		return round.(Int65,symmat),ocg2rad
+		return round.(Int64,symmat),ocg2rad
 	end
 	numfilt = binom(m,2)
 	for i = 1:m
@@ -3852,66 +3865,66 @@ end
 ################################################################################
 	# 	BEGIN: The following two functions appear to be unused as of 2018-04-15.
 ################################################################################
-function fv2ocff_1(	fv=fv,
-					dp=dp,
-					minrad=minrad,
-					maxrad=maxrad,
-					numrad=numrad)
-
-	complexdim 		= 	p -> length(fv[p])
-	maxsd 		= 	maxdim+2
-
-	### Format the grain data
-	# Concatenate the grain vectors
-	numcells 		= 	0
-	for p 			= 	1:maxsd
-	numcells   += 	complexdim(p)
-	end
-	filt1 = Array{Float64}(undef,numcells)
-	numcells = 0
-	for p 								= 	1:maxsd
-	l 								= 	complexdim(p)
-	filt1[numcells+1:numcells+l] 	= 	fv[p]
-	numcells   					   += 	l
-	end
-
-	# Convert to order canonical form
-	filt2 = integersinoppositeorder_nonunique(filt1)
-	ocff = fill(Array{Int64}(undef,0),maxsd+3)
-	numcells = 0
-	for i = 1:maxsd
-	l = length(fv[i])
-	ocff[i] = filt2[numcells+1:numcells+l]
-	numcells += l
-	end
-
-	# Compute the grain translator
-	ocg2rad = sort(unique(filt1))
-	ocg2rad = reverse(ocg2rad,dims=1)
-end
-
-function fv2ocff_2(	fv=fv,
-					dp=dp,
-					minrad=minrad,
-					maxrad=maxrad,
-					numrad=numrad)
-
-	if 	typeof(fv) <= Array{Float64}
-		fvo 	= 	copy(fv)
-	else
-		fvo 	= 	cat(1,fv...)
-	end
-
-	fvo 	= 	minmaxceil!( 	fvo,
-								minrad=minrad,
-								maxrad=maxrad,
-								numrad=numrad)
-
-	ocg,ocg2rad 	= 	trueordercanonicalform(fvo,factor=true)
-	ocg 			= 	maximum(ocg)+1-ocg
-	ocg2rad			= 	reverse(ocg2rad,dims=1)
-
-end
+# function fv2ocff_1(	fv=fv,
+# 					dp=dp,
+# 					minrad=minrad,
+# 					maxrad=maxrad,
+# 					numrad=numrad)
+#
+# 	complexdim 		= 	p -> length(fv[p])
+# 	maxsd 		= 	maxdim+2
+#
+# 	### Format the grain data
+# 	# Concatenate the grain vectors
+# 	numcells 		= 	0
+# 	for p 			= 	1:maxsd
+# 	numcells   += 	complexdim(p)
+# 	end
+# 	filt1 = Array{Float64}(undef,numcells)
+# 	numcells = 0
+# 	for p 								= 	1:maxsd
+# 	l 								= 	complexdim(p)
+# 	filt1[numcells+1:numcells+l] 	= 	fv[p]
+# 	numcells   					   += 	l
+# 	end
+#
+# 	# Convert to order canonical form
+# 	filt2 = integersinoppositeorder_nonunique(filt1)
+# 	ocff = fill(Array{Int64}(undef,0),maxsd+3)
+# 	numcells = 0
+# 	for i = 1:maxsd
+# 	l = length(fv[i])
+# 	ocff[i] = filt2[numcells+1:numcells+l]
+# 	numcells += l
+# 	end
+#
+# 	# Compute the grain translator
+# 	ocg2rad = sort(unique(filt1))
+# 	ocg2rad = reverse(ocg2rad,dims=1)
+# end
+#
+# function fv2ocff_2(	fv=fv,
+# 					dp=dp,
+# 					minrad=minrad,
+# 					maxrad=maxrad,
+# 					numrad=numrad)
+#
+# 	if 	typeof(fv) <= Array{Float64}
+# 		fvo 	= 	copy(fv)
+# 	else
+# 		fvo 	= 	cat(1,fv...)
+# 	end
+#
+# 	fvo 	= 	minmaxceil!( 	fvo,
+# 								minrad=minrad,
+# 								maxrad=maxrad,
+# 								numrad=numrad)
+#
+# 	ocg,ocg2rad 	= 	trueordercanonicalform(fvo,factor=true)
+# 	ocg 			= 	maximum(ocg)+1-ocg
+# 	ocg2rad			= 	reverse(ocg2rad,dims=1)
+#
+# end
 ################################################################################
 	# 	END: The following two functions appear to be unused as of 2018-04-15.
 ################################################################################
@@ -7252,12 +7265,10 @@ function persistencestats(x)
 	A = Array{Float64}(undef,8,L)
 	for ip = 1:L
 		i = x[ip]
-		println(i)
-		println(i)
 		pcloud = rand(20,i)
-		tic()
-		D = persistf2vr(pcloud,5,model = "pc",fastop=false)
- 		t = toc()
+		res = @timed persistf2vr(pcloud,5,model = "pc",fastop=false,record="all")
+  		D = res[1]
+   		t = res[2]
 		A[1,ip] = length(D["prepairs"][5])
 		A[2,ip] = length(D["farfaces"][5])
 		A[3,ip] = binom(i-1,4)
@@ -7327,19 +7338,19 @@ function cellcheck()
 		D 	= eirene(rand(20,50),model="pc",maxdim=maxdim)
 		N 	= ff2complex(D["farfaces"],D["firstv"])
 		Nf 	= ocff2of(D["grain"],D["ocg2rad"])
-		N1 = copy(N[1]);
-		N2 = copy(N[2]);
+		Nrv = copy(N[1]);
+		Ncp = copy(N[2]);
 		Nf_copy = copy(Nf)
-		F = persistf2complex(N[1],N[2],Nf,maxdim=maxdim,record="all")
-		if N1 != N[1] || N2 != N[2]
+		F = persistf2complex(rv=N[1],cp=N[2],fv=Nf,maxdim=maxdim,record="all")
+		if Nrv != N[1] || Ncp != N[2]
 			print("changed N")
 			break
 		elseif Nf_copy != Nf
 			print("changed Nf")
 			break
 		end
-		for k = 1:4
-			if sortrows(barcode(D,dim=k))!= sortrows(barcode(F,dim=k))
+		for k = 1:maxdim
+			if sortslices(barcode(D,dim=k),dims=1)!= sortslices(barcode(F,dim=k),dims=1)
 				c+=1
 			end
 		end
@@ -8805,8 +8816,8 @@ function generatecrosscheckdata_perseus()
 															fr 						= 	numrad == Inf)
 
 													K[solkey]						=	Dict()
-													K[solkey][:barcodes]			= 	Array{Any,1}(maxdim+1)
-													K[solkey][:cyclerep]			= 	Array{Any,1}(maxdim+1)  # this will be filled in manually
+													K[solkey][:barcodes]			= 	Array{Any,1}(undef,maxdim+1)
+													K[solkey][:cyclerep]			= 	Array{Any,1}(undef,maxdim+1)  # this will be filled in manually
 													for r 	= 	1:(maxdim+1)
 														K[solkey][:barcodes][r] = barcode_perseus(E,dim=r-1)
 													end
