@@ -1,7 +1,7 @@
 The Eirene.jl package is licensed under the GNU General Public License,
 Version 3
 
-Copyright (C) 2016, 2017, 2018  Gregory Henselman
+Copyright (C) 2016, 2017, 2018, 2019  Gregory Henselman
 
 www.gregoryhenselman.org
 

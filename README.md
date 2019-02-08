@@ -37,7 +37,7 @@ to ensure that you are using the latest versions of the supporting packages.  *S
 
 **Debugging Tip** *Pay special attention to red error messages.  You can solve nine out of ten installation problems by copy/pasting text from these directly into the REPL.*
 
-**Debuggin Tip** *Wait times of an hour or more have been reported.  The install will finish eventually!*
+**Debugging Tip** *Wait times of an hour or more have been reported.  The install will finish eventually!*
 
 ## Example
 
