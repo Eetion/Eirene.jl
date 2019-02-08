@@ -1,4 +1,5 @@
 using Eirene
+using JLD
 using Base.Test
 
 # @test 1 == 2 #(example syntax)
