@@ -7,6 +7,7 @@ Eirene is made possible by the important contributions of the following individu
 Jean-Pierre Both <br>
 Paul Breiding <br>
 Robert Ghrist <br>
+Chad Giusti <br>
 Alan Hylton <br>
 Sara Kalisnik <br>
 Bradley Nelson <br>
