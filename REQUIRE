@@ -1,5 +1,4 @@
 julia 0.7
-Pkg
 Distances
 JLD
 Blink
@@ -7,9 +6,5 @@ PlotlyJS
 Plotly
 MultivariateStats
 Colors
-SparseArrays
-LinearAlgebra
 Dates
-Statistics
-DelimitedFiles
 CSV
