@@ -1255,7 +1255,7 @@ function persistf2vr(
 	if model == "pc" || model == "perseus_brips"
 		pc 	= 	"genera"
 	else
-		pc 	= 	"na"
+		pc 	= 	"n/a"
 	end
 
 	#### Store the input
@@ -1311,7 +1311,7 @@ function persistf2vr(
 	#### type the matrix
 	s = convert(Array{Float64,2},s)
 	if model == "pc"
-		d = Distances.pairwise(Euclidean(),s)
+		d = Distances.pairwise(Euclidean(),s,dims=2)
 		if !isempty(nodrad)
 			for 	i 	= 	1:numpoints
 				d[i,i] 	= 	nodrad[i]
@@ -5242,6 +5242,7 @@ function classrep_pjs(
 	cloudcolor = [],
 	textlabels = [],
 	showlabels = false,
+	showedges = true,
 	alwaysshowcyclelabels = false)
 
 	###
@@ -5320,7 +5321,14 @@ function classrep_pjs(
 		cloudedges_orderverts = vetexinverter[cloudedges]
 	end
 
-	###
+	##############################################################################################
+	# WAYPOINT 1
+	# printval(coords,"coords")
+	# printval(coords==coords,"coords==coords")
+	# printval(D["input"]["pc"] == "n/a","D[\"input\"][\"pc\"] == \"n/a\"")
+	# printval(D["input"]["pc"],"D[\"input\"][\"pc\"]")
+##############################################################################################
+
 	if coords == []
 		if D["input"]["pc"] == "n/a"
 			print("No point cloud is available.  Please consider using the mds keyword argument to generate a Euclidean embedding from the distance matrix (see documentation).")
@@ -5340,8 +5348,8 @@ function classrep_pjs(
 	elseif coords == "mds"
 		if showcloud
 			if embeddingobj == "dmat"
-				metricmatrix = D["input"]["dmat"]
-				metricmatrix = metricmatrix - minimum(metricmatrix)
+				metricmatrix = D["input"]["genera"]
+				metricmatrix = metricmatrix .- minimum(metricmatrix)
 				for i = 1:size(metricmatrix,1)
 					metricmatrix[i,i]=0
 				end
@@ -5350,7 +5358,7 @@ function classrep_pjs(
 			end
 		else
 			if embeddingobj == "dmat"
-				metricmatrix = D["input"]["dmat"][classvinoldspace,classvinoldspace]
+				metricmatrix = D["input"]["genera"][classvinoldspace,classvinoldspace]
 				metricmatrix = metricmatrix - minimum(metricmatrix)
 				for i = 1:size(metricmatrix,1)
 					metricmatrix[i,i]=0
@@ -5360,7 +5368,7 @@ function classrep_pjs(
 			end
 		end
 		coords = classical_mds(metricmatrix,embeddingdim)
-		coords = round.(coords,10)
+		# coords = round.(coords,10)
 		model = "pc"
 	end
 
@@ -5411,6 +5419,13 @@ function classrep_pjs(
 		append!(data,[T2])
 	end
 
+	if showedges
+		faces = classrep(D,dim=dim,class=class)
+		edges = d1faces(faces)
+		T3 =  edgetrace_pjs(coords,edges,model=model	)
+		append!(data,T3)
+	end
+
 	if model == "pc"
 		dim = size(coords,1)
 	else
@@ -5444,7 +5459,8 @@ function plotclassrep_pjs(
 	classcolor = "spectral",
 	cloudcolor = [],
 	textlabels = [],
-	showlabels = "cycle")
+	showlabels = "cycle",
+	showedges = false)
 
 	if D["input"]["model"]!="pc" && D["input"]["pc"] == "n/a" && coords == []
 		print("No point cloud is available.  Coordinates may be supplied by the user with the <coords> keyword argument, or generated automatically via the mds keyword argument.  Please see documentation.")
@@ -5631,10 +5647,10 @@ function pcloudevec(pcloud;indices=1:size(pcloud,2),threshold = Inf,eval = 2)
 	l = length(indices)
 	if isodd(l)
 		A = zeros(l+1,l+1)
-		A[1:l,1:l] = Distances.pairwise(Euclidean(),pcloud)
+		A[1:l,1:l] = Distances.pairwise(Euclidean(),pcloud,dims=2)
 		eval = 3
 	else
-		A = Distances.pairwise(Euclidean(),pcloud)
+		A = Distances.pairwise(Euclidean(),pcloud,dims=2)
 	end
 
 	F = submatrixsublevellaplacianeigenstats(A,threshold = threshold,statrange = eval:eval)
@@ -5878,6 +5894,7 @@ function edgetrace_pjs(coordinates,edges;model="pc")
 				trace = PlotlyJS.scatter(
 					x = coordinates[1,verts],
 					y = coordinates[2,verts],
+					line = attr(color="#1f77b4", width=1.5),
 					mode = "lines",
 					name = "Dim 1 Faces")
 				edgetraces = [trace]
@@ -5885,6 +5902,7 @@ function edgetrace_pjs(coordinates,edges;model="pc")
 				trace = PlotlyJS.scatter(
 					x = coordinates[1,verts],
 					y = coordinates[2,verts],
+					line = attr(color="#1f77b4", width=1.5),
 					mode = "lines",
 					name = "edge ($(verts[1]),$(verts[2]))",
 					showlegend = false)
@@ -5899,6 +5917,7 @@ function edgetrace_pjs(coordinates,edges;model="pc")
 					x = coordinates[1,verts],
 					y = coordinates[2,verts],
 					z = coordinates[3,verts],
+					line=attr(color="#1f77b4", width=1.5),
 					mode = "lines",
 					opacity = 0.5,
 					name = "Dim 1 Faces")
@@ -5908,6 +5927,7 @@ function edgetrace_pjs(coordinates,edges;model="pc")
 					x = coordinates[1,verts],
 					y = coordinates[2,verts],
 					z = coordinates[3,verts],
+					line=attr(color="#1f77b4", width=1.5),
 					name = "edge ($(verts[1]),$(verts[2]))",
 					showlegend = false,
 					mode = "lines",
@@ -7292,7 +7312,7 @@ end
 function construction_sanitycheck(;numtrials = 10,samplesize = 50,sd=4)
 	for i = 1:numtrials
 		pcloud = rand(20,samplesize)
-		d = Distances.pairwise(Euclidean(),pcloud)
+		d = Distances.pairwise(Euclidean(),pcloud,dims=2)
 		(t,ocg2rad) = ordercanonicalform(d;fastop=false)
 		construction_sanitycheck_subroutine(t,sd,samplesize)
 		#gc()
@@ -8437,7 +8457,7 @@ function firstbcdiff(A,B;maxdim=1,offset=0) # stands for first barcode differenc
 end
 
 function 	colwised(x)
-	return	Distances.pairwise(Euclidean(),x)
+	return	Distances.pairwise(Euclidean(),x,dims=2)
 end
 
 function 	diagonalentries(x)
@@ -9159,9 +9179,9 @@ function writeperseusfile(
 
 		if 	model 	== 	"pc2vr"
 			if rowsare == "dimensions"
-				d = Distances.pairwise(Euclidean(),s)
+				d = Distances.pairwise(Euclidean(),s,dims=2)
 			elseif rowsare == "points"
-				d = Distances.pairwise(Euclidean(),s')
+				d = Distances.pairwise(Euclidean(),s',dims=2)
 			end
 		end
 
@@ -9217,7 +9237,7 @@ function writeperseusfile(
 		end
 		ambdim,numpts 		= 	size(s)
 		if nsteps == Inf
-			nsteps = 1 + ceil(Int64,maximum(Distances.pairwise(Euclidean(),s'))/stepsz)
+			nsteps = 1 + ceil(Int64,maximum(Distances.pairwise(Euclidean(),s',dims=2))/stepsz)
 		end
 		if 	isempty(pointbirths)
 			pointbirths 	= 	zeros(numpts)
