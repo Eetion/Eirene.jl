@@ -5100,7 +5100,7 @@ function barcode(D::Dict;dim = 1,ocf = false)
 		bc[finran] 			= 	D["ocg2rad"][bcc[finran]]
 		bc[evergrran,2]    .= 	Inf
 	else
-		bc 					= 	length(D["ocg2rad"])-bc
+		bc 					= 	length(D["ocg2rad"]).-bc
 	end
 
 	return bc
