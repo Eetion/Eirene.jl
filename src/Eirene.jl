@@ -4541,7 +4541,7 @@ function getbetticurve(D::Dict,sd;ocf = false)
 	bco = convert(Array{Int64},bco)
 
 	for i = 1:size(bco,1)
-		ran = 1+ (bco[i,1]:(bco[i,2]-1))
+		ran = 1 .+ (bco[i,1]:(bco[i,2]-1))
 		v[ran]+=1
 	end
 
