@@ -4545,6 +4545,7 @@ function getbetticurve(D::Dict,sd;ocf = false)
 			ran = .+ (bco[i,1]:(bco[i,2]-1))
 			v[ran]+=1
 		catch e
+			println(v[ran])
 			println(bco[i,1]:(bco[i,2]-1))
 			error(e)
 		end
