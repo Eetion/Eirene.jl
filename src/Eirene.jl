@@ -1343,7 +1343,7 @@ function persistf2vr(
 	t 			= 	(1+maximum(t)).-t
 	ocg2rad 	= 	reverse(ocg2rad,dims=1)
 
-	if 	any(d.>maxrad)
+	if 	any(d.>maxrad_alt)
 		t 		= 	t.-1
 		deleteat!(ocg2rad,1)
 	end
