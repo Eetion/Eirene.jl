@@ -4541,8 +4541,8 @@ function getbetticurve(D::Dict,sd;ocf = false)
 	bco = convert(Array{Int64},bco)
 
 	for i = 1:size(bco,1)
-		ran = 1+ (bco[i,1]:(bco[i,2]-1))
-		v[ran]+=1
+		ran = 1 .+ (bco[i,1]:(bco[i,2]-1))
+		v[ran] .+=1
 	end
 
 	if ocf == false
@@ -5100,7 +5100,7 @@ function barcode(D::Dict;dim = 1,ocf = false)
 		bc[finran] 			= 	D["ocg2rad"][bcc[finran]]
 		bc[evergrran,2]    .= 	Inf
 	else
-		bc 					= 	length(D["ocg2rad"])-bc
+		bc 					= 	length(D["ocg2rad"]).-bc
 	end
 
 	return bc
