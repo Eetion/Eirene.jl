@@ -17,6 +17,7 @@ Robert Short <br>
 Ann Sizemore <br>
 Primoz Skraba
 
+Special thanks to Professor Janche Sang and to Alan Hylton and Robert Short, for their work in [performant optimizations](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.2678?af=R).
 
 ## Installation
 
