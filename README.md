@@ -4,6 +4,7 @@
 
 Eirene is made possible by the important contributions of the following individuals.
 
+Ulrich Bauer <br>
 Jean-Pierre Both <br>
 Paul Breiding <br>
 Robert Ghrist <br>
