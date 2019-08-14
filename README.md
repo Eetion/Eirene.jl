@@ -2,7 +2,13 @@
 
 ## Contributors
 
-Eirene is made possible by the important contributions of the following individuals.
+Eirene is produced and maintained by
+
+Gregory Henselman-Petrusek \
+<gh10@princeton.edu> \
+<grh@seas.upenn.edu>
+
+Theoretical foundations for this platform lie in matroid optimization; see [here](https://arxiv.org/abs/1606.00199) for an introduction.  The developers make a special acknowledgement to Professor Janche Sang and to Alan Hylton and Robert Short, for their work in [performant optimizations](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.2678?af=R).  Important contributions have additionally been made by the following individuals.
 
 Ulrich Bauer <br>
 Jean-Pierre Both <br>
@@ -17,7 +23,7 @@ Robert Short <br>
 Ann Sizemore <br>
 Primoz Skraba
 
-Special thanks to Professor Janche Sang and to Alan Hylton and Robert Short, for their work in [performant optimizations](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.2678?af=R).
+
 
 ## Installation
 
