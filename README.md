@@ -313,9 +313,9 @@ julia> plotbarcode_pjs(C, dim=k)
 * Hovering the cursor over a point in the persistence diagram will show a message with its precise Euclidean coordinates (birth and death times) and two additional pieces of information:  `class` and `size`.  Variable `class` is an integer.  If `class = p`, then the point where the cursor is hovering represents the birth/death time of `p`th persistent homology class in Eirene's list.  It is born at time `A[p,1]` and dies at time `A[p,2]`.  Variable `size` is also an integer.  It is the number of cells in the cycle representative Eirene computed for this persistent homology class (since Eirene computes homology over the two element field, we always refer to vectors by their support).
 * `class` and `size` can be displayed permanently, without the need to hover a cursor, via the keyword argument `showlabels = true`.
 
-### $W_{q,p}$ distances between diagrams
+### q,p-Wasserstein distances between diagrams
 
-To compute the $W_{q,p}$ distance between a pair of persistence diagrams, dgm1 and dgm2, run:
+To compute the q,p-Wasserstein distance between a pair of persistence diagrams, dgm1 and dgm2, run:
 
 ```
 julia> wasserstein_distance(dgm1, dgm2, q=q, p=p)
@@ -324,37 +324,8 @@ julia> wasserstein_distance(dgm1, dgm2, q=q, p=p)
 * Keyword `p` defaults to 2.
 * Keyword `q` defaults to p.
 
-#### Background
-
-              A persistence diagram is a finite subset of $\{ (x,y) \in \R^2 \ | \ y\geq x \}$ union the diagonal $D = \{ (x,y) \in \R^2 \ | \ x = y \}$.
-        \end{defn}
-
-        Let two persistence diagrams $X$ and $Y$ be given.
-        Notice that both sets are uncountable due to the diagonal component.
-        The diagram $X$ can be decomposed to $X = X_o \sqcup D$ where $|X_o| < \infty $ and $X_o \subset \{ (x,y) \in \R^2 \ | \ y> x \}$.
-        Through adding points on the diagonal $D = \{ (x,y) \in \R^2 \ | \ x = y \}$ we can ensure that $|X| = |Y|$.
-        For convention, $\eta$ will denote a bijection $\eta : X \mapsto Y$.
-        This space is metrisable, one such metric is:
-        \begin{align*}
-                W_{p,q} (X,Y) = \left[ \inf_{\eta : X \mapsto Y}  \sum_{x \in X} \| x - \eta(x) \|_{p}^q \right]^{1/q} = \inf_{\eta : X \mapsto Y} \left\| \left(  \| x - \eta(x) \|_{p} \right)_{x \in X} \right\|_q.
-        \end{align*}
-       
-        Some properties of the norm above are:
-       
-        \begin{enumerate}
-                \item Selecting $p = 2$ and $q = 1$ yields
-                \begin{align*}
-                        W_{2,1} (X,Y) = \inf_{\eta : X \mapsto Y}  \sum_{x \in X} \| x - \eta(x) \|_{2},
-                \end{align*}
-                which looks to be the easiest one to compute.
-                This cost is also differentiable.
-                \item Fix $p \in [1,\infty]$ then
-                \begin{align*}
-                        W_{p,q} (X,Y) &= \left[ \inf_{\eta : X \mapsto Y}  \sum_{x \in X} \| x - \eta(x) \|_{p}^q \right]^{1/q} = \inf_{\eta : X \mapsto Y}\left[  \sum_{x \in X} \| x - \eta(x) \|_{p}^q \right]^{1/q}\\
-                         &\xrightarrow{q \rightarrow \infty}  \inf_{\eta : X \mapsto Y} \sup_{x \in X} \| x - \eta(x) \|_{p},
-                \end{align*}
-                when $p$ is equal to infinity this is the `bottleneck distance'.
-        \end{enumerate}
+#### Note
+Information on the actual metric being used is to follow.
 
 ### Representatives
 
