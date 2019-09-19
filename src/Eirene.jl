@@ -4526,10 +4526,11 @@ function barname2cyclename(D::Dict,barnumber = [1];dim = 1)
 end
 
 function getbetticurve(D::Dict,sd;ocf = false)
+	# NB: sd = (homology dimension)+2
 	# NB: D["ocg2rad"]: {grains > 0} --> rad
 	# NB: the ocf barcode takes values in [0, #{grains}-1]
 
-	if length(D["farfaces"][sd])==0
+	if complexrank(D,dim=sd-2) ==0
 		return Array{Float64}(undef,0,2)
 	end
 
