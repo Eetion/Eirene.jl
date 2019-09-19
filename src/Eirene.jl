@@ -7664,7 +7664,7 @@ function eirenevrVeirenepc(numits,maxdim)
 		nodrad		= 	offdiagmin(d)./2
 
 		Cvr 		= 	eirene( d,model="vr",maxdim=maxdim)
-		Cpc 		= 	eirene(pc,model="pc",maxdim=maxdim,nodrad=nodrad)
+		Cpc 		= 	eirene(pc,model="pc",maxdim=maxdim,nodrad=nodrad)checkparameters
 
 		i,j 		= 	firstbcdiff([Cpc Cvr],maxdim=maxdim)
 		if 	i 		!= 	0
@@ -8396,7 +8396,7 @@ function 	checkloadfile()
 	V 					= 	Array{Float64}([0 1 2 3])
 	d 					= 	Array{Float64}([0 1 2 3;1 0 1 2; 2 1 0 1; 3 2 1 0])
 	h 					= 	x -> delete!(x,"input")
-checkparameters
+
 	C 					= 	Array{Any}(undef,5)
 	C[1] 				= 	eirene(fp_spher,model="complex",entryformat="dp",maxdim=2,record="all")
 	C[2] 				= 	eirene(fp_csvdp,model="complex",entryformat="dp",maxdim=2,record="all")
@@ -8420,7 +8420,7 @@ checkparameters
 	for p 				= 	1:4
 		if !isassigned(D,p)
 			println("D is not completely assigned")
-			return Dcheckparameters
+			return D
 		end
 	end
 
