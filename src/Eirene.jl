@@ -48,6 +48,7 @@ using Dates
 using Statistics
 using DelimitedFiles
 using CSV
+using Hungarian #added for the Wasserstein distances
 
 
 ##########################################################################################
@@ -80,7 +81,8 @@ export 	eirene,
 		plane2torus,
 		zerodrandmat,
 		ezlabel,
-		unittest
+		unittest,
+		wasserstein_distance #this is in "wassterstein_distances.jl"
 
 ##########################################################################################
 
@@ -9288,5 +9290,9 @@ function barcode_perseus(D;dim=1)
 		return					translator[B]
 	end
 end
+
+###### Adding Wasserstein distances between persistence diagrams ##########
+
+include("wasserstein_distances.jl")
 
 end # module
