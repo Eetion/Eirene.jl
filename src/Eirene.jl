@@ -7512,8 +7512,8 @@ function unittest()
 
 	numits 	= 	5
 	maxdim 	= 	2
-	x 		= 	Array{Any}(undef,19)
-
+	x 		= 	Array{Any}(undef,20)
+	test_distances = [1,2,2*sqrt(0.5)]
 	x[1] 	= 	eirenevrVperseusvr() 					# correct answer: empty
 	x[2] 	= 	eirenevrVeirenepc(numits,maxdim) 		# correct answer: empty
 	x[3] 	= 	eirenevrVeirenecomplex(numits,maxdim)	# correct answer: empty
@@ -7533,13 +7533,20 @@ function unittest()
 	x[17]	= 	checkbuildcomplex3_diagentries(numits) 	# correct answer: empty
 	x[18] 	= 	checktrueordercanonicalform(numits) 	# correct answer: empty
 	x[19]	= 	checkloadfile()							# correct answer: empty
+	x[20]   =   wd_test_1()								# correct answer: 1
+	x[21]   =   wd_test_2()								# correct answer: 2
+	x[22]   =   wd_test_3()								# correct answer: 2*sqrt(0.5)
 
-	for p 	= 	1:length(x)
+	for p 	= 	1:19
 		if !isempty(x[p])
 			return x
 		end
 	end
-
+	for p = 1:3
+		if x[19+p] != test_distances[p]
+			return 
+		end
+	end
 	return []
 end
 
@@ -8387,7 +8394,7 @@ function 	checkloadfile()
 	V 					= 	Array{Float64}([0 1 2 3])
 	d 					= 	Array{Float64}([0 1 2 3;1 0 1 2; 2 1 0 1; 3 2 1 0])
 	h 					= 	x -> delete!(x,"input")
-
+checkparameters
 	C 					= 	Array{Any}(undef,5)
 	C[1] 				= 	eirene(fp_spher,model="complex",entryformat="dp",maxdim=2,record="all")
 	C[2] 				= 	eirene(fp_csvdp,model="complex",entryformat="dp",maxdim=2,record="all")
@@ -8411,7 +8418,7 @@ function 	checkloadfile()
 	for p 				= 	1:4
 		if !isassigned(D,p)
 			println("D is not completely assigned")
-			return D
+			return Dcheckparameters
 		end
 	end
 
