@@ -227,15 +227,3 @@ end
 
 
 	
-	if d1 != 0
-		return [1,d1]
-
-	elseif d2 != 1
-		return [2,d2]
-	
-	elseif d3 != 2*sqrt(0.5)
-		return [3,d3]
-	else
-		return []
-	end
-end

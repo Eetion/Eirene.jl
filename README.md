@@ -49,7 +49,19 @@ to ensure that you are using the latest versions of the supporting packages.  *S
 
 ## Example
 
-Let's plot the 1d persistence diagram for a point cloud of 50 points sampled from the uniform distribution on the unit cube, [0,1]<sup>3</sup>.  The second line below generates 3x50 iid matrix and stores it in a variable `x`.  The third asks Eirene to analyze `x` and store the results in a variable `C`.  The fourth plots the barcode.   The fifth plots the persistence diagram.  The sixth plots a cycle representative for the first point in this diagram  (Eirene numbers the points automatically, so it 'makes sense' to talk about the 'first'). Most of what you can do with Eirene is done with minor modifications to these commands.
+Let's plot the 1d persistence 	if d1 != 0
+		return [1,d1]
+
+	elseif d2 != 1
+		return [2,d2]
+	
+	elseif d3 != 2*sqrt(0.5)
+		return [3,d3]
+	else
+		return []
+	end
+end
+diagram for a point cloud of 50 points sampled from the uniform distribution on the unit cube, [0,1]<sup>3</sup>.  The second line below generates 3x50 iid matrix and stores it in a variable `x`.  The third asks Eirene to analyze `x` and store the results in a variable `C`.  The fourth plots the barcode.   The fifth plots the persistence diagram.  The sixth plots a cycle representative for the first point in this diagram  (Eirene numbers the points automatically, so it 'makes sense' to talk about the 'first'). Most of what you can do with Eirene is done with minor modifications to these commands.
 
 ```
 julia> using Eirene
@@ -332,8 +344,6 @@ julia> wasserstein_distance(dgm1, dgm2, q=q, p=p)
 * Keyword `p` defaults to 2.
 * Keyword `q` defaults to p.
 
-#### Note
-Information on the actual metric being used is to follow.
 
 ### Representatives
 

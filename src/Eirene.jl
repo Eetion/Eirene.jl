@@ -7513,7 +7513,8 @@ function unittest()
 
 	numits 	= 	5
 	maxdim 	= 	2
-	x 		= 	Array{Any}(undef,20)
+	x 		= 	Array{Any}(undef,22)
+
 	test_distances = [1,2,2*sqrt(0.5)]
 	x[1] 	= 	eirenevrVperseusvr() 					# correct answer: empty
 	x[2] 	= 	eirenevrVeirenepc(numits,maxdim) 		# correct answer: empty
