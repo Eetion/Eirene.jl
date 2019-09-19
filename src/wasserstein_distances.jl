@@ -94,11 +94,11 @@ function dist_mat(v1,v2,n1,n2; p = 2)
 end
 
 function dist_inf(v1,v2,p=2)
-    #= 
+    #= else
+		
     takes in two vectors with all y points at infinity.
     returns the distance between their persitance diagrams. 
     =#
-    
     @assert all(i->(i==Inf), v1[2,:]) == all(i->(i==Inf), v2[2,:])
     
     #if the point (Inf,Inf) exists return Inf.
@@ -107,27 +107,48 @@ function dist_inf(v1,v2,p=2)
         return Inf
     
     else 
-        n = size(v1')[1]
-        
-        cost = zeros(n,n)
-        
+        n = size(v1)[2]
+		cost = zeros(n,n)
+		#if n ==1 
+		#	return
+        #if p == 1
+		#	for i = 1:n
+		#		cost[i,:] = sum(broadcast(abs,broadcast(-, v1[:,i], v2)),dims = 1)
+		#	end   
+		#
+		#elseif p == Inf
+		#	for i = 1:n
+		#		for j in 1:n
+		#			cost[i,j] = maximum(broadcast(abs,v1[:,i]-v2[:,j]))
+		#		end
+		#	end  
+		#else
+		#	elsefor i = 1:n
+		#	else	
+		#	else	cost[i,:] = (sum( broadcast(abs,broadcast(-, v1[:,i], v2)).^p  ,dims = 1)).^(1/p)
+	#else
+		#endelse
         
         #calculate cost matrix for only x co-ordinates
-        for i = 1:n
+		for i = 1:n
             cost[i,:] = broadcast(abs,broadcast(-, v1[1,i], v2[1,:]))
-        end   
-        
+    	end  
+		 
         return cost, hungarian(cost)[1]
         
     end
-    
+	#end
 end
 #################################################################################
 
 ### Main function
 
-function wasserstein_distance(u1,u2; p = 2, q = p)#################################################################################
+#################################################################################
 
+function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
+	# I forgot that whilst Eirene processes points as nd x np matrices, the barcodes are np x 2
+	u1 = transpose(dgm1)
+	u2 = transpose(dgm2)
     
     #= 
     takes two (possibly unequal size) vectors and calculates the W_(q,p)distance between their persistence diagrams. The default is that q=p=2
@@ -137,7 +158,6 @@ function wasserstein_distance(u1,u2; p = 2, q = p)##############################
     
     #if no Inf is present in either vector calculate as normal.
     if all(i->(i!=Inf), u1) && all(i->(i!=Inf), u2)
-		
 		v1,v2,n1,n2 = pad(u1,u2)
 
 		cost = dist_mat(v1,v2,n1,n2,p=p)
@@ -150,7 +170,7 @@ function wasserstein_distance(u1,u2; p = 2, q = p)##############################
 
 		else
 			distance = 0
-        	for i in 1:length(assignment)
+			for i in 1:length(assignment)
             	distance += cost[i, assignment[i]]^(q)
 			end
 			return distance^(1/q)
@@ -165,17 +185,14 @@ function wasserstein_distance(u1,u2; p = 2, q = p)##############################
         
             #get the number of infinities.
             N_inf = sum(u1[2,:] .== Inf)
-            
             #sort vectors by incresum(broadcast(abs,broadcast(-, v1[:,i], v2)),dims = 1)asing amount in y component.
             u_sort_1 = u1[:, sortperm(u1[2, :], rev = true)]
             u_sort_2 = u2[:, sortperm(u2[2, :], rev = true)]
-            
             #split into infinity part and finite part
             u_sort_1_1 = u_sort_1[:,1:N_inf]
             u_sort_2_1 = u_sort_2[:,1:N_inf]
-            
-            u_sort_1_2 = u_sort_1[:,(1+N_inf):end]
-            u_sort_2_2 = u_sort_2[:,(1+N_inf):end]
+            u_sort_1_2 = transpose(u_sort_1[:,(1+N_inf):end])
+            u_sort_2_2 = transpose(u_sort_2[:,(1+N_inf):end])
         
             #calculate infinite cost.
 			cost, assignment_inf = dist_inf(u_sort_1_1,u_sort_2_1)

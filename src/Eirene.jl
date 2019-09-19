@@ -9294,5 +9294,5 @@ end
 ###### Adding Wasserstein distances between persistence diagrams ##########
 
 include("wasserstein_distances.jl")
-
+#print("included wasserstein")
 end # module
