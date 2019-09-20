@@ -10,126 +10,126 @@ Australian National University
 ############# General functions used in main function 'wasserstein_distance' #############
 
 function pad(u1,u2)
-    
+
     #=
-    Given 2 by n1 and 2 by n2 matrices, returns two 2 by (n1+n2) matrices. 
-    This is done by adding points to u1 by projecting the points in u2 to 
-    the diagonal {(x,y) : x = y }. This is also done to u2. 
+    Given 2 by n1 and 2 by n2 matrices, returns two 2 by (n1+n2) matrices.
+    This is done by adding points to u1 by projecting the points in u2 to
+    the diagonal {(x,y) : x = y }. This is also done to u2.
     =#
-    
+
     #check that columns of matrices match
     @assert size(u1)[2] == size(u2)[2] == 2
-    
+
 	#need transpose as sometimes a 1D vector
     n1 = size(u1)[1]
 	n2 = size(u2)[1]
 	# note total n = n1 + n2
     v1 = vcat(u1, zeros(n2,2))
     v2 = vcat(u2, zeros(n1,2))
-    #project to diagonal 
+    #project to diagonal
 	for i = 1:n2
         z = (v2[i,1]+v2[i,2])/2
         v1[n1+i,1] = z
         v1[n1+i,2] = z
-        
-    end 
+
+    end
     ################
     for i = 1:n1
-        
+
         z = (v1[1,i]+v1[2,i])/2
-        
+
         v2[n2+i,1] = z
         v2[n2+i,2] = z
-        
-    end 
-    
+
+    end
+
     return v1,v2,n1,n2
-    
+
     end
 
 function dist_mat(v1,v2,n1,n2; p = 2)
-    
+
 		#=  Accepts two equal size vectors and their original lengths and finite values.Returns the minimal Lp distance of their persistence diagrams.  =#
-    
+
     #check vectors are of the same length
     @assert size(v1) == size(v2)
-    
-    #take the length of columns, note this is always bigger than 2. 
+
+    #take the length of columns, note this is always bigger than 2.
     n = size(v1)[1]
-    
+
     #set up cost matrix
 	cost = zeros(n,n)
 
-    #if l1 compute here in faster way. 
+    #if l1 compute here in faster way.
     if p == 1
         for i = 1:n
             cost[i,:] = sum(broadcast(abs,broadcast(-, v1[i,:], v2)),dims = 1)
-        end   
-    
+        end
+
 	elseif p == Inf
 		for i = 1:n
 			for j in 1:n
 				cost[i,j] = maximum(broadcast(abs,v1[i,:]-v2[j,:]))
 			end
-        end  
+        end
     else
         for i = 1:n
-            
+
             cost[i,:] = (sum( broadcast(abs,broadcast(-, v1[i,:], v2)).^p  ,dims = 1)).^(1/p)
 
 		end
-        
+
     end
-        
-        
+
+
     #set distance between diagonal points to be 0.
-    #this could just not be calculated if not using broadcast. 
+    #this could just not be calculated if not using broadcast.
     cost[(n-n2+1):n,(n-n1+1):n] = zeros(n2,n1)
 
     return cost
-    
+
 end
 
 function dist_inf(v1,v2,p=2)
     #= else
-		
+
     takes in two vectors with all y points at infinity.
-    returns the distance between their persitance diagrams. 
+    returns the distance between their persitance diagrams.
     =#
     @assert all(i->(i==Inf), v1[:,2]) == all(i->(i==Inf), v2[:,2])
-    
+
     #if the point (Inf,Inf) exists return Inf.
     if any(i->(i==Inf), v1[:,1]) || any(i->(i==Inf), v2[:,1])
-        
+
         return Inf
-    
-    else 
+
+    else
         n = size(v1)[1]
 		cost = zeros(n,n)
         if p == 1
 			for i = 1:n
 				cost[i,:] = sum(broadcast(abs,broadcast(-, v1[i,:], v2)),dims = 1)
-			end   
-		
+			end
+
 		elseif p == Inf
 			for i = 1:n
 				for j in 1:n
 					cost[i,j] = maximum(broadcast(abs,v1[i,:]-v2[j,:]))
 				end
-			end  
+			end
 		else
 			for i = 1:n
 				cost[i,:] = (sum( broadcast(abs,broadcast(-, v1[i,:], v2)).^p  ,dims = 1)).^(1/p)
 			end
 		end
-        
+
         #calculate cost matrix for only x co-ordinates
 		#for i = 1:n
         #    cost[i,:] = broadcast(abs,broadcast(-, v1[im1], v2[:,1]))
-    	#end  
-		 
+    	#end
+
         return cost, hungarian(cost)[1]
-        
+
     end
 	#end
 end
@@ -139,13 +139,13 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 
 	u1 = transpose(dgm1)
 	u2 = transpose(dgm2)
-    
-    #= 
+
+    #=
     takes two (possibly unequal size) vectors and calculates the W_(q,p)distance between their persistence diagrams. The default is that q=p=2
     Can calculate lp distance between diagrams, l1 should be the fastest.
-	Can handle values of Inf in vectors. 
+	Can handle values of Inf in vectors.
     =#
-    
+
     #if no Inf is present in either vector calculate as normal.
     if all(i->(i!=Inf), u1) && all(i->(i!=Inf), u2)
 		v1,v2,n1,n2 = pad(u1,u2)
@@ -168,12 +168,12 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 
 		end
 
-        
 
-        
-    #if there are equal amounts of infinity calculate possibly finite distance.    
+
+
+    #if there are equal amounts of infinity calculate possibly finite distance.
     elseif sum(u1[:,2] .== Inf) == sum(u2[:,2] .== Inf)
-        
+
             #get the number of infinities.
             N_inf = sum(u1[:,  	2] .== Inf)
             #sort vectors by incresum(broadcast(abs,broadcast(-, v1[:,i], v2)),dims = 1)asing amount in y component.
@@ -184,10 +184,10 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
             u_sort_2_1 = u_sort_2[1:N_inf,:]
             u_sort_1_2 = u_sort_1[(1+N_inf):end,:]
             u_sort_2_2 = u_sort_2[(1+N_inf):end,:]
-        
+
             #calculate infinite cost.
 			cost, assignment_inf = dist_inf(u_sort_1_1,u_sort_2_1)
-			
+
 			if q == Inf
 				costs = [cost[i, assignment_inf[i]] for i in 1:(N_inf)]
 				cost_inf = maximum(costs)
@@ -197,33 +197,53 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
             		cost_inf += cost[i, assignment_inf[i]]^(q)
         		end
 			end
-            #calculate finite cost with self-reference. 
+            #calculate finite cost with self-reference.
             cost_h = wasserstein_distance(u_sort_1_2,u_sort_2_2,p=p, q=q)
-            
-            
+
+
             return cost_h + cost_inf
-            
-    #unequal infinity return infinity.      
+
+    #unequal infinity return infinity.
     else
-            return Inf 
-        
+            return Inf
+
     end
 
-end 
+end
 
 
 ############# Tests #############
 
+# test_distances = [1,2,2*sqrt(0.5)]
+
 function wd_test_1()
-	return wasserstein_distance([1,1], [1,1])
+    val = wasserstein_distance([1,1], [1,1])
+    if val == 0
+	    return []
+    else
+        print("Error: wd_test_1, value = ",val)
+        return val
+    end
 end
+
 function wd_test_2()
-	return wasserstein_distance([1,2],[3,4] )
+    val = wasserstein_distance([1,2],[3,4] )
+    if val == 2
+	    return []
+    else
+        print("Error: wd_test_2, value = ",val)
+        return
+    end
+	return val
 end
 
 function wd_test_3()
-	return wasserstein_distance([1,2],[3,4], q=1 )
+    val = wasserstein_distance([1,2],[3,4], q=1 )
+    if val == 2*sqrt(0.5)
+	    return []
+    else
+        print("Error: wd_test_3, value = ",val)
+        return
+    end
+	return val
 end
-
-
-	
