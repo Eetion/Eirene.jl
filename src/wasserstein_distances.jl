@@ -232,9 +232,8 @@ function wd_test_2()
 	    return []
     else
         print("Error: wd_test_2, value = ",val)
-        return
+        return val
     end
-	return val
 end
 
 function wd_test_3()
@@ -243,7 +242,6 @@ function wd_test_3()
 	    return []
     else
         print("Error: wd_test_3, value = ",val)
-        return
+        return val
     end
-	return val
 end
