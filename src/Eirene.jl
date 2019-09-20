@@ -48,6 +48,7 @@ using Dates
 using Statistics
 using DelimitedFiles
 using CSV
+using Hungarian #added for the Wasserstein distances
 
 
 ##########################################################################################
@@ -80,7 +81,8 @@ export 	eirene,
 		plane2torus,
 		zerodrandmat,
 		ezlabel,
-		unittest
+		unittest,
+		wasserstein_distance #this is in "wassterstein_distances.jl"
 
 ##########################################################################################
 
@@ -7511,8 +7513,9 @@ function unittest()
 
 	numits 	= 	5
 	maxdim 	= 	2
-	x 		= 	Array{Any}(undef,19)
+	x 		= 	Array{Any}(undef,22)
 
+	test_distances = [1,2,2*sqrt(0.5)]
 	x[1] 	= 	eirenevrVperseusvr() 					# correct answer: empty
 	x[2] 	= 	eirenevrVeirenepc(numits,maxdim) 		# correct answer: empty
 	x[3] 	= 	eirenevrVeirenecomplex(numits,maxdim)	# correct answer: empty
@@ -7532,13 +7535,20 @@ function unittest()
 	x[17]	= 	checkbuildcomplex3_diagentries(numits) 	# correct answer: empty
 	x[18] 	= 	checktrueordercanonicalform(numits) 	# correct answer: empty
 	x[19]	= 	checkloadfile()							# correct answer: empty
+	x[20]   =   wd_test_1()								# correct answer: 1
+	x[21]   =   wd_test_2()								# correct answer: 2
+	x[22]   =   wd_test_3()								# correct answer: 2*sqrt(0.5)
 
-	for p 	= 	1:length(x)
+	for p 	= 	1:19
 		if !isempty(x[p])
 			return x
 		end
 	end
-
+	for p = 1:3
+		if x[19+p] != test_distances[p]
+			return 
+		end
+	end
 	return []
 end
 
@@ -7654,7 +7664,7 @@ function eirenevrVeirenepc(numits,maxdim)
 		nodrad		= 	offdiagmin(d)./2
 
 		Cvr 		= 	eirene( d,model="vr",maxdim=maxdim)
-		Cpc 		= 	eirene(pc,model="pc",maxdim=maxdim,nodrad=nodrad)
+		Cpc 		= 	eirene(pc,model="pc",maxdim=maxdim,nodrad=nodrad)checkparameters
 
 		i,j 		= 	firstbcdiff([Cpc Cvr],maxdim=maxdim)
 		if 	i 		!= 	0
@@ -9290,4 +9300,8 @@ function barcode_perseus(D;dim=1)
 	end
 end
 
+###### Adding Wasserstein distances between persistence diagrams ##########
+
+include("wasserstein_distances.jl")
+#print("included wasserstein")
 end # module
