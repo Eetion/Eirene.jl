@@ -7534,18 +7534,13 @@ function unittest()
 	x[17]	= 	checkbuildcomplex3_diagentries(numits) 	# correct answer: empty
 	x[18] 	= 	checktrueordercanonicalform(numits) 	# correct answer: empty
 	x[19]	= 	checkloadfile()							# correct answer: empty
-	x[20]   =   wd_test_1()								# correct answer: 1
-	x[21]   =   wd_test_2()								# correct answer: 2
-	x[22]   =   wd_test_3()								# correct answer: 2*sqrt(0.5)
+	x[20]   =   wd_test_1()								# correct answer: empty
+	x[21]   =   wd_test_2()								# correct answer: empty
+	x[22]   =   wd_test_3()								# correct answer: empty
 
 	for p 	= 	1:length(x)
 		if !isempty(x[p])
 			return x
-		end
-	end
-	for p = 1:3
-		if x[19+p] != test_distances[p]
-			return
 		end
 	end
 	return []
