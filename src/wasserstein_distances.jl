@@ -214,10 +214,11 @@ end
 
 ############# Tests #############
 
-# test_distances = [1,2,2*sqrt(0.5)]
+# 
 
 function wd_test_1()
-    val = wasserstein_distance([1,1], [1,1])
+	val = wasserstein_distance([1,1], [1,1])
+	
     if val == 0
 	    return []
     else
@@ -227,8 +228,9 @@ function wd_test_1()
 end
 
 function wd_test_2()
-    val = wasserstein_distance([1,2],[3,4] )
-    if val == 2
+	val = wasserstein_distance([1,2],[3,4], p=Inf )
+	
+    if val == 1.25
 	    return []
     else
         print("Error: wd_test_2, value = ",val)
@@ -237,8 +239,9 @@ function wd_test_2()
 end
 
 function wd_test_3()
-    val = wasserstein_distance([1,2],[3,4], q=1 )
-    if val == 2*sqrt(0.5)
+    val = wasserstein_distance([1,2],[3,3.5],p=1,q=2 )
+
+    if val == 2.125
 	    return []
     else
         print("Error: wd_test_3, value = ",val)
