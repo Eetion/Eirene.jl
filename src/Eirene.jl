@@ -39,7 +39,6 @@ using Distances
 using JLD
 using Blink
 using PlotlyJS
-using Plotly
 using MultivariateStats
 using Colors
 using SparseArrays
