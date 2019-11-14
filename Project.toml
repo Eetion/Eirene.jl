@@ -25,3 +25,11 @@ DelimitedFiles = "8bb1440f-4735-579b-a4ab-409b98df4dab"
 
 [compat]
 julia = "1"
+Blink = "0.12.0"
+CSV = "0.5.16"
+Colors = "0.9.6"
+Distances = "0.8.2"
+Hungarian = "0.4.0"
+JLD = "0.9.1"
+MultivariateStats = "0.7.0"
+PlotlyJS = "0.13.0"
