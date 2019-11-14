@@ -209,7 +209,7 @@ julia> C = eirene(rv=rv,cp=cp,dv=dv,fv=fv)
 
 ### Simple format (from file)
 
-This format is handy if you need to proof read, or write files by hand.
+This format is handy if you need to proof read, or write files by hand.  Recall that rows must be arranged in **sorted according to dimension**.  In practice, this means that the entries in the first column should increase from top to bottom.
 
 ```
 dv[1], fv[1], <all id #'s for the faces of cell 1, separated by commas>
@@ -325,7 +325,7 @@ julia> plotbarcode_pjs(C, dim=k)
 
 ### `q,p`-Wasserstein distances between diagrams
 
-Given two persistence diagrams`X` and `Y`, the `q,p`-Wasserstein Distance `W_{q,p}(X,Y)` between them is defined as 
+Given two persistence diagrams`X` and `Y`, the `q,p`-Wasserstein Distance `W_{q,p}(X,Y)` between them is defined as
 
 ```
 W_{q,p}(X,Y) := (\inf_{bijections s: X \to Y} \Sigma_{x \in X} ||x - s(x)||_p^q)^(1/q).
