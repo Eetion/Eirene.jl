@@ -11,41 +11,39 @@ Australian National University
 
 function pad(u1,u2)
 
-    #=
-    Given 2 by n1 and 2 by n2 matrices, returns two 2 by (n1+n2) matrices.
-    This is done by adding points to u1 by projecting the points in u2 to
-    the diagonal {(x,y) : x = y }. This is also done to u2.
-    =#
+    	#=
+    	Given 2 by n1 and 2 by n2 matrices, returns two 2 by (n1+n2) matrices.
+    	This is done by adding points to u1 by projecting the points in u2 to
+    	the diagonal {(x,y) : x = y }. This is also done to u2.
+    	=#
 
-    #check that columns of matrices match
-    @assert size(u1)[2] == size(u2)[2] == 2
+    	#check that columns of matrices match
+    	@assert size(u1)[2] == size(u2)[2] == 2
 
 	#need transpose as sometimes a 1D vector
-    n1 = size(u1)[1]
+    	n1 = size(u1)[1]
 	n2 = size(u2)[1]
 	# note total n = n1 + n2
-    v1 = vcat(u1, zeros(n2,2))
-    v2 = vcat(u2, zeros(n1,2))
-    #project to diagonal
+    	v1 = vcat(u1, zeros(n2,2))
+    	v2 = vcat(u2, zeros(n1,2))
+    	#project to diagonal
 	for i = 1:n2
-        z = (v2[i,1]+v2[i,2])/2
-        v1[n1+i,1] = z
-        v1[n1+i,2] = z
-
-    end
+        	z = (v2[i,1]+v2[i,2])/2
+        	v1[n1+i,1] = z
+        	v1[n1+i,2] = z
+    	end
     ################
-    for i = 1:n1
+    	for i = 1:n1
 
-        z = (v1[1,i]+v1[2,i])/2
+        	z = (v1[i,1]+v1[i,2])/2
 
-        v2[n2+i,1] = z
-        v2[n2+i,2] = z
+        	v2[n2+i,1] = z
+        	v2[n2+i,2] = z
 
-    end
+    	end
 
-    return v1,v2,n1,n2
-
-    end
+    	return v1,v2,n1,n2
+end
 
 function dist_mat(v1,v2,n1,n2; p = 2)
 
@@ -63,7 +61,9 @@ function dist_mat(v1,v2,n1,n2; p = 2)
     #if l1 compute here in faster way.
     if p == 1
         for i = 1:n
-            cost[i,:] = sum(broadcast(abs,broadcast(-, v1[i,:], v2)),dims = 1)
+		for j in 1:n
+			cost[i,j] = abs(v1[i,1]-v2[j,1]) + abs(v1[i,2] - v2[j,2]) 
+		end
         end
 
 	elseif p == Inf
@@ -74,10 +74,10 @@ function dist_mat(v1,v2,n1,n2; p = 2)
         end
     else
         for i = 1:n
-
-            cost[i,:] = (sum( broadcast(abs,broadcast(-, v1[i,:], v2)).^p  ,dims = 1)).^(1/p)
-
+		for j in 1:n
+			cost[i,j] = ((abs(v1[i,1]-v)^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
 		end
+	end
 
     end
 
@@ -106,22 +106,26 @@ function dist_inf(v1,v2,p=2)
     else
         n = size(v1)[1]
 		cost = zeros(n,n)
-        if p == 1
-			for i = 1:n
-				cost[i,:] = sum(broadcast(abs,broadcast(-, v1[i,:], v2)),dims = 1)
-			end
 
-		elseif p == Inf
-			for i = 1:n
-				for j in 1:n
-					cost[i,j] = maximum(broadcast(abs,v1[i,:]-v2[j,:]))
-				end
-			end
-		else
-			for i = 1:n
-				cost[i,:] = (sum( broadcast(abs,broadcast(-, v1[i,:], v2)).^p  ,dims = 1)).^(1/p)
-			end
-		end
+	 if p == 1
+        for i = 1:n 
+                for j in 1:n 
+                        cost[i,j] = abs(v1[i,1]-v2[j,1]) + abs(v1[i,2] - v2[j,2]) 
+                end
+        end
+
+        elseif p == Inf 
+                for i = 1:n 
+                        for j in 1:n 
+                                cost[i,j] = maximum(broadcast(abs,v1[i,:]-v2[j,:]))
+                        end
+        end
+    	else
+        for i = 1:n 
+                for j in 1:n 
+                        cost[i,j] = ((abs(v1[i,1]-v)^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
+                end
+        end	
 
         #calculate cost matrix for only x co-ordinates
 		#for i = 1:n
