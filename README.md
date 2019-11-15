@@ -11,6 +11,7 @@ Gregory Henselman-Petrusek \
 Theoretical foundations for this platform lie in matroid optimization; see [here](https://arxiv.org/abs/1606.00199) for an introduction.  The developers make a special acknowledgement to Professor Janche Sang and to Alan Hylton and Robert Short, for their work in [performant optimizations](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.2678?af=R).  Important contributions have additionally been made by the following individuals.
 
 Ulrich Bauer <br>
+Yossi Bokor <br>
 Jean-Pierre Both <br>
 Paul Breiding <br>
 Robert Ghrist <br>
@@ -21,7 +22,8 @@ Bradley Nelson <br>
 Janche Sang <br>
 Robert Short <br>
 Ann Sizemore <br>
-Primoz Skraba
+Primoz Skraba <br>
+Christopher Williams
 
 
 
@@ -321,7 +323,13 @@ julia> plotbarcode_pjs(C, dim=k)
 * Hovering the cursor over a point in the persistence diagram will show a message with its precise Euclidean coordinates (birth and death times) and two additional pieces of information:  `class` and `size`.  Variable `class` is an integer.  If `class = p`, then the point where the cursor is hovering represents the birth/death time of `p`th persistent homology class in Eirene's list.  It is born at time `A[p,1]` and dies at time `A[p,2]`.  Variable `size` is also an integer.  It is the number of cells in the cycle representative Eirene computed for this persistent homology class (since Eirene computes homology over the two element field, we always refer to vectors by their support).
 * `class` and `size` can be displayed permanently, without the need to hover a cursor, via the keyword argument `showlabels = true`.
 
-### q,p-Wasserstein distances between diagrams
+### `q,p`-Wasserstein distances between diagrams
+
+Given two persistence diagrams`X` and `Y`, the `q,p`-Wasserstein Distance `W_{q,p}(X,Y)` between them is defined as 
+
+```
+W_{q,p}(X,Y) := (\inf_{bijections s: X \to Y} \Sigma_{x \in X} ||x - s(x)||_p^q)^(1/q).
+```
 
 To compute the q,p-Wasserstein distance between a pair of persistence diagrams, dgm1 and dgm2, run:
 
