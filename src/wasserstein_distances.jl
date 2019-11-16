@@ -220,7 +220,7 @@ function wd_test_1()
     if val == 0
 	    return []
     else
-        print("Error: wd_test_1, value = ",val)
+        print("Error: wd_test_1, value = ")
         return val
     end
 end
@@ -228,21 +228,21 @@ end
 function wd_test_2()
 	val = wasserstein_distance([1 2],[3 4], p=Inf )
 	
-    if val == 1.25
+    if val == 0.5
 	    return []
     else
-        print("Error: wd_test_2, value = ",val)
+        print("Error: wd_test_2, value = ")
         return val
     end
 end
 
 function wd_test_3()
-    val = wasserstein_distance([1 2],[3 3.5],p=1,q=2 )
+    val = wasserstein_distance([1 2],[3 3.5],p=1,q=Inf )
 
-    if val == 2.125
+    if val == 1
 	    return []
     else
-        print("Error: wd_test_3, value = ",val)
+        print("Error: wd_test_3, value = ")
         return val
     end
 end
