@@ -74,9 +74,9 @@ function dist_mat(v1,v2,n1,n2; p = 2)
         end
     else
         for i = 1:n
-		for j in 1:n
-			cost[i,j] = ((abs(v1[i,1]-v)^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
-		end
+			for j in 1:n
+				cost[i,j] = ((abs(v1[i,1]-v2[i,1])^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
+			end
 	end
 
     end
@@ -107,35 +107,30 @@ function dist_inf(v1,v2,p=2)
         n = size(v1)[1]
 		cost = zeros(n,n)
 
-	 if p == 1
-        for i = 1:n 
-                for j in 1:n 
+	 	if p == 1
+        	for i = 1:n 
+         	       for j in 1:n 
                         cost[i,j] = abs(v1[i,1]-v2[j,1]) + abs(v1[i,2] - v2[j,2]) 
-                end
-        end
+                	end
+        	end
 
         elseif p == Inf 
                 for i = 1:n 
                         for j in 1:n 
                                 cost[i,j] = maximum(broadcast(abs,v1[i,:]-v2[j,:]))
                         end
-        end
+        		end
     	else
-        for i = 1:n 
+        	for i = 1:n 
                 for j in 1:n 
                         cost[i,j] = ((abs(v1[i,1]-v)^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
                 end
-        end	
+        	end
 
-        #calculate cost matrix for only x co-ordinates
-		#for i = 1:n
-        #    cost[i,:] = broadcast(abs,broadcast(-, v1[im1], v2[:,1]))
-    	#end
+        	return cost, hungarian(cost)[1]
 
-        return cost, hungarian(cost)[1]
-
-    end
-	#end
+    	end
+	end
 end
 ############# Main function #############
 
