@@ -199,7 +199,7 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 			cost_h = wasserstein_distance(u_sort_1_2,u_sort_2_2,p=p, q=q)
 	
 	
-			return cost_h + cost_inf
+			return (cost_h^q + cost_inf)^(1/q)
 	
 	#unequal infinity return infinity.
 	else
