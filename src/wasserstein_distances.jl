@@ -21,7 +21,7 @@ function pad(u1,u2)
     	@assert size(u1)[2] == size(u2)[2] == 2
 
 	#need transpose as sometimes a 1D vector
-    	n1 = size(u1)[1]
+    n1 = size(u1)[1]
 	n2 = size(u2)[1]
 	# note total n = n1 + n2
     	v1 = vcat(u1, zeros(n2,2))
@@ -31,16 +31,16 @@ function pad(u1,u2)
         	z = (v2[i,1]+v2[i,2])/2
         	v1[n1+i,1] = z
         	v1[n1+i,2] = z
-    	end
+    end
     ################
-    	for i = 1:n1
+    for i = 1:n1
 
-        	z = (v1[i,1]+v1[i,2])/2
+        z = (v1[i,1]+v1[i,2])/2
 
-        	v2[n2+i,1] = z
-        	v2[n2+i,2] = z
+        v2[n2+i,1] = z
+        v2[n2+i,2] = z
 
-    	end
+    end
 
     	return v1,v2,n1,n2
 end
@@ -123,10 +123,9 @@ function dist_inf(v1,v2,p=2)
     	else
         	for i = 1:n 
                 for j in 1:n 
-                        cost[i,j] = ((abs(v1[i,1]-v)^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
+                        cost[i,j] = ((abs(v1[i,1]-v2[i,1])^p) + abs(v1[i,2]-v2[j,2])^p)^(1/p)
                 end
         	end
-
         	return cost, hungarian(cost)[1]
 
     	end
@@ -198,8 +197,11 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 			#calculate finite cost with self-reference.
 			cost_h = wasserstein_distance(u_sort_1_2,u_sort_2_2,p=p, q=q)
 	
-	
-			return (cost_h^q + cost_inf)^(1/q)
+			if q == Inf
+				return maximum(cost_h, cost_inf)
+			else
+				return (cost_h^q + cost_inf)^(1/q)
+			end
 	
 	#unequal infinity return infinity.
 	else
