@@ -75,7 +75,7 @@ function dist_mat(v1,v2,n1,n2; p = 2)
     else
         for i = 1:n
 			for j in 1:n
-				cost[i,j] = ((abs(v1[i,1]-v2[i,1])^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
+				cost[i,j] = ((abs(v1[i,1]-v2[j,1])^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
 			end
 	end
 
@@ -85,7 +85,6 @@ function dist_mat(v1,v2,n1,n2; p = 2)
     #set distance between diagonal points to be 0.
     #this could just not be calculated if not using broadcast.
     cost[(n-n2+1):n,(n-n1+1):n] = zeros(n2,n1)
-
     return cost
 
 end
@@ -126,9 +125,8 @@ function dist_inf(v1,v2,p=2)
                         cost[i,j] = ((abs(v1[i,1]-v2[i,1])^p) + abs(v1[i,2]-v2[j,2])^p)^(1/p)
                 end
         	end
-        	return cost, hungarian(cost)[1]
-
-    	end
+		end
+		return cost, hungarian(cost)[1]
 	end
 end
 ############# Main function #############
@@ -247,4 +245,14 @@ function wd_test_3()
         print("Error: wd_test_3, value = ")
         return val
     end
+end
+
+function wd_test_4()
+	val = wasserstein_distance([0 1], [3 5; 7 9], p=Inf, q=1)
+
+	if val == 2.5
+		return []
+	else print("Error: wd_test_4, value = ")
+		return val
+	end
 end
