@@ -7512,7 +7512,7 @@ function unittest()
 
 	numits 	= 	5
 	maxdim 	= 	2
-	x 		= 	Array{Any}(undef,23)
+	x 		= 	Array{Any}(undef,24)
 
 	x[1] 	= 	eirenevrVperseusvr() 					# correct answer: empty
 	x[2] 	= 	eirenevrVeirenepc(numits,maxdim) 		# correct answer: empty
@@ -7537,6 +7537,7 @@ function unittest()
 	x[21]   =   wd_test_2()								# correct answer: empty
 	x[22]   =   wd_test_3()								# correct answer: empty
 	x[23] 	= 	wd_test_4()								# correct answer: empty
+	x[24]	=	wd_test_5()								# correct answer: empty
 
 	for p 	= 	1:length(x)
 		if !isempty(x[p])

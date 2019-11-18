@@ -61,9 +61,9 @@ function dist_mat(v1,v2,n1,n2; p = 2)
     #if l1 compute here in faster way.
     if p == 1
         for i = 1:n
-		for j in 1:n
-			cost[i,j] = abs(v1[i,1]-v2[j,1]) + abs(v1[i,2] - v2[j,2]) 
-		end
+			for j in 1:n
+				cost[i,j] = abs(v1[i,1]-v2[j,1]) + abs(v1[i,2] - v2[j,2]) 
+			end
         end
 
 	elseif p == Inf
@@ -77,19 +77,20 @@ function dist_mat(v1,v2,n1,n2; p = 2)
 			for j in 1:n
 				cost[i,j] = ((abs(v1[i,1]-v2[j,1])^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
 			end
-	end
+		end
 
     end
 
-
     #set distance between diagonal points to be 0.
     #this could just not be calculated if not using broadcast.
-    cost[(n-n2+1):n,(n-n1+1):n] = zeros(n2,n1)
+	cost[(n-n2+1):n,(n-n1+1):n] = zeros(n2,n1)
+	#print("cost matrix is ", cost,"\n")
+	
     return cost
 
 end
 
-function dist_inf(v1,v2,p=2)
+function dist_inf(v1,v2)
     #= else
 
     takes in two vectors with all y points at infinity.
@@ -106,26 +107,25 @@ function dist_inf(v1,v2,p=2)
         n = size(v1)[1]
 		cost = zeros(n,n)
 
-	 	if p == 1
-        	for i = 1:n 
-         	       for j in 1:n 
-                        cost[i,j] = abs(v1[i,1]-v2[j,1]) + abs(v1[i,2] - v2[j,2]) 
-                	end
-        	end
-
-        elseif p == Inf 
-                for i = 1:n 
-                        for j in 1:n 
-                                cost[i,j] = maximum(broadcast(abs,v1[i,:]-v2[j,:]))
-                        end
-        		end
-    	else
-        	for i = 1:n 
-                for j in 1:n 
-                        cost[i,j] = ((abs(v1[i,1]-v2[i,1])^p) + abs(v1[i,2]-v2[j,2])^p)^(1/p)
+        for i = 1:n 
+         	    for j in 1:n 
+                    cost[i,j] = abs(v1[i,1]-v2[j,1]) + abs(v1[i,2] - v2[j,2]) 
                 end
-        	end
-		end
+        end
+
+        # elseif p == Inf 
+        #         for i = 1:n 
+        #                 for j in 1:n 
+        #                         cost[i,j] = maximum(broadcast(abs,v1[i,:]-v2[j,:]))
+        #                 end
+        # 		end
+    	# else
+        # 	for i = 1:n 
+        #         for j in 1:n 
+        #                 cost[i,j] = ((abs(v1[i,1]-v2[i,1])^p) )^(1/p)
+        #         end
+        # 	end
+		# end
 		return cost, hungarian(cost)[1]
 	end
 end
@@ -215,7 +215,7 @@ end
 # 
 
 function wd_test_1()
-	val = wasserstein_distance([1 1], [1 1])
+	val = wasserstein_distance([1 2], [1 2])
 	
     if val == 0
 	    return []
@@ -255,4 +255,15 @@ function wd_test_4()
 	else print("Error: wd_test_4, value = ")
 		return val
 	end
+end
+
+function wd_test_5()
+	val = wasserstein_distance([1 1], [2 2])
+	
+    if val == 0
+	    return []
+    else
+        print("Error: wd_test_5, value = ")
+        return val
+    end
 end
