@@ -18,7 +18,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Eirene.  If not, see <http://www.gnu.org/licenses/>.
+# along with Eirene.  If not, swasserstein_distance([0 1], [3 5; 7 9], p=Inf, q=1)ee <http://www.gnu.org/licenses/>.
 #
 # PLEASE HELP US DOCUMENT Eirene's recent work! Bibtex entries and
 # contact information for teaching and outreach can be found at the
@@ -7512,7 +7512,7 @@ function unittest()
 
 	numits 	= 	5
 	maxdim 	= 	2
-	x 		= 	Array{Any}(undef,22)
+	x 		= 	Array{Any}(undef,24)
 
 	x[1] 	= 	eirenevrVperseusvr() 					# correct answer: empty
 	x[2] 	= 	eirenevrVeirenepc(numits,maxdim) 		# correct answer: empty
@@ -7536,6 +7536,8 @@ function unittest()
 	x[20]   =   wd_test_1()								# correct answer: empty
 	x[21]   =   wd_test_2()								# correct answer: empty
 	x[22]   =   wd_test_3()								# correct answer: empty
+	x[23] 	= 	wd_test_4()								# correct answer: empty
+	x[24]	=	wd_test_5()								# correct answer: empty
 
 	for p 	= 	1:length(x)
 		if !isempty(x[p])
