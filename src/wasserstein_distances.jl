@@ -18,7 +18,6 @@ function pad(u1,u2)
     	=#
 
     	#check that columns of matrices match
-    	#println(size(u1))
     	@assert size(u1)[2] == size(u2)[2] == 2
     	
     	#need transpose as sometimes a 1D vector
@@ -55,7 +54,7 @@ function pad_infinite(u1,u2)
     	=#
 
     	#check that columns of matrices match
-    	#println(size(u1))
+    	
     	@assert size(u1)[2] == size(u2)[2] ==1
 	
 	
@@ -92,7 +91,6 @@ function dist_mat(v1,v2,n1,n2; p = 2)
 
     #take the length of columns, note this is always bigger than 2.
     n = size(v1)[1]
-    println("in dist_mat n is $n")
 
     #set up cost matrix
 	cost = zeros(n,n)
@@ -123,7 +121,6 @@ function dist_mat(v1,v2,n1,n2; p = 2)
     #set distance between diagonal points to be 0.
     #this could just not be calculated if not using broadcast.
 	cost[(n-n2+1):n,(n-n1+1):n] = zeros(n2,n1)
-	#print("cost matrix is ", cost,"\n")
 	
     return cost
 
@@ -134,26 +131,6 @@ function dist_inf(v1,v2)
     takes in two vectors with all y points at infinity.
     returns the distance between their persitance diagrams.
     =#
-    println(size(v1))
-    #= c_1_inf = 0
-    c_2_inf = 0
-    for i in 1:size(v1)[1]
-    print(v1)
-    println("i is $i")
-	println(v1[i,2])
-		if v1[i,2] == Inf
-			c_1_inf += 1
-		end
-    end
-    
-    for i in 1:size(v2)[1]
-		if v2[i,2] == Inf
-			c_2_inf += 1
-		end
-	end
-	
-	@assert c_1_inf == c_2_inf
-	=#
 	
 	#if the point (Inf,Inf) exists return Inf.
 	if any(i->(i==Inf), v1[:,1]) || any(i->(i==Inf), v2[:,1])
@@ -168,7 +145,7 @@ function dist_inf(v1,v2)
 				cost[i,j] = abs(v1[i]-v2[j])
 			end
 		end
-		println("n is $n cost matrix from dist_inf is", cost)
+		
 		return cost, hungarian(cost)[1]
 	end
 end
@@ -179,7 +156,6 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 	
 	u1 = vcat([0 0], dgm1) # this is to avoid issues with empty diagram parts
 	u2 = vcat([0 0], dgm2)
-	print(u1, u2)
 	#=
 	takes two (possibly unequal size) vectors and calculates the W_(q,p)distance between their persistence diagrams. The default is that q=p=2
 	Can calculate lp distance between diagrams, l1 should be the fastest.
@@ -188,11 +164,11 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 	
 	#if no Inf is present in either vector calculate as normal.
 	if all(i->(i!=Inf), u1) && all(i->(i!=Inf), u2)
-		println("padding", u1, u2)
+		
 		v1,v2,n1,n2 = pad(u1,u2)
 	
 		cost = dist_mat(v1,v2,n1,n2,p=p)
-		println("cost matrix is", cost)
+		
 		assignment = hungarian(cost)[1]
 	
 		if q == Inf
@@ -237,7 +213,7 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 			u_sort_2_1 = u_sort_2[(1+N_inf):end,:]
 	
 			#calculate infinite cost.
-			println("\n now matrices are", u_sort_1_1,u_sort_1_2,u_sort_2_1,u_sort_2_2)
+			
 			cost, assignment_inf = dist_inf(u_sort_1_2,u_sort_2_2)
 	
 			if q == Inf
@@ -250,11 +226,11 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 				end
 			end
 			#calculate finite cost without self-reference.
-			println("now matrices are", u_sort_1_2,u_sort_2_2)
+			
 			v1,v2,n1,n2 = pad(u_sort_1_1,u_sort_2_1)
-			println(v1,v2,n1,n2)
+			
 			cost = dist_mat(v1,v2,n1,n2,p=p)
-			println("cost matrix is", cost," i think it is here")
+			
 			
 			assignment = hungarian(cost)[1]
 		
