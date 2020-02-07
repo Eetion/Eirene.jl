@@ -126,27 +126,41 @@ function dist_mat(v1,v2,n1,n2; p = 2)
 
 end
 
-function dist_inf(v1,v2)
+function dist_inf(v1,v2; q = 2)
     #=
     takes in two vectors with all y points at infinity.
     returns the distance between their persitance diagrams.
     =#
-	
+	n = size(v1)[1]
+	println(n)
 	#if the point (Inf,Inf) exists return Inf.
 	if any(i->(i==Inf), v1[:,1]) || any(i->(i==Inf), v2[:,1])
 
 		return Inf
     else
-		n = size(v1)[1]
-		
-		cost = zeros(n,n)
-		for i = 1:n
-			for j in 1:n
-				cost[i,j] = abs(v1[i]-v2[j])
+		if q == Inf
+			cost = zeros(n,n)
+			for i in 1:n
+				for j in 1:n
+					cost[i,j] = abs(v1[i,1]-v2[j,1])
+				end
 			end
+			assignment_inf = hungarian(cost)[1]
+			costs = [cost[i, assignment_inf[i]] for i in 1:n]
+			cost_inf = maximum(costs)
+			return cost_inf
+		else
+			
+		
+			cost = zeros(n,n)
+			for i = 1:n
+				for j in 1:n
+					cost[i,j] = abs(v1[i,1]-v2[j,1])^q
+				end
+			end
+			return hungarian(cost)[2]^(1/q)
 		end
 		
-		return cost, hungarian(cost)[1]
 	end
 end
 ############# Main function #############
@@ -214,17 +228,9 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 	
 			#calculate infinite cost.
 			
-			cost, assignment_inf = dist_inf(u_sort_1_2,u_sort_2_2)
+			cost_inf = dist_inf(u_sort_1_2,u_sort_2_2,q=q)
 	
-			if q == Inf
-				costs = [cost[i, assignment_inf[i]] for i in 1:(N_inf)]
-				cost_inf = maximum(costs)
-			else
-				cost_inf = 0
-				for i in 1:N_inf
-					cost_inf += cost[i, assignment_inf[i]]^(q)
-				end
-			end
+
 			#calculate finite cost without self-reference.
 			
 			v1,v2,n1,n2 = pad(u_sort_1_1,u_sort_2_1)
@@ -251,7 +257,7 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 			if q == Inf
 				return maximum(cost_h, cost_inf)
 			else
-				return (cost_h + cost_inf)^(1/q)
+				return (cost_h + cost_inf^q)^(1/q)
 			end
 	
 	#unequal infinity return infinity.
