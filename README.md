@@ -218,9 +218,9 @@ julia> C = eirene(rv=rv,cp=cp,dv=dv,fv=fv)
 
 
 
-### 3. Simple format (from file)*  
+### 3. Simple format (from file)  
 
-#### ideal for beginners |  well suited to small, hand-written data | slow for big data
+####   ideal for beginners //  well suited to small, hand-written data // slow for big data
 This format is handy if you want to write files by hand, or if you need to visually proof-read your data to make sure it's formatted correctly.  Large files with this format can take a long time to load (in fact, much longer than the persistence computation itself), so if you experiene performance issues, please consider another input format.  Recall that rows must be arranged in **sorted according to dimension**.  In practice, this means that the entries in the first column should increase from top to bottom.
 
 ```
