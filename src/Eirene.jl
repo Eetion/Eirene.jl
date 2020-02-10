@@ -1588,6 +1588,10 @@ end
 function unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ncd=Inf)
 	# ncd stands for number of chain dimensions
 	# nsd stands for number of stored dimensions
+	# this function returns a segmented complex with data for the first ncd
+	# dimensions (the others are not included in the output); the output takes
+	# the form of four length-ncd arrays
+
 	nsd 	= 	length(dp)-1
 	if ncd == Inf
 		ncd  	= nsd
@@ -1613,7 +1617,13 @@ function unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ncd=Inf
 		fvc[p] 		=	zeros(Int64,0)
 	end
 
-	dpc 			= vcat(dp,fill(dp[end],ncd+1-length(dp))) # extend dp to the proper length
+	if length(dp) 	>	ncd+1
+		dpc			=	copy(dp[1:ncd+1])
+	elseif length(dp)<  ncd+1
+		dpc 		=	vcat(dp,fill(dp[end],ncd+1-length(dp))) # extend dp to the proper length
+	else
+		dpc 		=	copy(dp)
+	end
 	return rvc,cpc,fvc,dpc
 end
 
@@ -7541,6 +7551,7 @@ function unittest()
 
 	for p 	= 	1:length(x)
 		if !isempty(x[p])
+			println(p)
 			return x
 		end
 	end
