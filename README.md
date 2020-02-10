@@ -207,18 +207,18 @@ julia> C = eirene(rv=rv,cp=cp,dv=dv,fv=fv)
 
 
 
-### Simple format (from file)
+### Simple format (best for small, hand-written input files)
 
-This format is handy if you need to proof read, or write files by hand.  Recall that rows must be arranged in **sorted according to dimension**.  In practice, this means that the entries in the first column should increase from top to bottom.
+This format is handy if you want to write files by hand, or if you need to visually proof-read your data to make sure it's formatted correctly.  Large files with this format can take a long time to load, however (in fact, much longer than the persistence computation itself), so if you experiene performance issues, please consider another input format.  Recall that rows must be arranged in **sorted according to dimension**.  In practice, this means that the entries in the first column should increase from top to bottom.
 
 ```
-dv[1], fv[1], <all id #'s for the faces of cell 1, separated by commas>
-dv[2], fv[2], <all id #'s for the faces of cell 1, separated by commas>
+dv[1], fv[1], <id #'s for the codimension-1 faces of cell 1, separated by commas>
+dv[2], fv[2], <id #'s for the codimension-1 faces of cell 2, separated by commas>
 ...
-dv[N], fv[N], <all id #'s for the faces of cell 1, separated by commas>
+dv[N], fv[N], <id #'s for the codimension-1 faces of cell N, separated by commas>
 ```
 
-***Example file***  For our example space, this file would take form:
+***Example***  For our example space, the file would take form:
 
 ```
 0, 0.01
@@ -226,11 +226,12 @@ dv[N], fv[N], <all id #'s for the faces of cell 1, separated by commas>
 1, 0.03, 1, 2
 ```
 
-***Example computation***  If this file is saved as `Users/Adam/ez.csv`, then to compute PH call
+If this file is saved as `Users/Adam/ez.csv`, then to compute PH call
 
 ```
 julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="sp")
 ```
+
 
 
 
