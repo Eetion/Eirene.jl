@@ -4,7 +4,7 @@
 # Eirene.  If not, please see <http://www.gnu.org/licenses/>.
 #
 # Eirene Library for Homological Algebra
-# Copyright (C) 2016, 2017, 2018, 2019  Gregory Henselman
+# Copyright (C) 2016, 2017, 2018, 2019, 2020  Gregory Henselman
 # www.gregoryhenselman.org
 #
 # Eirene is free software: you can redistribute it and/or modify
@@ -18,7 +18,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Eirene.  If not, swasserstein_distance([0 1], [3 5; 7 9], p=Inf, q=1)ee <http://www.gnu.org/licenses/>.
+# along with Eirene.  If not, see <http://www.gnu.org/licenses/>.
 #
 # PLEASE HELP US DOCUMENT Eirene's recent work! Bibtex entries and
 # contact information for teaching and outreach can be found at the
