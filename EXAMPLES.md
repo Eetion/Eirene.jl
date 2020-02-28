@@ -1,13 +1,13 @@
 # Installing Eirene
-If you haven't done so already, install Eirene by running
+If you haven't done so already, install Eirene with these steps: 0) ensure you are running the most recent version of Eirene 1) open a Julia REPL, 2) press `]` to switch to the Pkg REPL, and 3) type `add Eirene` and press return.
 
 ```
-julia> Pkg.clone("https://github.com/Eetion/Eirene.jl.git")
+(v1.3) pkg> add Eirene
 ```
 It's fairly common to get error messages when you do this.  Generally they will want you to install additional (supporting) packages.  Read these messages, and follow the instructions.  When in doubt, always double check that you are running the latest version of Eirene (it's been observed that installers such as Homebrew install dated versions of the language, so the only way to be sure you're up to date is to visit the Julia homepage), and use
 
 ```
-julia> Pkg.update()
+(v1.3) pkg> update
 ```
 
 to ensure that you are using the latest versions of the supporting packages.
@@ -18,13 +18,13 @@ You can now run any function in the Eirene package in the REPL.  If you want to 
 julia> Eirene.fictionalfunction()
 ```
 
-Typing the prefix `Eirene.` quickly becomes tiresome, so run
+Typing the prefix `Eirene.` quickly becomes tiresome. Entering command
 
 ```
 julia> using Eirene
 ```
 
-This allows you to call Eirene functions without the prefix.
+will allow you to call Eirene functions without the prefix.
 
 # 1: The Noisy Circle
 
@@ -37,7 +37,8 @@ julia> filepath = eirenefilepath("noisycircle")
 The contents of this file can be loaded via
 
 ```
-julia> pointcloud = readcsv(filepath)
+julia> using DelimitedFiles
+julia> pointcloud = readdlm(filepath,',')
 ```
 
 This stores the points in the cloud as the columns of matrix `pointcloud`.  To see this cloud for yourself, call
@@ -45,6 +46,8 @@ This stores the points in the cloud as the columns of matrix `pointcloud`.  To s
 ```
 julia> ezplot_pjs(pointcloud)
 ```
+
+![](/Users/gh10/a/c/j/eirene/code/Eirene.jl/images/sample_cloud_circle.png)
 
 To compute persistent homology in dimensions 0 and 1, run
 
@@ -59,6 +62,9 @@ julia> plotbarcode_pjs(C,dim=1)
 
 julia> plotpersistencediagram_pjs(C,dim=1)
 ```
+
+
+![](/Users/gh10/a/c/j/eirene/code/Eirene.jl/images/sample_persistence_diagram.png)
 
 If you hover the mouse over a point in the persistence diagram you'll see some information about the associated persistent homology class:
 
@@ -77,11 +83,15 @@ representative involved 153 cells (wow!).  To plot this class, call
 julia> plotclassrep_pjs(C,class=50,dim=1)
 ```
 
+![](/Users/gh10/a/c/j/eirene/code/Eirene.jl/images/sample_cycle_circle.png)
+
 To plot the class without point labels, call
 
 ```
 julia> plotclassrep_pjs(C,class=50,dim=1,showlabels=false)
 ```
+
+![](/Users/gh10/a/c/j/eirene/code/Eirene.jl/images/sample_cycle_circle_nolabels.png)
 
 and to plot only the points incident to the class representative, call
 

@@ -5339,14 +5339,6 @@ function classrep_pjs(
 		cloudedges_orderverts = vetexinverter[cloudedges]
 	end
 
-	##############################################################################################
-	# WAYPOINT 1
-	# printval(coords,"coords")
-	# printval(coords==coords,"coords==coords")
-	# printval(D["input"]["pc"] == "n/a","D[\"input\"][\"pc\"] == \"n/a\"")
-	# printval(D["input"]["pc"],"D[\"input\"][\"pc\"]")
-##############################################################################################
-
 	if coords == []
 		if D["input"]["pc"] == "n/a"
 			print("No point cloud is available.  Please consider using the mds keyword argument to generate a Euclidean embedding from the distance matrix (see documentation).")
