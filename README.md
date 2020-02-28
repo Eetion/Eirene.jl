@@ -61,8 +61,13 @@ julia> plotbarcode_pjs(C,dim=1)
 julia> plotpersistencediagram_pjs(C,dim=1)
 julia> plotclassrep_pjs(C,dim=1,class=1)
 ```
-**More examples** can be found in `EXAMPLES.md`!
 
+## More examples
+
+
+Can be found in `EXAMPLES.md`!
+
+![](images/globe_rep.png) 
 
 ## Keyword arguments
 
