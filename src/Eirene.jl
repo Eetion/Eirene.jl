@@ -49,6 +49,16 @@ using DelimitedFiles
 using CSV
 using Hungarian #added for the Wasserstein distances
 
+##########################################################################################
+
+#### 	USER TEST FUNCTION
+
+##########################################################################################
+
+function example_function()
+	print("Welcome to Eirene!  Great job running the example function.")
+end
+
 
 ##########################################################################################
 
@@ -5377,7 +5387,7 @@ function classrep_pjs(
 				metricmatrix = hopdistance(edges_orderverts,inputis = "edges")
 			end
 		end
-		coords = classical_mds(metricmatrix,embeddingdim)
+		coords = transform(fit(MDS, float.(metricmatrix), maxoutdim = embeddingdim, distances=true)) #classical_mds(metricmatrix,embeddingdim)
 		# coords = round.(coords,10)
 		model = "pc"
 	end
@@ -5432,7 +5442,22 @@ function classrep_pjs(
 	if showedges
 		faces = classrep(D,dim=dim,class=class)
 		edges = d1faces(faces)
-		T3 =  edgetrace_pjs(coords,edges,model=model	)
+		if showcloud
+			T3 =  edgetrace_pjs(coords,edges,model=model	)
+		else
+			# by default vertices in the edge list index into the original
+			# point cloud; if we're not showing the ambient cloud, then we have
+			# by this point deleted the "irrelevant" columns from the coordinate
+			# matrix, which changes the indices.  padding with zeros corrects
+			# for this difference
+			# note that for design reasons we re-defined classvinoldspace above,
+			# so must re-define it
+			classvinoldspace_original = D["nvl2ovl"][classvinnewspace]
+			coords_padded = zeros(size(coords,1),maximum(classvinoldspace_original))
+			coords_padded[:,classvinoldspace_original] = coords
+			T3 =  edgetrace_pjs(coords_padded,edges,model=model	)
+		end
+
 		append!(data,T3)
 	end
 
@@ -6327,7 +6352,7 @@ function hopdistance_sparse(rv,cp)
 			fringelist = findall(fringenodes)
 			fringenodes[:].= false
 		end
-		H[.!metnodes,i]=m+1
+		H[.!metnodes,i].=m+1
 	end
 	return H
 end
