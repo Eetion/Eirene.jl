@@ -56,7 +56,7 @@ This stores the points in the cloud as the columns of matrix `pointcloud`.  To s
 julia> ezplot_pjs(pointcloud)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/circle_pc.png)
+![](images/circle_pc.png)
 
 To compute persistent homology in dimensions 0 and 1, run
 
@@ -73,7 +73,7 @@ julia> plotpersistencediagram_pjs(C,dim=1)
 ```
 
 
-![](/Users/gh10/tutorial/dev/Eirene/images/circle_pdiagram.png)
+![](images/circle_pdiagram.png)
 
 If you hover the mouse over a point in the persistence diagram you'll see some information about the associated persistent homology class:
 
@@ -92,7 +92,7 @@ representative involved 153 cells (wow!).  To plot this class, call
 julia> plotclassrep_pjs(C,class=50,dim=1)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/circle_h1rep.png)
+![](images/circle_h1rep.png)
 
 Note that every point on the cycle representative has a number; these numbers correspond to the columns of the `pointcloud` matrix.  To plot the class without point labels, call
 
@@ -100,7 +100,7 @@ Note that every point on the cycle representative has a number; these numbers co
 julia> plotclassrep_pjs(C,class=50,dim=1,showlabels=false)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/circle_h1rep_nolabel.png)
+![](images/circle_h1rep_nolabel.png)
 
 and to plot only the points incident to the class representative, call
 
@@ -108,7 +108,7 @@ and to plot only the points incident to the class representative, call
 julia> plotclassrep_pjs(C,class=50,dim=1,showlabels=false,showcloud = false)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/circle_h1rep_nolabel_nocloud.png)
+![](images/circle_h1rep_nolabel_nocloud.png)
 
 
 Sometimes you don't have natural coordinates to work with (eg, if your data comes from a similarity matrix).  In that case you can generate coordinates with the built-in MDS system:
@@ -117,7 +117,7 @@ Sometimes you don't have natural coordinates to work with (eg, if your data come
 julia> plotclassrep_pjs(C,class=50,dim=1,showlabels=false,showcloud = false,coords="mds",embeddingobj="hop")
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/circle_h1rep_mds.png)
+![](images/circle_h1rep_mds.png)
 
 
 
@@ -134,7 +134,7 @@ julia> ezplot_pjs(pointcloud)
 
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/torus_pc.png)
+![](images/torus_pc.png)
 
 and checkout the new point cloud (it's a noisy torus).  Note that
 
@@ -162,13 +162,13 @@ julia> plotclassrep_pjs(C,class=768,dim=1)
 julia> plotclassrep_pjs(C,class=769,dim=1)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/torus_h1_pdiagram.png)  ![](/Users/gh10/tutorial/dev/Eirene/images/torus_h1_barcode.png)
+![](images/torus_h1_pdiagram.png)  ![](images/torus_h1_barcode.png)
 
 Red points on the diagonal represent classes that "never die".  Technically they should be infinitely high up on the y-axis, but since that's not possible, we color them red and place them on the diagonal. 
 
 
 
-![](/Users/gh10/tutorial/dev/Eirene/images/torus_h1rep1.png) ![](/Users/gh10/tutorial/dev/Eirene/images/torus_h1rep2.png)
+![](images/torus_h1rep1.png) ![](images/torus_h1rep2.png)
 
 
 For H2, use the following. Make sure to set showlabels=false, otherwise the
@@ -182,11 +182,11 @@ julia> plotpersistencediagram_pjs(C,dim=2)
 julia> plotclassrep_pjs(C,class=12,dim=2,showlabels=false)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/torus_h2_pdiagram.png)  ![](/Users/gh10/tutorial/dev/Eirene/images/torus_h2_barcode.png)
+![](images/torus_h2_pdiagram.png)  ![](images/torus_h2_barcode.png)
 
 
 
-![](/Users/gh10/tutorial/dev/Eirene/images/torus_h2_rep.png)  
+![](images/torus_h2_rep.png)  
 
 
 # 3: Clouds
@@ -278,7 +278,7 @@ Now that we have a point cloud we can take a preliminary look at its shape and s
 julia> ezplot_pjs(c)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/globe_pc.png)
+![](images/globe_pc.png)
 
 A cursory inspection shows that a number of interesting features appear at or below epsilon = 0.15, so we'll use that as our initial cutoff. To pass city names to the `eirene` function, extract column 2 of array a, sans header, and store in a 1-dimensional array of type `Array{Any}`. Due to potential errors resulting from nonstandard character strings, it's good practice to use the built-in label sanitzer ezlabel to clean this column before assigning to d.  The wrapper will replace any element of the column that cannot be expressed as an ACIIString with the number corresponding to its row.  Aside: n can be omitted from the expression `Array{T,n}` when n=1.
 
@@ -333,7 +333,7 @@ We did not specify `bettimax`, so only the persistence modules in dimensions 0 a
 julia> plotpersistencediagram_pjs(C)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/globe_pdiagram.png)
+![](images/globe_pdiagram.png)
 
 Hovering over a point in the diagram will display the identification number of the corresponding persistent homology class, together with the size the cycle representative Eirene computed for it. Fix a feature of interest - say number 1757 - and plot the corresponding cycle, noting that only vertices will appear in the figure (cells of dimension 1 and higher are generally too numerous to plot efficiently).
 
@@ -343,7 +343,7 @@ Note: The cost of displaying text labels for individual points in the Plotly pla
 julia> plotclassrep_pjs(C,class = 1757)
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/globe_rep.png)
+![](images/globe_rep.png)
 
 Class 1757, shown above, is among my favorites: the Himalayan branch of the silk road is clearly visible on its South West arc; to the North it follows the Trans-Siberian railroad from Moscow in the west to Vladivostok on the Sea of Japan, by way of Omsk, Irktsk, and Chita; from there, it follows the connecting route from Beijing to Hong Kong, passing Nanning, Hanoi, and close to Ho Chi Min on its way to Bangkok (not all of these appear in the cycle itself, but they are easily spotted nearby).  With a little exploration you can find large features formed by the Sahara Desert, Tapajos River, Falkland Islands, South China Sea, Guam, and Hudson Bay, and smaller ones shaped by the Andes mountains and Gulf of Mexico - all through the proxy of urban development.
 
@@ -365,7 +365,7 @@ To plot these using MDS, use
 julia> plotclassrep_pjs(C,class = 1757,showcloud=false,coords="mds",embeddingobj="hop")
 ```
 
-![](/Users/gh10/tutorial/dev/Eirene/images/globe_rep_mds.png)
+![](images/globe_rep_mds.png)
 
 To make any further changes to the appearance of your plot, share it with others, or export to still-frames, you can upload to the interactive, open-source Plotly web API.  This requires the setup of a personal account beforehand (see the github documentation for Plotly.jl for instructions), but once this has been done and the connection between your Julia REPL and Plotly account has been established,  uploading is quite simple: create an object p for the PlotlyJS figure, and call Plotly.post
 
