@@ -2,8 +2,16 @@
 
 ## Contributors
 
-Eirene is made possible by the important contributions of the following individuals.
+Eirene is produced and maintained by
 
+Gregory Henselman-Petrusek \
+<gh10@princeton.edu> \
+<grh@seas.upenn.edu>
+
+Theoretical foundations for this platform lie in matroid optimization; see [here](https://arxiv.org/abs/1606.00199) for an introduction.  The developers make a special acknowledgement to Professor Janche Sang and to Alan Hylton and Robert Short, for their work in [performant optimizations](https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.2678?af=R).  Important contributions have additionally been made by the following individuals.
+
+Ulrich Bauer <br>
+Yossi Bokor <br>
 Jean-Pierre Both <br>
 Paul Breiding <br>
 Robert Ghrist <br>
@@ -14,7 +22,9 @@ Bradley Nelson <br>
 Janche Sang <br>
 Robert Short <br>
 Ann Sizemore <br>
-Primoz Skraba
+Primoz Skraba <br>
+Christopher Williams
+
 
 
 ## Installation
@@ -51,12 +61,23 @@ julia> plotbarcode_pjs(C,dim=1)
 julia> plotpersistencediagram_pjs(C,dim=1)
 julia> plotclassrep_pjs(C,dim=1,class=1)
 ```
-**More examples** can be found in `EXAMPLES.md`!
+
+## More examples
 
 
-## Keywords
+Can be found in `EXAMPLES.md`!
 
-  In the example above, the expression `model = "pc"` that sits inside `C = eirene(x, model = "pc")` functions as a declaration to Eirene. It asserts that the columns of `x` should be treated as points in a Euclidean point cloud. In this context, `model` is a *keyword argument*, and `"pc"` is its *value*.  Every keyword comes with a default value; you only have to declare a value if you want something other than a default.
+![](images/globe_rep.png) 
+
+## Keyword arguments
+
+Consider the following line of code
+
+```
+julia> C = eirene(x, model = "pc")
+```
+
+In this expression, `model = "pc"` tells Eirene that the columns of `x` should be treated as a collection of points in Euclidean space. The expression `model` is a *keyword argument*, and the expression `"pc"` is the *value* of keyword `model`.  Every keyword comes with a default value; you only have to declare a value if you want something other than a default.
 
 `model = "pc", "vr", "complex"`   
 * States format of the data.  
@@ -110,10 +131,13 @@ Formats for `x`
 ## Complexes
 
 ### Roadmap for beginners
-If you're new to Julia and/or Eirene, formatting for complexes can be a bit overwhelming.  We suggest reading the *Example* and *General Formatting sections*, ***ignoring*** the content on `D`, `rv` and `cp`.  Then skip to the section entitled *Simple format (from file)*.  This should cover the needs of most users.
+If you're new to Julia and/or Eirene, formatting for complexes can be a bit overwhelming.  We suggest reading the *Example* and *General Formatting sections*, ***ignoring*** the content on `D`, `rv` and `cp`.  Then skip to the section entitled *Simple format*.  This will cover everything you need to start running real computations, and lay a good foundation for advanced uses.
+
+### Vocabulary: the faces of a cell
+We'll talk a lot about cell complexes.  Roughly speaking, a cell complex is an object constructed by "gluing" together simple building blocks, called *cells*.  For us, the details aren't important.  What *is* important is that each cell has a dimension.   A simplicial complex is a cell complex built from vertices (dimension 0 cells), edges (dimension 1 cells), triangles (dimension 2 cells), tetrahedra (dimension 3 cells), and so on.  A cubical complex is built from vertices (dimension 0 cells), edges (dimension 1 cells), squares (dimension 2 cells), cubes (dimension 3 cells), etc.  The **faces** of a cell are the cells of lower dimension that "touch" it.  For example, the faces of an edge e in a simple graph are the two vertices that touch e.  The faces of a triangle, A, in a simplicial complex are the edges and vertices that touch A.  We say that x is a **codimension-1 face** of Y if x touches Y, and dim(x) = dim(Y)-1.  Thus, while both vertices and edges can be faces of a triangle in a simplicial complex, only *edges* can be codimension-1 faces.
 
 ### Example
-This section gives a practical overview on customized (filtered) topological spaces.  For complete details, see the following section.  As an example of a (filtered) topological space, we'll use an undirected  graph with with two vertices, `v1` and `v2`, and one edge, `e1`.  To begin, let's assign unique ID numbers to the cells of `G` (see table below).
+This section gives a practical overview on customized (filtered) topological spaces.  For complete details, see the following sections.  As an example of a (filtered) topological space, we'll use an undirected  graph with with two vertices, `v1` and `v2`, and one edge, `e1`.  To begin, let's assign unique ID numbers to the cells of `G` (see table below).
 
 **Debugging  tip** ID numbers must be assigned in ascending order with respect to the dimension of cells (e.g. cells of dimension 0 receive lower id numbers than cells of dimension 1). **
 
@@ -137,7 +161,8 @@ julia> D = [0 0 1; 0 0 1; 0 0 0]
  0  0  1
  0  0  0
 ```
-Suppose that *G* is the last in a nested sequence of graphs `G1, G2, G3` where `G1` is just the vertex `v1` and `G2` is the (unconnected) pair of vertices `v1, v2`.  Suppose that `G1`, `G2`, and `G3` appear at times `t1 =0.01`, `t2 =0.02`, and `t3 =0.3`, respectively.  Then
+Suppose that *G* is the last in a nested sequence of graphs `G1, G2, G3` where `G1` is just the vertex `v1` and `G2` is the (unconnected) pair of vertices `v1, v2`.  Suppose that `G1`, `G2`, and `G3` appear at times `t1 =0.01`, `t2 =0.02`, and `t3 =0.03`, respectively.  Then
+
 ```
 i = cell id number   |   fv[i]   |   dv[i]   |   ev[i]   |   dp[i]   |   rv[i]   |   cp[i]   |
 ----------------------------------------------------------------------------------------------
@@ -158,14 +183,15 @@ rv = [1,2]
 cp = [1,1,3]
 ```
 
-### General formats
+### 1. General formats
+
 
 **Debugging Tip** Julia is ***1-indexed***.  For an example, `v[1]` is the first entry of a list or vector `v`.  Thus, when assigning unique ID numbers to cells, numbering should start at 1, not 0.
 
 There are several ways to format the data of a cell complex `E`.  Here are the main ingredients.
 
 * number the cells `1, ..., N` in ascending order, according to dimension
-* let `D` be the `N x N` zero/one matrix with `D[i,j] = 1` iff `i` is a face of cell `j`
+* let `D` be the `N x N` zero/one matrix with `D[i,j] = 1` iff `i` is a codimension-1 face of cell `j`
 * define vectors `rv` and `cp` by the following procedure (see Julia documentation for a more direct interpretation)
 ```
 julia> S  = sparse(D)
@@ -185,7 +211,7 @@ If in addition we have a nested sequence of complexes `E_0 ≤ ... ≤ E_n = E`
 
 
 
-### Sparse column format
+### 2. Sparse column format
 
 Eirene has a keyword argument for every vector defined in the general formatting section.  In the example below, you can substitute either `ev = ev` or `dp=dp` in place of `dv=dv`.  Eirene only needs one of the three.
 
@@ -197,18 +223,19 @@ julia> C = eirene(rv=rv,cp=cp,dv=dv,fv=fv)
 
 
 
-### Simple format (from file)
+### 3. Simple format (from file)  
 
-This format is handy if you need to proof read, or write files by hand.
+####   ideal for beginners //  well suited to small, hand-written data // slow for big data
+This format is handy if you want to write files by hand, or if you need to visually proof-read your data to make sure it's formatted correctly.  Large files with this format can take a long time to load (in fact, much longer than the persistence computation itself), so if you experiene performance issues, please consider another input format.  Recall that rows must be arranged in **sorted according to dimension**.  In practice, this means that the entries in the first column should increase from top to bottom.
 
 ```
-dv[1], fv[1], <all id #'s for the faces of cell 1, separated by commas>
-dv[2], fv[2], <all id #'s for the faces of cell 1, separated by commas>
+dv[1], fv[1], <id #'s for the codimension-1 faces of cell 1, separated by commas>
+dv[2], fv[2], <id #'s for the codimension-1 faces of cell 2, separated by commas>
 ...
-dv[N], fv[N], <all id #'s for the faces of cell 1, separated by commas>
+dv[N], fv[N], <id #'s for the codimension-1 faces of cell N, separated by commas>
 ```
 
-***Example file***  For our example space, this file would take form:
+***Example***  For our example space, the file would take form:
 
 ```
 0, 0.01
@@ -216,7 +243,7 @@ dv[N], fv[N], <all id #'s for the faces of cell 1, separated by commas>
 1, 0.03, 1, 2
 ```
 
-***Example computation***  If this file is saved as `Users/Adam/ez.csv`, then to compute PH call
+If this file is saved as `Users/Adam/ez.csv`, then to compute PH call
 
 ```
 julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="sp")
@@ -224,7 +251,8 @@ julia> C = eirene("Users/Adam/complex.csv",model="complex",entryformat="sp")
 
 
 
-### Sparse column format (from file)
+
+### 4. Sparse column format (from file)
 
 You can store `E` as a comma separated .txt or .csv file with four lines
 
@@ -312,6 +340,24 @@ julia> plotbarcode_pjs(C, dim=k)
 * A class that never dies will appear as red dot on the diagonal at the time of its birth.
 * Hovering the cursor over a point in the persistence diagram will show a message with its precise Euclidean coordinates (birth and death times) and two additional pieces of information:  `class` and `size`.  Variable `class` is an integer.  If `class = p`, then the point where the cursor is hovering represents the birth/death time of `p`th persistent homology class in Eirene's list.  It is born at time `A[p,1]` and dies at time `A[p,2]`.  Variable `size` is also an integer.  It is the number of cells in the cycle representative Eirene computed for this persistent homology class (since Eirene computes homology over the two element field, we always refer to vectors by their support).
 * `class` and `size` can be displayed permanently, without the need to hover a cursor, via the keyword argument `showlabels = true`.
+
+### `q,p`-Wasserstein distances between diagrams
+
+Given two persistence diagrams`X` and `Y`, the `q,p`-Wasserstein Distance `W_{q,p}(X,Y)` between them is defined as
+
+```
+W_{q,p}(X,Y) := (\inf_{bijections s: X \to Y} \Sigma_{x \in X} ||x - s(x)||_p^q)^(1/q).
+```
+
+To compute the q,p-Wasserstein distance between a pair of persistence diagrams, dgm1 and dgm2, run:
+
+```
+julia> wasserstein_distance(dgm1, dgm2, q=q, p=p)
+```
+
+* Keyword `p` defaults to 2.
+* Keyword `q` defaults to p.
+
 
 ### Representatives
 

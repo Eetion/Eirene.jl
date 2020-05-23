@@ -4,7 +4,7 @@
 # Eirene.  If not, please see <http://www.gnu.org/licenses/>.
 #
 # Eirene Library for Homological Algebra
-# Copyright (C) 2016, 2017, 2018, 2019  Gregory Henselman
+# Copyright (C) 2016, 2017, 2018, 2019, 2020  Gregory Henselman
 # www.gregoryhenselman.org
 #
 # Eirene is free software: you can redistribute it and/or modify
@@ -39,7 +39,6 @@ using Distances
 using JLD
 using Blink
 using PlotlyJS
-using Plotly
 using MultivariateStats
 using Colors
 using SparseArrays
@@ -48,6 +47,17 @@ using Dates
 using Statistics
 using DelimitedFiles
 using CSV
+using Hungarian #added for the Wasserstein distances
+
+##########################################################################################
+
+#### 	USER TEST FUNCTION
+
+##########################################################################################
+
+function example_function()
+	print("Welcome to Eirene!  Great job running the example function.")
+end
 
 
 ##########################################################################################
@@ -80,7 +90,8 @@ export 	eirene,
 		plane2torus,
 		zerodrandmat,
 		ezlabel,
-		unittest
+		unittest,
+		wasserstein_distance #this is in "wassterstein_distances.jl"
 
 ##########################################################################################
 
@@ -1343,7 +1354,7 @@ function persistf2vr(
 	t 			= 	(1+maximum(t)).-t
 	ocg2rad 	= 	reverse(ocg2rad,dims=1)
 
-	if 	any(d.>maxrad)
+	if 	any(d.>maxrad_alt)
 		t 		= 	t.-1
 		deleteat!(ocg2rad,1)
 	end
@@ -1469,7 +1480,7 @@ end
 
 # possible values for toprow: dp, dv, ev
 function cscfilepath2unsegmentedfilteredcomplex(fp;toprow="dp")
-	M 				= 	CSV.read(fp,header=0)
+	M 				= 	CSV.read(fp,header=0,silencewarnings=true)
 	nemo 			=	Array{Any}(M[:,1])
 
 	#	a zero operator // empty complex, formatted by [dv, ev]
@@ -1538,7 +1549,7 @@ function cscfilepath2unsegmentedfilteredcomplex(fp;toprow="dp")
 end
 
 function humanreadablefilepath2unsegmentedfilteredcomplex(fp)
-	M 					= 	CSV.read(fp,header=0)
+	M 					= 	CSV.read(fp,header=0,silencewarnings=true)
 	M 					= 	convert(Matrix{Float64},M)
 	m 					= 	size(M,1)
 
@@ -1587,6 +1598,10 @@ end
 function unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ncd=Inf)
 	# ncd stands for number of chain dimensions
 	# nsd stands for number of stored dimensions
+	# this function returns a segmented complex with data for the first ncd
+	# dimensions (the others are not included in the output); the output takes
+	# the form of four length-ncd arrays
+
 	nsd 	= 	length(dp)-1
 	if ncd == Inf
 		ncd  	= nsd
@@ -1612,7 +1627,13 @@ function unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ncd=Inf
 		fvc[p] 		=	zeros(Int64,0)
 	end
 
-	dpc 			= vcat(dp,fill(dp[end],ncd+1-length(dp))) # extend dp to the proper length
+	if length(dp) 	>	ncd+1
+		dpc			=	copy(dp[1:ncd+1])
+	elseif length(dp)<  ncd+1
+		dpc 		=	vcat(dp,fill(dp[end],ncd+1-length(dp))) # extend dp to the proper length
+	else
+		dpc 		=	copy(dp)
+	end
 	return rvc,cpc,fvc,dpc
 end
 
@@ -4524,10 +4545,11 @@ function barname2cyclename(D::Dict,barnumber = [1];dim = 1)
 end
 
 function getbetticurve(D::Dict,sd;ocf = false)
+	# NB: sd = (homology dimension)+2
 	# NB: D["ocg2rad"]: {grains > 0} --> rad
 	# NB: the ocf barcode takes values in [0, #{grains}-1]
 
-	if length(D["farfaces"][sd])==0
+	if complexrank(D,dim=sd-2) ==0
 		return Array{Float64}(undef,0,2)
 	end
 
@@ -4541,8 +4563,14 @@ function getbetticurve(D::Dict,sd;ocf = false)
 	bco = convert(Array{Int64},bco)
 
 	for i = 1:size(bco,1)
-		ran = 1+ (bco[i,1]:(bco[i,2]-1))
-		v[ran]+=1
+		#try
+		ran = 1 .+ (bco[i,1]:(bco[i,2]-1))
+		v[ran] = v[ran] .+ 1
+		#catch e
+		#	println(v[ran])
+		#	println(bco[i,1]:(bco[i,2]-1))
+		#	error(e)
+		#end
 	end
 
 	if ocf == false
@@ -5100,7 +5128,7 @@ function barcode(D::Dict;dim = 1,ocf = false)
 		bc[finran] 			= 	D["ocg2rad"][bcc[finran]]
 		bc[evergrran,2]    .= 	Inf
 	else
-		bc 					= 	length(D["ocg2rad"])-bc
+		bc 					= 	length(D["ocg2rad"]).-bc
 	end
 
 	return bc
@@ -5321,14 +5349,6 @@ function classrep_pjs(
 		cloudedges_orderverts = vetexinverter[cloudedges]
 	end
 
-	##############################################################################################
-	# WAYPOINT 1
-	# printval(coords,"coords")
-	# printval(coords==coords,"coords==coords")
-	# printval(D["input"]["pc"] == "n/a","D[\"input\"][\"pc\"] == \"n/a\"")
-	# printval(D["input"]["pc"],"D[\"input\"][\"pc\"]")
-##############################################################################################
-
 	if coords == []
 		if D["input"]["pc"] == "n/a"
 			print("No point cloud is available.  Please consider using the mds keyword argument to generate a Euclidean embedding from the distance matrix (see documentation).")
@@ -5367,7 +5387,7 @@ function classrep_pjs(
 				metricmatrix = hopdistance(edges_orderverts,inputis = "edges")
 			end
 		end
-		coords = classical_mds(metricmatrix,embeddingdim)
+		coords = transform(fit(MDS, float.(metricmatrix), maxoutdim = embeddingdim, distances=true)) #classical_mds(metricmatrix,embeddingdim)
 		# coords = round.(coords,10)
 		model = "pc"
 	end
@@ -5422,7 +5442,22 @@ function classrep_pjs(
 	if showedges
 		faces = classrep(D,dim=dim,class=class)
 		edges = d1faces(faces)
-		T3 =  edgetrace_pjs(coords,edges,model=model	)
+		if showcloud
+			T3 =  edgetrace_pjs(coords,edges,model=model	)
+		else
+			# by default vertices in the edge list index into the original
+			# point cloud; if we're not showing the ambient cloud, then we have
+			# by this point deleted the "irrelevant" columns from the coordinate
+			# matrix, which changes the indices.  padding with zeros corrects
+			# for this difference
+			# note that for design reasons we re-defined classvinoldspace above,
+			# so must re-define it
+			classvinoldspace_original = D["nvl2ovl"][classvinnewspace]
+			coords_padded = zeros(size(coords,1),maximum(classvinoldspace_original))
+			coords_padded[:,classvinoldspace_original] = coords
+			T3 =  edgetrace_pjs(coords_padded,edges,model=model	)
+		end
+
 		append!(data,T3)
 	end
 
@@ -6317,7 +6352,7 @@ function hopdistance_sparse(rv,cp)
 			fringelist = findall(fringenodes)
 			fringenodes[:].= false
 		end
-		H[.!metnodes,i]=m+1
+		H[.!metnodes,i].=m+1
 	end
 	return H
 end
@@ -7504,7 +7539,7 @@ function unittest()
 
 	numits 	= 	5
 	maxdim 	= 	2
-	x 		= 	Array{Any}(undef,19)
+	x 		= 	Array{Any}(undef,24)
 
 	x[1] 	= 	eirenevrVperseusvr() 					# correct answer: empty
 	x[2] 	= 	eirenevrVeirenepc(numits,maxdim) 		# correct answer: empty
@@ -7525,13 +7560,18 @@ function unittest()
 	x[17]	= 	checkbuildcomplex3_diagentries(numits) 	# correct answer: empty
 	x[18] 	= 	checktrueordercanonicalform(numits) 	# correct answer: empty
 	x[19]	= 	checkloadfile()							# correct answer: empty
+	x[20]   =   wd_test_1()								# correct answer: empty
+	x[21]   =   wd_test_2()								# correct answer: empty
+	x[22]   =   wd_test_3()								# correct answer: empty
+	x[23] 	= 	wd_test_4()								# correct answer: empty
+	x[24]	=	wd_test_5()								# correct answer: empty
 
 	for p 	= 	1:length(x)
 		if !isempty(x[p])
+			println(p)
 			return x
 		end
 	end
-
 	return []
 end
 
@@ -9283,4 +9323,8 @@ function barcode_perseus(D;dim=1)
 	end
 end
 
+###### Adding Wasserstein distances between persistence diagrams ##########
+
+include("wasserstein_distances.jl")
+#print("included wasserstein")
 end # module
