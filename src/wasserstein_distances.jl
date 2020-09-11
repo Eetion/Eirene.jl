@@ -139,7 +139,7 @@ function dist_mat(v1,v2; p = 2)
 	else
 		for i in 1:n1
 			for j in 1:n2
-				cost[i,j]= (abs(v1[i,1]-v2[i,1])^p +(abs(v1[i,2]-v2[i,2])^p)^(1/p))
+				cost[i,j]= (abs(v1[i,1]-v2[j,1])^p +(abs(v1[i,2]-v2[j,2])^p)^(1/p))
 			end
 		end
 		for i in 1:n1
