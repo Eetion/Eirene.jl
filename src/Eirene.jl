@@ -5735,6 +5735,58 @@ function chain_to_index(C::Dict, chain)
 	return chain_idx
 end
 
+function checksimplex2index()
+    pc =  rand(3,50)
+    C  =  eirene(pc, model="pc")
+
+    ### Test a 1-simplex
+    dim = 1
+    # number of 1-simplices
+    n = last(C["firstv"][dim+1])-1
+    idx = rand(1:n)
+
+    # find simplex as a list of vertices (vertex labeling according to original input)
+    simplex = incidentverts(C["farfaces"], C["firstv"], dim+1,[idx])
+    simplex = sort(C["nvl2ovl"][simplex])
+
+    # find simplex index using "simplex_to_index" function
+    v_perm = get_vertex_perm(C)
+    simplex_eirene = sort([v_perm[i] for i in simplex])
+    simplex_idx = simplex_to_index(C, simplex_eirene)
+
+    # check that simplex_idx equals idx
+    if simplex_idx == idx
+        return zeros(Int64,0)
+    else
+        return false
+    end
+end
+
+function checkchain2index()
+    pc = rand(3,50)
+    C = Eirene.eirene(pc, model="pc")
+
+    dim = 1
+    # number of 1-simplices
+    n = last(C["firstv"][dim+1])-1
+    # select a random 1-chain
+    chain = rand(1:n,5)
+    #chain = Eirene.classrep_cells(C, dim=dim, class=1) 
+
+    # express the chain as [simplex_1, ... , simplex_k], 
+    # where each simplex_i = [i_0, ..., i_n] is a list of vertices for simplex_i.  
+    # the vertices i_0, ..., i_n are indexed (labeled) according to input. 
+    chain_v = [incidentverts(C["farfaces"],C["firstv"],dim+1,[item]) for item in chain]
+    chain_v = [sort(C["nvl2ovl"][item]) for item in chain_v]
+
+    # test the function "chain_to_index" 
+    chain_test = chain_to_index(C, chain_v)
+    if chain_test == chain
+        return zeros(Int64, 0)
+    else
+        return false
+    end
+end
 
 ##########################################################################################
 
@@ -7690,6 +7742,8 @@ function unittest()
 	x[22]   =   wd_test_3()								# correct answer: empty
 	x[23] 	= 	wd_test_4()								# correct answer: empty
 	x[24]	=	wd_test_5()								# correct answer: empty
+	x[25]	=	checksimplex2index()					# correct answer: empty
+	x[26]	=	checkchain2index()						# correct answer: empty
 
 	for p 	= 	1:length(x)
 		if !isempty(x[p])
