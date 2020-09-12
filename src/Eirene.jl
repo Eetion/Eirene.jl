@@ -5536,6 +5536,10 @@ function plotbetticurve_pjs(D::Dict;dim=1,ocf = false)
 	PlotlyJS.plot(T,L)
 end
 
+
+
+
+
 ##########################################################################################
 
 ####	BARCODE PLOTTING
@@ -5610,6 +5614,127 @@ function plotbarcode_pjs(C::Dict; dim = 0:C["input"]["maxdim"], sortby = "birth"
          yaxis = attr(rangevar = [0,y+0.1], showgrid=false, ticks = false))
          return PlotlyJS.plot(traces[end:-1:1], layout)
 end
+
+
+##########################################################################################
+
+####	Rewriting an arbitray chain in terms of Eirene index 
+
+##########################################################################################
+
+"""
+Given an n-chain chain = [simplex_1, simplex_2, ... , simplex_k],
+where each simplex_j = [j_0, ... ,j_n], a list of its (n+1) vertices,
+rewrite the chain as a list of integers [i_1, ..., i_k], 
+where each i_j is the index of simplex_j in according to Eirene. 
+"""
+
+function get_vertex_perm(C::Dict)
+	# Find the map between input vertex labeling and Eirene labeling
+    """
+    --- input ---
+	C: (dict) output from Eirene
+	
+    --- output ---
+    v_perm: (arr) v_perm[k] = i, where k: original vertex index, and i: corresponding Eirene index.
+            ex) If C = Eirene(distance_matrix), then vertex "k" corresponds to the kth row/column of distance_matrix.
+    """
+    n_vertices = size(C["nvl2ovl"],1) 
+    v_perm = zeros(Int64,n_vertices)
+	for i=1:n_vertices
+		# find index of i in C["nvl2ovl"]
+        idx = findall(x->x==i, C["nvl2ovl"])[1]
+        v_perm[i] = idx
+    end
+    return v_perm
+end
+
+function simplex_to_index(C::Dict, simplex)
+	# Given a n-simplex [v_1, v_2, ... , v_{n+1}], where each v_i is Eirene-indexed, 
+	# find the index of simplex in C.
+    
+    """
+	--- input ---
+	C (dict): output from Eirene
+	simplex (arr) : [v_1, v_2, ... , v_{n+1}], where each v_i is indexed according to Eirene.
+					note: v_1 < v_2 < ... < v_{n+1}, and n >= 1
+    --- output ---
+    index (int): index of given simplex in C_n according to C.
+
+    --- example use ---
+    1. get vertex labeling permutation
+    	v_perm = get_vertex_perm(C)
+    2. rewrite simplex according to Eirene's indexing of vertices 
+    	simplex_old = [1, 2, 3]  :vertices 1, 2, 3 are according to the input labeling
+    	simplex = sort([v_perm[i] for i in simplex_old])
+    3. find simplex index
+    	simplex_to_index(C, simplex)
+	""" 
+	# Proceed by finding the indices of [v_n, v_{n+1}], [v_{n-1}, v_n, v_{n+1}], ..., simplex
+	dim = size(simplex,1) - 1
+	sub_index = last(simplex) #v_{n+1}
+
+	for i in dim:-1:1
+		# find index of simplex [v_i, v_{i+1}, ... , v_{n+1}]
+		sub_simplex = simplex[i:end]
+		sub_dim = size(sub_simplex,1)-1
+
+		# find the portion of row-indices for column v_i
+    	rowvals = crows(C["firstv"][sub_dim+1], C["farfaces"][sub_dim+1], sub_simplex[1])
+
+		# if sub_simplex is 1-dimensional
+		if sub_dim == 1
+			rowloc = findfirst(x->x==sub_simplex[2], rowvals)
+		
+		# if sub_simplex has dimension > 1
+		else
+			rowloc = findfirst(x->x==sub_index, rowvals)
+		end
+		
+		# find index of sub_simplex if possible, update sub_index
+		if rowloc != nothing
+			sub_index = C["firstv"][sub_dim+1][sub_simplex[1]] + rowloc - 1
+		else
+			print("Simplex ", sub_simplex, " does not exist")
+			return 
+		end	
+	end
+
+	return  sub_index
+end
+
+function chain_to_index(C::Dict, chain)
+    # Given an n-chain chain = [simplex_1, simplex_2, ... , simplex_k],
+	# where each simplex_j = [j_0, ... ,j_n], a list of its (n+1) vertices.
+	# The vertices j_i are indexed (labeled) according to input, and not Eirene labeling.
+    # Rewrite the chain as a list of integers [i_1, ..., i_k], 
+    # where each i_j is the index of simplex_j in C
+    
+    """
+    --- input ---
+    chain (arr) : [[1_0, ... , 1_n], [2_0, ..., 2_n], ... , [k_0, ..., k_n]]
+    C (dict): output from Eirene
+
+    --- output ---
+    chain_idx (arr): [i_1, ... ,i_k], where each i_j is the index of simplex_j according to C
+    """
+    # get permutation of vertices
+    v_perm = get_vertex_perm(C)
+
+    chain_idx = []
+    for simplex in chain
+		simplex_eirene = sort([v_perm[i] for i in simplex])
+		simplex_idx = simplex_to_index(C, simplex_eirene)
+		if simplex_idx != nothing
+			append!(chain_idx, simplex_idx)
+		else
+			print("chain doesn't exist at", simplex, simplex_eirene)
+			return 
+		end
+	end
+	return chain_idx
+end
+
 
 ##########################################################################################
 
