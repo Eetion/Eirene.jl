@@ -23,7 +23,8 @@ Janche Sang <br>
 Robert Short <br>
 Ann Sizemore <br>
 Primoz Skraba <br>
-Christopher Williams
+Christopher Williams <br>
+Hee Rhang (Iris) Yoon
 
 
 
@@ -500,7 +501,7 @@ adsurl = {http://adsabs.harvard.edu/abs/2016arXiv160600199H},
 
 Eirene.jl package for Homological Algebra
 
-Copyright (C) 2016, 2017, 2018  Gregory Henselman
+Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021  Gregory Henselman
 
 www.gregoryhenselman.org
 

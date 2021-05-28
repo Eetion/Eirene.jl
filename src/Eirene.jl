@@ -7717,7 +7717,7 @@ function unittest()
 
 	numits 	= 	5
 	maxdim 	= 	2
-	x 		= 	Array{Any}(undef,24)
+	x 		= 	Array{Any}(undef,26)
 
 	x[1] 	= 	eirenevrVperseusvr() 					# correct answer: empty
 	x[2] 	= 	eirenevrVeirenepc(numits,maxdim) 		# correct answer: empty
