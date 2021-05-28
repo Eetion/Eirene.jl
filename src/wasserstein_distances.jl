@@ -5,7 +5,9 @@ yossi.bokor@anu.edu.au					christopher.williams@anu.edu.au
 Mathematical Sciences Institute
 Australian National University
 =#
-
+using SharedArrays
+using Distributed
+using Hungarian
 
 ############# General functions used in main function 'wasserstein_distance' #############
 
@@ -70,7 +72,6 @@ function pad_infinite(u1,u2)
 				v1[n1+i,1] = v2[i,1]
 				#v1[n1+i,2] = z
 		end
-		################
 		for i = 1:n1
 			#z = (v1[i,1]+v1[i,2])/2
 			v2[n2+i,1] = v1[i,1]
@@ -82,47 +83,81 @@ function pad_infinite(u1,u2)
     	return v1,v2,n1,n2
 end
 
-function dist_mat(v1,v2,n1,n2; p = 2)
+function dist_mat(v1,v2; p = 2)
 
 		#=  Accepts two equal size vectors and their original lengths and finite values.Returns the minimal Lp distance of their persistence diagrams.  =#
 
-    #check vectors are of the same length
-    @assert size(v1) == size(v2)
+	##check vectors are of the same length
+	#@assert size(v1) == size(v2)
+	
+	#take the length of columns, note this is always bigger than 2.
+	n1 = size(v1,1)
+	n2 = size(v2,1)
+	
+	#set up cost matrix
+	cost = zeros(n1+n2,n1+n2)
 
-    #take the length of columns, note this is always bigger than 2.
-    n = size(v1)[1]
-
-    #set up cost matrix
-	cost = zeros(n,n)
-
-    #if l1 compute here in faster way.
-    if p == 1
-        for i = 1:n
-			for j in 1:n
-				cost[i,j] = abs(v1[i,1]-v2[j,1]) + abs(v1[i,2] - v2[j,2]) 
-			end
-        end
-
-	elseif p == Inf
-		for i = 1:n
-			for j in 1:n
-				cost[i,j] = maximum(broadcast(abs,v1[i,:]-v2[j,:]))
-			end
-        end
-    else
-        for i = 1:n
-			for j in 1:n
-				cost[i,j] = ((abs(v1[i,1]-v2[j,1])^p)+ abs(v1[i,2]-v2[j,2])^p)^(1/p)
+	#if l1 compute here in faster way.
+	if p == 1
+		for i in 1:n1
+			for j in 1:n2
+				cost[i,j]= abs(v1[i,1]-v2[j,1])+abs(v1[i,2]-v2[j,2])
 			end
 		end
-
-    end
-
-    #set distance between diagonal points to be 0.
-    #this could just not be calculated if not using broadcast.
-	cost[(n-n2+1):n,(n-n1+1):n] = zeros(n2,n1)
-	
-    return cost
+		for i in 1:n1
+			d = abs(v1[i,1]-sum(v1[i,:])/2)+abs(v1[i,2]-sum(v1[i,:])/2)
+			cost[i,(n2+1):(n2+n1)] = [d for i in 1:n1]
+		end
+		for i in 1:n2
+			d=abs(v2[i,1]-sum(v2[i,:])/2)+abs(v2[i,2]-sum(v2[i,:])/2)
+			cost[n1+i,1:n2]= [d for i in 1:n2]
+		end
+		for i in 1:n2
+			for j in 1:n1
+				cost[n1+i, n2+j] = 0
+			end
+		end
+	elseif p == Inf
+		for i in 1:n1
+			for j in 1:n2
+				cost[i,j]= maximum(broadcast(abs,v1[i,:]-v2[j,:]))
+			end
+		end
+		for i in 1:n1
+			d = maximum(broadcast(abs,v1[i,:].-sum(v1[i,:])/2))
+			cost[i,(n2+1):(n2+n1)] = [d for i in 1:n1]
+		end
+		for i in 1:n2
+			d = maximum(broadcast(abs,v2[i,:].-sum(v2[i,:])/2))
+			cost[n1+i,1:n2]= [d for i in 1:n2]
+		end
+		for i in 1:n2
+			for j in 1:n1
+				cost[n1+i, n2+j] = 0
+			end
+		end
+	else
+		for i in 1:n1
+			for j in 1:n2
+				cost[i,j]= (abs(v1[i,1]-v2[j,1])^p +(abs(v1[i,2]-v2[j,2])^p)^(1/p))
+			end
+		end
+		for i in 1:n1
+			d = (abs(v1[i,1]-sum(v1[i,:])/2)^p +(abs(v1[i,2]-sum(v1[i,:])/2)^p)^(1/p))
+			cost[i,(n2+1):(n2+n1)] = [d for i in 1:n1]
+		end
+		for i in 1:n2
+			d = (abs(v2[i,1]-sum(v2[i,:])/2)^p +(abs(v2[i,2]-sum(v2[i,:])/2)^p)^(1/p))
+			cost[n1+i,1:n2]= [d for i in 1:n2]
+		end
+		for i in 1:n2
+			for j in 1:n1
+				cost[n1+i, n2+j] = 0
+			end
+		end
+	end
+	cost[(n1+1):n1+n2,(n2+1):n1+n2] = zeros(n2,n1)
+	return cost
 
 end
 
@@ -132,7 +167,6 @@ function dist_inf(v1,v2; q = 2)
     returns the distance between their persitance diagrams.
     =#
 	n = size(v1)[1]
-	println(n)
 	#if the point (Inf,Inf) exists return Inf.
 	if any(i->(i==Inf), v1[:,1]) || any(i->(i==Inf), v2[:,1])
 
@@ -167,9 +201,16 @@ end
 
 function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 	
-	
-	u1 = vcat([0 0], dgm1) # this is to avoid issues with empty diagram parts
-	u2 = vcat([0 0], dgm2)
+	if size(dgm1,1) == 0
+		u1 = vcat([0 0], dgm1) # this is to avoid issues with empty diagram parts
+	else
+		u1 = copy(dgm1)
+	end
+	if size(dgm2, 1) == 0
+		u2 = vcat([0 0], dgm2)
+	else
+		u2 = copy(dgm2)
+	end
 	#=
 	takes two (possibly unequal size) vectors and calculates the W_(q,p)distance between their persistence diagrams. The default is that q=p=2
 	Can calculate lp distance between diagrams, l1 should be the fastest.
@@ -178,25 +219,22 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 	
 	#if no Inf is present in either vector calculate as normal.
 	if all(i->(i!=Inf), u1) && all(i->(i!=Inf), u2)
-		
-		v1,v2,n1,n2 = pad(u1,u2)
 	
-		cost = dist_mat(v1,v2,n1,n2,p=p)
-		
+		n1=size(u1,1)
+		n2=size(u2,1)
+		cost = dist_mat(u1,u2,p=p)
 		assignment = hungarian(cost)[1]
 	
 		if q == Inf
-			values = [cost[i, assignment[i]] for i in 1:(n1+n2)]
-			distance = maximum(values)
+			vals = [cost[i, assignment[i]] for i in 1:(n1+n2)]
+			distance = maximum(vals)
 			return distance
-	
 		else
 			distance = 0
 			for i in 1:length(assignment)
 				distance += cost[i, assignment[i]]^(q)
 			end
 			return distance^(1/q)
-	
 		end
 	
 	
@@ -232,12 +270,10 @@ function wasserstein_distance(dgm1,dgm2; p = 2,q=p)
 	
 
 			#calculate finite cost without self-reference.
-			
-			v1,v2,n1,n2 = pad(u_sort_1_1,u_sort_2_1)
-			
-			cost = dist_mat(v1,v2,n1,n2,p=p)
-			
-			
+			n1=size(u_sort_1_1,1)
+			n2=size(u_sort_2_1,1)
+			cost = dist_mat(u_sort_1_1,u_sort_2_1,p=p)
+
 			assignment = hungarian(cost)[1]
 		
 			if q == Inf
@@ -271,7 +307,7 @@ end
 
 ############# Tests #############
 
-# 
+#
 
 function wd_test_1()
 	val = wasserstein_distance([1 2], [1 2])
@@ -285,7 +321,7 @@ function wd_test_1()
 end
 
 function wd_test_2()
-	val = wasserstein_distance([1 2],[3 4], p=Inf )
+	val = wasserstein_distance([1 2],[3 4], p=Inf)
 	
     if val == 0.5
 	    return []
@@ -296,7 +332,7 @@ function wd_test_2()
 end
 
 function wd_test_3()
-    val = wasserstein_distance([1 2],[3 3.5],p=1,q=Inf )
+    val = wasserstein_distance([1 2],[3 3.5],p=1,q=Inf)
 
     if val == 1
 	    return []
