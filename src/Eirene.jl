@@ -4,7 +4,7 @@
 # Eirene.  If not, please see <http://www.gnu.org/licenses/>.
 #
 # Eirene Library for Homological Algebra
-# Copyright (C) 2016, 2017, 2018, 2019, 2020  Gregory Henselman
+# Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021  Gregory Henselman
 # www.gregoryhenselman.org
 #
 # Eirene is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@ module Eirene
 
 using Pkg
 using Distances
-using JLD
+using FileIO
 using Blink
 using PlotlyJS
 using MultivariateStats
@@ -3068,7 +3068,7 @@ end
 function worldexample()
 	a = readdlm("/Users/greghenselman/Desktop/citylonglat.csv",',',Float64,'\r')
 	d = latlon2sphere(a')
-	x = JLD.load("/Users/greghenselman/JuliaFiles/citysample3_copy.jld")
+	x = FileIO.load("/Users/greghenselman/JuliaFiles/citysample3_copy.jld2")
 	supp = x["supp"]
 	C = eirene(d[:,supp];model = "pc",maxdim=1,upperlim = 0.25,record="cyclerep")
 	return a,d,supp,C
@@ -7179,8 +7179,8 @@ function eirene_batchcsv(
 				record		=record,
 				pointlabels	=pointlabels,
 				verbose		=verbose)
-		savepath = "$(outputdirectory)/$(filename).jld"
-		JLD.save(savepath,"C",C)
+		savepath = "$(outputdirectory)/$(filename).jld2"
+		FileIO.save(savepath,"C",C)
 	end
 end
 
@@ -7517,9 +7517,10 @@ function testfp(s)
 	D 	= 	Dict(
 			"prsip" => joinpath(@__DIR__,"perseus/reservoir/input.txt"),
 			"prsop" => joinpath(@__DIR__,"perseus/reservoir/output"),
-			"prsjd" => joinpath(@__DIR__,"test/perseus/testdata.jld"), # peresus julian data
+			"prsjd" => joinpath(@__DIR__,"test/perseus/testdata.jld2"), # peresus julian data
+            "prsbn" => joinpath(@__DIR__,"test/perseus/perseusMac"), # perseus binary
 			"hantx" => joinpath(@__DIR__,"test/handcalc/testdata.txt"),
-			"hanjd" => joinpath(@__DIR__,"test/handcalc/testdata.jld"),
+			"hanjd" => joinpath(@__DIR__,"test/handcalc/testdata.jld2"),
 			"hsphr" => joinpath(@__DIR__,"test/handcalc/sphere.csv"),
 			"hempt" => joinpath(@__DIR__,"test/handcalc/empty.csv"),
 			"hstri" => joinpath(@__DIR__,"test/handcalc/skrabatriangle.csv"),
@@ -7599,17 +7600,18 @@ function checkdv(rv_ag,cp_ag,dv)
 	return []
 end
 
+# save some barcodes (computed by persesus) to compare with eirene outputs
 function saveperseustestdata()
 	E 					= 	generateperseusvrdata()
 	filepath			= 	testfp("prsjd")
-	JLD.save(filepath,"E",E)
+	FileIO.save(filepath,"E",E)
 end
 
 function eirenevrVperseusvr()
 	passtest 			= 	true
 
 	datapath 			=   Eirene.testfp("prsjd")
-	E 					= 	JLD.load(datapath)
+	E 					= 	FileIO.load(datapath)
 	E 					= 	E["E"]
 
 	for p 				= 	1:length(E)
@@ -7660,7 +7662,7 @@ function generateperseusvrdata()
 		stepsz			= 	stepsize,
 		nsteps			= 	numsteps,
 		# pointbirths		= 	birthtimes,
-		perseusfilepath = 	"/Users/gh10/a/c/j/gdc_agora/gdc_a_peresuswrappers/perseusMac"
+        perseusfilepath =   testfp("prsbn"),	
 		)
 
 		E 				= 	Dict(
@@ -8625,8 +8627,8 @@ end
 # reps.
 # function unittest()
 #
-# 	filepath 							= 	joinpath(@__DIR__,"testsolutions/testsolutions.jld")
-# 	K 									= 	JLD.load(filepath)			# K for "calibrate" (letter C was taken)
+# 	filepath 							= 	joinpath(@__DIR__,"testsolutions/testsolutions.jld2")
+# 	K 									= 	FileIO.load(filepath)			# K for "calibrate" (letter C was taken)
 # 	K									=  	K["K"]
 # 	errorindices						= 	Array{Any,1}(0)
 #
@@ -9065,10 +9067,10 @@ function savesolutions()
 	""")
 	K 	= 	generatecrosscheckdata_perseus()
 	manualcycleadditions(K)
-	filepath = joinpath(@__DIR__,"testsolutions/testsolutions.jld")
-	JLD.save(filepath,"K",K)
-	# JLD.save("/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/gdb_da_a_d_solns/gdb_da_a_dsoln_a.jld","K",K)
-	# JLD.save("/Users/greghenselman/Google Drive/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/gdb_da_a_d_solns/gdb_da_a_dsoln_a.jld","K",K)
+	filepath = joinpath(@__DIR__,"testsolutions/testsolutions.jld2")
+	FileIO.save(filepath,"K",K)
+	# FileIO.save("/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/gdb_da_a_d_solns/gdb_da_a_dsoln_a.jld2","K",K)
+	# FileIO.save("/Users/greghenselman/Google Drive/GregDirectory/julia_gd/gdb_eirene/gdb_data/gdb_da_a_calib/gdb_da_a_d_solns/gdb_da_a_dsoln_a.jld2","K",K)
 	return K
 end
 
@@ -9109,7 +9111,7 @@ function perseusjl(
 					fr						= 	false, # stands for full resolution; used only for "vr" model
 					scalefactor				= 	1,
 					pointbirths				= 	[],
-					perseusfilepath 		= 	"/Users/gh10/Google Drive/gregtaylorgoogledrive_nongooglefiles/GregDirectory/julia_gd/gdc_agora/gdc_a_peresuswrappers/perseusMac"
+                    perseusfilepath 		=   testfp("prsbn"),	
 					)
 
 	if in(model, ["perseusdistmat","perseusbrips"])
