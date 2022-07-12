@@ -4943,7 +4943,7 @@ function boundarymatrix(C;dim=1,rows="a",cols="a")
 		println("error: keyword argument <cols> contains an integer greater than the rank of the complex in dimension <dim>")
 		println()
 		return
-	elseif empteval(maximum,rows,0) > crc
+	elseif empteval(maximum,rows,0) > crr
 		println()
 		print("error: keyword argument <rows> contains an integer greater than the rank of the complex in dimension <dim-1>")
 		println()
