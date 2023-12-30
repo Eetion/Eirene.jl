@@ -1,6 +1,6 @@
 using Eirene
 using JLD
-using Base.Test
+using Test
 
 # @test 1 == 2 #(example syntax)
 # @test isempty(eirenevrVperseusvr())

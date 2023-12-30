@@ -47,6 +47,7 @@ using Dates
 using Statistics
 using DelimitedFiles
 using CSV
+using DataFrames
 using Hungarian #added for the Wasserstein distances
 
 ##########################################################################################
@@ -1480,7 +1481,7 @@ end
 
 # possible values for toprow: dp, dv, ev
 function cscfilepath2unsegmentedfilteredcomplex(fp;toprow="dp")
-	M 				= 	CSV.read(fp,header=0,silencewarnings=true)
+	M 				= 	CSV.read(fp, DataFrame, header=0,silencewarnings=true, ignoreemptyrows=false)
 	nemo 			=	Array{Any}(M[:,1])
 
 	#	a zero operator // empty complex, formatted by [dv, ev]
@@ -1532,8 +1533,9 @@ function cscfilepath2unsegmentedfilteredcomplex(fp;toprow="dp")
 
 	#	error
 	else
-		println("Error: please check formatting of input file.")
-		printval(xx,"missing values")
+        @error "Error: please check formatting of input file." nemo
+		#println("Error: please check formatting of input file.")
+		#printval(xx,"missing values")
 
 	end
 
@@ -1549,8 +1551,8 @@ function cscfilepath2unsegmentedfilteredcomplex(fp;toprow="dp")
 end
 
 function humanreadablefilepath2unsegmentedfilteredcomplex(fp)
-	M 					= 	CSV.read(fp,header=0,silencewarnings=true)
-	M 					= 	convert(Matrix{Float64},M)
+	M 					= 	CSV.read(fp, DataFrame, header=0,silencewarnings=true)
+    M 					= 	Matrix{Union{Float64,Missing}}(M)
 	m 					= 	size(M,1)
 
 	dv 					= 	Array{Int64}(M[:,1])
@@ -1618,7 +1620,7 @@ function unsegmentedfilteredcomplex2segmentedfilteredcomplex(rv,cp,fv,dp;ncd=Inf
 	for p = 1:m
 		rvc[p],cpc[p]   = 	copycolumnsubmatrix(rv,cp,cran(dp,p))
 		rvc[p]			= 	rvc[p] .- (ec(dp,p-1,1) - 1)  # we subtract off the number of cells of dimension 2 less than those of interest, since starts the _faces_ of the cells of interest off at index 1; we get away with this in dimension 0 bc rvc[1] is the empty set
-		fvc[p] 			=   convert(Array{Float64,1},fv[cran(dp,p)])
+		fvc[p] 			=   Array{Float64,1}(fv[cran(dp,p)])
 	end
 
 	for p = (m+1):(ncd)
@@ -6329,11 +6331,11 @@ function separatelabels(s,side)
 end
 
 function csvreadrow(fp;row=1,rowtype=Float64)
-	M 					=	CSV.read(fp,header=0,skipto=row,limit=1)
+	M 					=	CSV.read(fp, DataFrame, header=0,skipto=row,limit=1)
 	if rowtype 			==	nothing
 		return M
 	else
-		M 				=	convert(Matrix{rowtype},M)
+		M 				=	Matrix{rowtype}(M)
 		M 				=	vec(M)
 		return M
 	end
@@ -7345,7 +7347,7 @@ function eirene_batchcsv(
 	for i = 2:length(filenames)
 		filename = filenames[i]
 		filepath = "$(inputdirectory)/$(filename)"
-		C = eirene(CSV.read(filepath),
+		C = eirene(CSV.read(filepath, DataFrame),
 				maxdim 		=maxdim,
 				model		=model,
 				entryformat	=entryformat,
